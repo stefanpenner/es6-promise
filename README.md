@@ -1,6 +1,6 @@
 # RSVP.js
 
-RSVP.js provides simple tools for organize asynchronous code.
+RSVP.js provides simple tools for organizing asynchronous code.
 
 Specifically, it is a tiny implementation of Promises/A and a
 mixin for turning objects into event targets.
