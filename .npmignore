@@ -1,0 +1,6 @@
+/.jshintrc
+/.npmignore
+/browser/
+/node_modules/
+/Rakefile
+/tests/
