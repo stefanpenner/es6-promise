@@ -39,7 +39,7 @@ if (typeof process !== 'undefined') {
   };
 }
 
-RSVP.async = async;
+exports.async = async;
 
 var Event = exports.Event = function(type, options) {
   this.type = type;
@@ -184,7 +184,7 @@ Promise.prototype = {
   },
 
   resolve: function(value) {
-    RSVP.async(function() {
+    exports.async(function() {
       this.trigger('promise:resolved', { detail: value });
       this.isResolved = value;
     }, this);
@@ -194,7 +194,7 @@ Promise.prototype = {
   },
 
   reject: function(value) {
-    RSVP.async(function() {
+    exports.async(function() {
       this.trigger('promise:failed', { detail: value });
       this.isRejected = value;
     }, this);
