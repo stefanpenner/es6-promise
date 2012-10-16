@@ -59,7 +59,7 @@ var getJSON = function(url) {
   client.setRequestHeader("Accept", "application/json");
 
   function handler() {
-    if (this.readyState = this.DONE) {
+    if (this.readyState === this.DONE) {
       if (this.status === 200) { promise.resolve(this.response); }
       else { promise.reject(this); }
     }
