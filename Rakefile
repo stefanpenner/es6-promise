@@ -35,7 +35,7 @@ task :prepare_tests => "promise-tests/lib/adapters/rsvp.js"
   task :prepare_tests => test
 end
 
-task :test do
+task :test => :prepare_tests do
   cd "promise-tests" do
     sh "./node_modules/mocha/bin/mocha lib/promises-a.js lib/always-async.js lib/resolution-races.js lib/returning-a-promise.js --reporter spec"
   end
