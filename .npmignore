@@ -2,5 +2,6 @@
 /.npmignore
 /browser/
 /node_modules/
+/promise-tests/
 /Rakefile
 /tests/
