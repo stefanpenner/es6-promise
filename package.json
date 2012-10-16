@@ -1,0 +1,26 @@
+{
+  "name": "rsvp",
+  "version": "1.0.0",
+  "description": "A lightweight library that provides tools for organizing asynchronous code",
+  "main": "lib/rsvp.js",
+  "directories": { "lib": "lib" },
+  "devDependencies": {
+    "jshint": "~0.9"
+  },
+  "scripts": {
+    "test": "rake",
+    "lint": "jshint lib"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/tildeio/rsvp.js.git"
+  },
+  "bugs": { "url": "https://github.com/tildeio/rsvp.js/issues" },
+  "keywords": [
+    "promises",
+    "futures",
+    "events"
+  ],
+  "author": "Tilde, Inc.",
+  "license": "MIT"
+}
