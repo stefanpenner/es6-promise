@@ -15,17 +15,17 @@ exports.rejected = function(error) {
 };
 
 exports.pending = function () {
-    var promise = new Promise();
+  var promise = new Promise();
 
-    return {
-        promise: promise,
-        fulfill: function(value) {
-          promise.resolve(value);
-        },
-        reject: function(error) {
-          promise.reject(error);
-        }
-    };
+  return {
+    promise: promise,
+    fulfill: function(value) {
+      promise.resolve(value);
+    },
+    reject: function(error) {
+      promise.reject(error);
+    }
+  };
 };
 
 exports.throws = true;
