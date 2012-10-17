@@ -5,10 +5,11 @@
   "main": "lib/rsvp.js",
   "directories": { "lib": "lib" },
   "devDependencies": {
-    "jshint": "~0.9"
+    "jshint": "~0.9",
+    "promise-tests": "2.0.0"
   },
   "scripts": {
-    "test": "rake",
+    "test": "promise-tests all ./tests/test-adapter",
     "lint": "jshint lib"
   },
   "repository": {
