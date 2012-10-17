@@ -1,6 +1,6 @@
-"use strict";
+'use strict';
 
-var Promise = require("../lib/rsvp").Promise;
+var Promise = require('../lib/rsvp').Promise;
 
 exports.fulfilled = function(value) {
   var promise = new Promise();
