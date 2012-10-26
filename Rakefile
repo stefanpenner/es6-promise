@@ -46,4 +46,8 @@ task :test => :update_tests do
   end
 end
 
-task :default => [:browser]
+task :browser_test => [:update_tests, :dist] do
+  sh "open tests/index.html"
+end
+
+task :default => :dist
