@@ -29,4 +29,21 @@ task :push => :dist do
   sh "git commit -m 'Updates build artifacts'"
 end
 
+file "promise-tests" do
+  sh "git clone https://github.com/domenic/promise-tests.git"
+end
+
+task :update_tests => "promise-tests" do
+  cd "promise-tests" do
+    sh "git pull"
+    sh "npm install"
+  end
+end
+
+task :test => :update_tests do
+  cd "promise-tests" do
+    sh "node ./lib/cli.js all ../tests/test-adapter.js"
+  end
+end
+
 task :default => [:browser]
