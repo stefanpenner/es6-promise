@@ -1,0 +1,13 @@
+{
+  "name": "rsvp.js",
+  "description": "A lightweight library that provides tools for organizing asynchronous code",
+  "keywords": [
+    "promise",
+    "deferred"
+  ],
+  "version": "1.0.0",
+  "scripts": [
+    "lib/rsvp.js"
+  ],
+  "repo": "tildeio/rsvp.js"
+}
