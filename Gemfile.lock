@@ -1,0 +1,18 @@
+GIT
+  remote: git://github.com/wycats/js_module_transpiler.git
+  revision: c2f2d529c2e45f32f6c71a5beaef23a75e8286e8
+  branch: master
+  specs:
+    js_module_transpiler (0.0.1)
+      thor
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    thor (0.16.0)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  js_module_transpiler!

@@ -3,7 +3,7 @@
 (function(global) {
   'use strict';
 
-  var Promise = require('../lib/rsvp').Promise;
+  var Promise = require('./rsvp').Promise;
   var adapter;
 
   if (typeof process !== 'undefined' && {}.toString.call(process) === '[object process]') {

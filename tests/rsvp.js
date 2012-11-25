@@ -1,3 +1,4 @@
+"use strict";
 var browserGlobal = (typeof window !== 'undefined') ? window : {};
 
 var MutationObserver = browserGlobal.MutationObserver || browserGlobal.WebKitMutationObserver;
@@ -38,7 +39,6 @@ if (typeof process !== 'undefined' &&
   };
 }
 
-export async;
 
 var Event = function(type, options) {
   this.type = type;
@@ -50,7 +50,6 @@ var Event = function(type, options) {
   }
 };
 
-export Event;
 
 var indexOf = function(callbacks, callback) {
   for (var i=0, l=callbacks.length; i<l; i++) {
@@ -135,7 +134,6 @@ var EventTarget = {
   }
 };
 
-export EventTarget;
 
 var Promise = function() {
   this.on('promise:resolved', function(event) {
@@ -147,7 +145,6 @@ var Promise = function() {
   }, this);
 };
 
-export Promise;
 
 var noop = function() {};
 
@@ -238,3 +235,7 @@ function reject(promise, value) {
 }
 
 EventTarget.mixin(Promise.prototype);
+exports.async = async;
+exports.Event = Event;
+exports.EventTarget = EventTarget;
+exports.Promise = Promise;

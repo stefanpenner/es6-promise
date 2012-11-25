@@ -1,16 +1,23 @@
+require "bundler/setup"
+require "js_module_transpiler"
+
 directory "browser"
 
 file "browser/rsvp.js" => ["browser", "lib/rsvp.js"] do
   library = File.read("lib/rsvp.js")
   open "browser/rsvp.js", "w" do |file|
-    file.puts "(function(exports) { #{library} })(window.RSVP = {});"
+    converter = JsModuleTranspiler::Compiler.new(File.read("./lib/rsvp.js"), "rsvp", into: "RSVP")
+    file.puts converter.to_globals
   end
 end
 
 file "browser/rsvp-amd.js" => ["browser", "lib/rsvp.js"] do
   library = File.read("lib/rsvp.js")
   open "browser/rsvp-amd.js", "w" do |file|
-    file.puts "define(function(require, exports, module) { #{library} });"
+    require "js_module_transpiler"
+
+    converter = JsModuleTranspiler::Compiler.new(File.read("./lib/rsvp.js"), "rsvp")
+    file.puts converter.to_amd
   end
 end
 
@@ -19,6 +26,16 @@ file "browser/rsvp.min.js" => "browser/rsvp.js" do
 
   open "browser/rsvp.min.js", "w" do |file|
     file.puts output
+  end
+end
+
+file "tests/rsvp.js" => "lib/rsvp.js" do
+  library = File.read("lib/rsvp.js")
+  open "tests/rsvp.js", "w" do |file|
+    require "js_module_transpiler"
+
+    converter = JsModuleTranspiler::Compiler.new(File.read("./lib/rsvp.js"), "rsvp")
+    file.puts converter.to_cjs
   end
 end
 
@@ -40,7 +57,7 @@ task :update_tests => "promise-tests" do
   end
 end
 
-task :test => :update_tests do
+task :test => [:update_tests, "tests/rsvp.js"] do
   cd "promise-tests" do
     sh "node ./lib/cli.js all ../tests/test-adapter.js"
   end
