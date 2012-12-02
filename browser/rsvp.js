@@ -3,7 +3,7 @@
   var browserGlobal = (typeof window !== 'undefined') ? window : {};
 
   var MutationObserver = browserGlobal.MutationObserver || browserGlobal.WebKitMutationObserver;
-  var async;
+  var RSVP, async;
 
   if (typeof process !== 'undefined' &&
     {}.toString.call(process) === '[object process]') {
@@ -40,7 +40,6 @@
     };
   }
 
-
   var Event = function(type, options) {
     this.type = type;
 
@@ -50,7 +49,6 @@
       this[option] = options[option];
     }
   };
-
 
   var indexOf = function(callbacks, callback) {
     for (var i=0, l=callbacks.length; i<l; i++) {
@@ -135,7 +133,6 @@
     }
   };
 
-
   var Promise = function() {
     this.on('promise:resolved', function(event) {
       this.trigger('success', { detail: event.detail });
@@ -145,7 +142,6 @@
       this.trigger('error', { detail: event.detail });
     }, this);
   };
-
 
   var noop = function() {};
 
@@ -182,13 +178,13 @@
       var thenPromise = new Promise();
 
       if (this.isResolved) {
-        async(function() {
+        rsvp.async(function() {
           invokeCallback('resolve', thenPromise, done, { detail: this.resolvedValue });
         }, this);
       }
 
       if (this.isRejected) {
-        async(function() {
+        rsvp.async(function() {
           invokeCallback('reject', thenPromise, fail, { detail: this.rejectedValue });
         }, this);
       }
@@ -220,7 +216,7 @@
   };
 
   function resolve(promise, value) {
-    async(function() {
+    rsvp.async(function() {
       promise.trigger('promise:resolved', { detail: value });
       promise.isResolved = true;
       promise.resolvedValue = value;
@@ -228,7 +224,7 @@
   }
 
   function reject(promise, value) {
-    async(function() {
+    rsvp.async(function() {
       promise.trigger('promise:failed', { detail: value });
       promise.isRejected = true;
       promise.rejectedValue = value;
@@ -236,8 +232,7 @@
   }
 
   EventTarget.mixin(Promise.prototype);
-  exports.async = async;
-  exports.Event = Event;
-  exports.EventTarget = EventTarget;
-  exports.Promise = Promise;
-})(window.RSVP = {});
+
+  RSVP = { async: async, Promise: Promise, Event: Event, EventTarget: EventTarget };
+  exports.RSVP = RSVP;
+})(window);

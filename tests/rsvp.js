@@ -2,7 +2,7 @@
 var browserGlobal = (typeof window !== 'undefined') ? window : {};
 
 var MutationObserver = browserGlobal.MutationObserver || browserGlobal.WebKitMutationObserver;
-var async;
+var RSVP, async;
 
 if (typeof process !== 'undefined' &&
   {}.toString.call(process) === '[object process]') {
@@ -39,7 +39,6 @@ if (typeof process !== 'undefined' &&
   };
 }
 
-
 var Event = function(type, options) {
   this.type = type;
 
@@ -49,7 +48,6 @@ var Event = function(type, options) {
     this[option] = options[option];
   }
 };
-
 
 var indexOf = function(callbacks, callback) {
   for (var i=0, l=callbacks.length; i<l; i++) {
@@ -134,7 +132,6 @@ var EventTarget = {
   }
 };
 
-
 var Promise = function() {
   this.on('promise:resolved', function(event) {
     this.trigger('success', { detail: event.detail });
@@ -144,7 +141,6 @@ var Promise = function() {
     this.trigger('error', { detail: event.detail });
   }, this);
 };
-
 
 var noop = function() {};
 
@@ -181,13 +177,13 @@ Promise.prototype = {
     var thenPromise = new Promise();
 
     if (this.isResolved) {
-      async(function() {
+      RSVP.async(function() {
         invokeCallback('resolve', thenPromise, done, { detail: this.resolvedValue });
       }, this);
     }
 
     if (this.isRejected) {
-      async(function() {
+      RSVP.async(function() {
         invokeCallback('reject', thenPromise, fail, { detail: this.rejectedValue });
       }, this);
     }
@@ -219,7 +215,7 @@ Promise.prototype = {
 };
 
 function resolve(promise, value) {
-  async(function() {
+  RSVP.async(function() {
     promise.trigger('promise:resolved', { detail: value });
     promise.isResolved = true;
     promise.resolvedValue = value;
@@ -227,7 +223,7 @@ function resolve(promise, value) {
 }
 
 function reject(promise, value) {
-  async(function() {
+  RSVP.async(function() {
     promise.trigger('promise:failed', { detail: value });
     promise.isRejected = true;
     promise.rejectedValue = value;
@@ -235,7 +231,6 @@ function reject(promise, value) {
 }
 
 EventTarget.mixin(Promise.prototype);
-exports.async = async;
-exports.Event = Event;
-exports.EventTarget = EventTarget;
-exports.Promise = Promise;
+
+RSVP = { async: async, Promise: Promise, Event: Event, EventTarget: EventTarget };
+module.exports = RSVP;

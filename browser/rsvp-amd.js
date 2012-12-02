@@ -1,11 +1,11 @@
 define("rsvp",
-  ["exports"],
-  function(__exports__) {
+  [],
+  function() {
     "use strict";
     var browserGlobal = (typeof window !== 'undefined') ? window : {};
 
     var MutationObserver = browserGlobal.MutationObserver || browserGlobal.WebKitMutationObserver;
-    var async;
+    var RSVP, async;
 
     if (typeof process !== 'undefined' &&
       {}.toString.call(process) === '[object process]') {
@@ -42,7 +42,6 @@ define("rsvp",
       };
     }
 
-
     var Event = function(type, options) {
       this.type = type;
 
@@ -52,7 +51,6 @@ define("rsvp",
         this[option] = options[option];
       }
     };
-
 
     var indexOf = function(callbacks, callback) {
       for (var i=0, l=callbacks.length; i<l; i++) {
@@ -137,7 +135,6 @@ define("rsvp",
       }
     };
 
-
     var Promise = function() {
       this.on('promise:resolved', function(event) {
         this.trigger('success', { detail: event.detail });
@@ -147,7 +144,6 @@ define("rsvp",
         this.trigger('error', { detail: event.detail });
       }, this);
     };
-
 
     var noop = function() {};
 
@@ -184,13 +180,13 @@ define("rsvp",
         var thenPromise = new Promise();
 
         if (this.isResolved) {
-          async(function() {
+          rsvp.async(function() {
             invokeCallback('resolve', thenPromise, done, { detail: this.resolvedValue });
           }, this);
         }
 
         if (this.isRejected) {
-          async(function() {
+          rsvp.async(function() {
             invokeCallback('reject', thenPromise, fail, { detail: this.rejectedValue });
           }, this);
         }
@@ -222,7 +218,7 @@ define("rsvp",
     };
 
     function resolve(promise, value) {
-      async(function() {
+      rsvp.async(function() {
         promise.trigger('promise:resolved', { detail: value });
         promise.isResolved = true;
         promise.resolvedValue = value;
@@ -230,7 +226,7 @@ define("rsvp",
     }
 
     function reject(promise, value) {
-      async(function() {
+      rsvp.async(function() {
         promise.trigger('promise:failed', { detail: value });
         promise.isRejected = true;
         promise.rejectedValue = value;
@@ -238,8 +234,7 @@ define("rsvp",
     }
 
     EventTarget.mixin(Promise.prototype);
-    __exports__.async = async;
-    __exports__.Event = Event;
-    __exports__.EventTarget = EventTarget;
-    __exports__.Promise = Promise;
+
+    RSVP = { async: async, Promise: Promise, Event: Event, EventTarget: EventTarget };
+    return RSVP;
   });

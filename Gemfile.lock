@@ -1,6 +1,6 @@
 GIT
   remote: git://github.com/wycats/js_module_transpiler.git
-  revision: c2f2d529c2e45f32f6c71a5beaef23a75e8286e8
+  revision: c9f0ada0f7b7ec654ddec25f4a1fb07bcf41c9f7
   branch: master
   specs:
     js_module_transpiler (0.0.1)
@@ -9,6 +9,7 @@ GIT
 GEM
   remote: https://rubygems.org/
   specs:
+    rake (10.0.2)
     thor (0.16.0)
 
 PLATFORMS
@@ -16,3 +17,4 @@ PLATFORMS
 
 DEPENDENCIES
   js_module_transpiler!
+  rake
