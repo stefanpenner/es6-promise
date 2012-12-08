@@ -180,13 +180,13 @@ define("rsvp",
         var thenPromise = new Promise();
 
         if (this.isResolved) {
-          rsvp.async(function() {
+          RSVP.async(function() {
             invokeCallback('resolve', thenPromise, done, { detail: this.resolvedValue });
           }, this);
         }
 
         if (this.isRejected) {
-          rsvp.async(function() {
+          RSVP.async(function() {
             invokeCallback('reject', thenPromise, fail, { detail: this.rejectedValue });
           }, this);
         }
@@ -218,7 +218,7 @@ define("rsvp",
     };
 
     function resolve(promise, value) {
-      rsvp.async(function() {
+      RSVP.async(function() {
         promise.trigger('promise:resolved', { detail: value });
         promise.isResolved = true;
         promise.resolvedValue = value;
@@ -226,7 +226,7 @@ define("rsvp",
     }
 
     function reject(promise, value) {
-      rsvp.async(function() {
+      RSVP.async(function() {
         promise.trigger('promise:failed', { detail: value });
         promise.isRejected = true;
         promise.rejectedValue = value;
