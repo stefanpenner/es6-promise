@@ -11,9 +11,9 @@ file "browser/rsvp.js" => ["browser", "lib/rsvp.js"] do
   end
 end
 
-file "browser/rsvp-amd.js" => ["browser", "lib/rsvp.js"] do
+file "browser/rsvp.amd.js" => ["browser", "lib/rsvp.js"] do
   library = File.read("lib/rsvp.js")
-  open "browser/rsvp-amd.js", "w" do |file|
+  open "browser/rsvp.amd.js", "w" do |file|
     require "js_module_transpiler"
 
     converter = JsModuleTranspiler::Compiler.new(File.read("./lib/rsvp.js"), "rsvp")
@@ -39,10 +39,10 @@ file "tests/rsvp.js" => "lib/rsvp.js" do
   end
 end
 
-task :dist => ["browser/rsvp.js", "browser/rsvp.min.js", "browser/rsvp-amd.js"]
+task :dist => ["browser/rsvp.js", "browser/rsvp.min.js", "browser/rsvp.amd.js"]
 
 task :push => :dist do
-  sh "git add browser/rsvp.js browser/rsvp.min.js browser/rsvp-amd.js"
+  sh "git add browser/rsvp.js browser/rsvp.min.js browser/rsvp.amd.js"
   sh "git commit -m 'Updates build artifacts'"
 end
 
