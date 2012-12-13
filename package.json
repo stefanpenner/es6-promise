@@ -6,7 +6,8 @@
   "directories": { "lib": "lib" },
   "devDependencies": {
     "jshint": "~0.9",
-    "promise-tests": "2.0.0"
+    "promise-tests": "2.0.0",
+    "uglify-js": "~2.2"
   },
   "scripts": {
     "test": "promise-tests all ./tests/test-adapter",
