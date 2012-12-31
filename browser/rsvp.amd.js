@@ -148,9 +148,10 @@ define("rsvp",
     var noop = function() {};
 
     var invokeCallback = function(type, promise, callback, event) {
-      var value, error, succeeded, failed;
+      var hasCallback = typeof callback === 'function',
+          value, error, succeeded, failed;
 
-      if (callback) {
+      if (hasCallback) {
         try {
           value = callback(event.detail);
           succeeded = true;
@@ -163,13 +164,13 @@ define("rsvp",
         succeeded = true;
       }
 
-      if (value instanceof Promise) {
+      if (value && typeof value.then === 'function') {
         value.then(function(value) {
           promise.resolve(value);
         }, function(error) {
           promise.reject(error);
         });
-      } else if (callback && succeeded) {
+      } else if (hasCallback && succeeded) {
         promise.resolve(value);
       } else if (failed) {
         promise.reject(error);
