@@ -46,20 +46,20 @@ task :push => :dist do
   sh "git commit -m 'Updates build artifacts'"
 end
 
-file "promise-tests" do
-  sh "git clone https://github.com/domenic/promise-tests.git"
+file "promises-tests" do
+  sh "git clone https://github.com/promises-aplus/promises-tests"
 end
 
-task :update_tests => "promise-tests" do
-  cd "promise-tests" do
+task :update_tests => "promises-tests" do
+  cd "promises-tests" do
     sh "git pull"
     sh "npm install"
   end
 end
 
 task :test => [:update_tests, "tests/rsvp.js"] do
-  cd "promise-tests" do
-    sh "node ./lib/cli.js all ../tests/test-adapter.js"
+  cd "promises-tests" do
+    sh "node ./lib/cli.js ../tests/test-adapter.js"
   end
 end
 

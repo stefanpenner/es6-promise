@@ -146,16 +146,19 @@
   var noop = function() {};
 
   var invokeCallback = function(type, promise, callback, event) {
-    var value, error;
+    var value, error, succeeded, failed;
 
     if (callback) {
       try {
         value = callback(event.detail);
+        succeeded = true;
       } catch(e) {
+        failed = true;
         error = e;
       }
     } else {
       value = event.detail;
+      succeeded = true;
     }
 
     if (value instanceof Promise) {
@@ -164,9 +167,9 @@
       }, function(error) {
         promise.reject(error);
       });
-    } else if (callback && value) {
+    } else if (callback && succeeded) {
       promise.resolve(value);
-    } else if (error) {
+    } else if (failed) {
       promise.reject(error);
     } else {
       promise[type](value);

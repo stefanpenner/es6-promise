@@ -11,6 +11,7 @@
       switch(name) {
         case "assert": return window.assert;
         case "sinon": return window.sinon;
+        case "./helpers/testThreeCases": return window.testThreeCases;
         case "./rsvp": return RSVP;
       }
     };
@@ -20,11 +21,19 @@
   <script src="mocha.js"></script>
   <script src="../browser/rsvp.js"></script>
   <script src="test-adapter.js"></script>
-  <script>mocha.setup('bdd')</script>
-  <script src="../promise-tests/lib/tests/promises-a.js"></script>
-  <script src="../promise-tests/lib/tests/always-async.js"></script>
-  <script src="../promise-tests/lib/tests/resolution-races.js"></script>
-  <script src="../promise-tests/lib/tests/returning-a-promise.js"></script>
+  <script>
+    var global = window;
+    var exports = testThreeCases = {};
+  </script>
+  <script src="../promises-tests/lib/tests/helpers/testThreeCases.js"></script>
+  <script>window.exports = undefined;</script>
+  <script>mocha.setup({ ui: 'bdd', timeout: 200 })</script>
+  <script src="../promises-tests/lib/tests/3.2.1.js"></script>
+  <script src="../promises-tests/lib/tests/3.2.2.js"></script>
+  <script src="../promises-tests/lib/tests/3.2.3.js"></script>
+  <script src="../promises-tests/lib/tests/3.2.4.js"></script>
+  <script src="../promises-tests/lib/tests/3.2.5.js"></script>
+  <script src="../promises-tests/lib/tests/3.2.6.js"></script>
   <script>
     mocha.run();
   </script>
