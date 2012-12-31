@@ -3,4 +3,7 @@
 /browser/
 /node_modules/
 /Rakefile
+/Gemfile
+/Gemfile.lock
 /tests/
+/promises-aplus-tests
