@@ -2,6 +2,7 @@ require "bundler/setup"
 require "js_module_transpiler"
 
 directory "browser"
+directory "node"
 
 file "browser/rsvp.js" => ["browser", "lib/rsvp.js"] do
   library = File.read("lib/rsvp.js")
@@ -18,6 +19,16 @@ file "browser/rsvp.amd.js" => ["browser", "lib/rsvp.js"] do
 
     converter = JsModuleTranspiler::Compiler.new(File.read("./lib/rsvp.js"), "rsvp")
     file.puts converter.to_amd
+  end
+end
+
+file "node/rsvp.js" => ["node", "lib/rsvp.js"] do
+  library = File.read("lib/rsvp.js")
+  open "node/rsvp.js", "w" do |file|
+    require "js_module_transpiler"
+
+    converter = JsModuleTranspiler::Compiler.new(File.read("./lib/rsvp.js"), "rsvp")
+    file.puts converter.to_cjs
   end
 end
 
@@ -39,7 +50,7 @@ file "tests/rsvp.js" => "lib/rsvp.js" do
   end
 end
 
-task :dist => ["browser/rsvp.js", "browser/rsvp.min.js", "browser/rsvp.amd.js"]
+task :dist => ["browser/rsvp.js", "browser/rsvp.min.js", "browser/rsvp.amd.js", "node/rsvp.js"]
 
 task :push => :dist do
   sh "git add browser/rsvp.js browser/rsvp.min.js browser/rsvp.amd.js"

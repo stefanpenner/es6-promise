@@ -9,3 +9,4 @@
 /tests/
 /promises-aplus-tests
 /promise-tests # for orphans left from earlier versions
+/lib

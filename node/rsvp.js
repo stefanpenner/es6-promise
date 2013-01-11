@@ -242,5 +242,5 @@ function reject(promise, value) {
 
 EventTarget.mixin(Promise.prototype);
 
-RSVP = { async: async, Promise: Promise, Event: Event, EventTarget: EventTarget };
+RSVP = { async: async, Promise: Promise, Event: Event, EventTarget: EventTarget, raiseOnUncaughtExceptions: true };
 module.exports = RSVP;

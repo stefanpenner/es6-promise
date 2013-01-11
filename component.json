@@ -7,7 +7,7 @@
   ],
   "version": "1.0.0",
   "scripts": [
-    "lib/rsvp.js"
+    "node/rsvp.js"
   ],
   "repo": "tildeio/rsvp.js"
 }

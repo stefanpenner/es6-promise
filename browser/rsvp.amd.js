@@ -245,6 +245,6 @@ define("rsvp",
 
     EventTarget.mixin(Promise.prototype);
 
-    RSVP = { async: async, Promise: Promise, Event: Event, EventTarget: EventTarget };
+    RSVP = { async: async, Promise: Promise, Event: Event, EventTarget: EventTarget, raiseOnUncaughtExceptions: true };
     return RSVP;
   });
