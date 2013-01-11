@@ -10,7 +10,7 @@ It works in node and the browser. You can get the browser build in
 
 ## Promises
 
-`RSVP.Promise` is an implementation of 
+`RSVP.Promise` is an implementation of
 [Promises/A](http://wiki.commonjs.org/wiki/Promises/A) that passes the
 [promises test suite](https://github.com/domenic/promise-tests) written
 by Domenic Denicola.
@@ -134,6 +134,27 @@ getJSON("/post/1.json").then(function(post) {
   // proceed with access to posts and comments
 }).then(null, function(error) {
   // handle errors in either of the two requests
+});
+```
+
+## Arrays of promises
+
+Sometimes you might want to work with many promises at once. If you
+pass an array of promises to the `all()` method it will return a new
+promise that will be fulfilled when all of the promises in the array
+have been fulfilled; or rejected immediately if any promise in the array
+is rejected.
+
+```javascript
+var postIds = [2, 3, 5, 7, 11, 13];
+var promises = [];
+
+for(var i = 0; i < postIds.length; i++) {
+	promises.push(getJSON("/post/" + postIds[i] + ".json"));
+}
+
+RSVP.all(promises).then(function(posts) {
+	// posts contains an array of results for the given promises
 });
 ```
 
