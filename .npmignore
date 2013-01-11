@@ -1,5 +1,6 @@
 /.jshintrc
 /.npmignore
+/bin
 /browser/
 /node_modules/
 /Rakefile
@@ -7,3 +8,4 @@
 /Gemfile.lock
 /tests/
 /promises-aplus-tests
+/promise-tests # for orphans left from earlier versions
