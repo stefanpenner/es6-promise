@@ -62,5 +62,12 @@ describe("RSVP extensions", function() {
         done();
       });
     });
+
+    specify('resolves an empty array passed to RSVP.all()', function(done) {
+      RSVP.all([]).then(function(results) {
+        assert(results.length === 0);
+        done();
+      });
+    });
   });
 });
