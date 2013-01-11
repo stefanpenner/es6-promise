@@ -283,4 +283,5 @@ function configure(name, value) {
 exports.Promise = Promise;
 exports.Event = Event;
 exports.EventTarget = EventTarget;
+exports.all = all;
 exports.configure = configure;

@@ -1,40 +1,43 @@
 /*global RSVP*/
 
-(function(global) {
-  'use strict';
+'use strict';
 
-  var Promise = require('./rsvp').Promise;
-  var adapter;
+var Promise;
 
-  if (typeof process !== 'undefined' && {}.toString.call(process) === '[object process]') {
-    adapter = exports;
-  } else {
-    global.adapter = adapter = {};
-  }
+if (typeof RSVP !== 'undefined') {
+  // Test the browser build
+  Promise = RSVP.Promise;
+} else {
+  // Test the Node build
+  var Promise = require('../node/rsvp').Promise;
+}
 
-  adapter.fulfilled = function(value) {
-    var promise = new Promise();
-    promise.resolve(value);
-    return promise;
+var adapter = {};
+
+adapter.fulfilled = function(value) {
+  var promise = new Promise();
+  promise.resolve(value);
+  return promise;
+};
+
+adapter.rejected = function(error) {
+  var promise = new Promise();
+  promise.reject(error);
+  return promise;
+};
+
+adapter.pending = function () {
+  var promise = new Promise();
+
+  return {
+    promise: promise,
+    fulfill: function(value) {
+      promise.resolve(value);
+    },
+    reject: function(error) {
+      promise.reject(error);
+    }
   };
+};
 
-  adapter.rejected = function(error) {
-    var promise = new Promise();
-    promise.reject(error);
-    return promise;
-  };
-
-  adapter.pending = function () {
-    var promise = new Promise();
-
-    return {
-      promise: promise,
-      fulfill: function(value) {
-        promise.resolve(value);
-      },
-      reject: function(error) {
-        promise.reject(error);
-      }
-    };
-  };
-})(this);
+module.exports = global.adapter = adapter;

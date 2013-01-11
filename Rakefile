@@ -52,6 +52,16 @@ end
 
 task :dist => ["browser/rsvp.js", "browser/rsvp.min.js", "browser/rsvp.amd.js", "node/rsvp.js"]
 
+directory "tests/tmp"
+
+test_files  = ["tests/test-adapter.js"]
+test_files += Dir["promises-tests/lib/tests/**/*.js"]
+test_files += Dir["promises-tests/node_modules/sinon/lib/{sinon.js,sinon/*.js}"]
+
+file "tests/tmp/test-bundle.js" => ["tests/tmp"].concat(test_files) do
+  sh "browserify #{test_files.join(" ")} > tests/tmp/test-bundle.js"
+end
+
 task :push => :dist do
   sh "git add browser/rsvp.js browser/rsvp.min.js browser/rsvp.amd.js"
   sh "git commit -m 'Updates build artifacts'"
@@ -68,14 +78,17 @@ task :update_tests => "promises-tests" do
   end
 end
 
+desc "Run the tests using Node"
 task :test => [:update_tests, "tests/rsvp.js"] do
   cd "promises-tests" do
     sh "node ./lib/cli.js ../tests/test-adapter.js"
   end
 end
 
-task :browser_test => [:update_tests, :dist] do
+desc "Run the tests using the browser"
+task :browser_test => [:update_tests, "tests/tmp/test-bundle.js", :dist] do
   sh "open tests/index.html"
 end
 
+desc "Build RSVP.js"
 task :default => :dist
