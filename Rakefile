@@ -17,7 +17,7 @@ file "browser/rsvp.amd.js" => ["browser", "lib/rsvp.js"] do
   open "browser/rsvp.amd.js", "w" do |file|
     require "js_module_transpiler"
 
-    converter = JsModuleTranspiler::Compiler.new(File.read("./lib/rsvp.js"), "rsvp")
+    converter = JsModuleTranspiler::Compiler.new(File.read("./lib/rsvp.js"))
     file.puts converter.to_amd
   end
 end

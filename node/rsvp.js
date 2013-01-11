@@ -1,12 +1,14 @@
 "use strict";
+var config = {};
+
 var browserGlobal = (typeof window !== 'undefined') ? window : {};
 
 var MutationObserver = browserGlobal.MutationObserver || browserGlobal.WebKitMutationObserver;
-var RSVP, async;
+var RSVP;
 
 if (typeof process !== 'undefined' &&
   {}.toString.call(process) === '[object process]') {
-  async = function(callback, binding) {
+  config.async = function(callback, binding) {
     process.nextTick(function() {
       callback.call(binding);
     });
@@ -33,12 +35,12 @@ if (typeof process !== 'undefined' &&
     observer = null;
   });
 
-  async = function(callback, binding) {
+  config.async = function(callback, binding) {
     queue.push([callback, binding]);
     element.setAttribute('drainQueue', 'drainQueue');
   };
 } else {
-  async = function(callback, binding) {
+  config.async = function(callback, binding) {
     setTimeout(function() {
       callback.call(binding);
     }, 1);
@@ -187,13 +189,13 @@ Promise.prototype = {
     var thenPromise = new Promise();
 
     if (this.isResolved) {
-      RSVP.async(function() {
+      config.async(function() {
         invokeCallback('resolve', thenPromise, done, { detail: this.resolvedValue });
       }, this);
     }
 
     if (this.isRejected) {
-      RSVP.async(function() {
+      config.async(function() {
         invokeCallback('reject', thenPromise, fail, { detail: this.rejectedValue });
       }, this);
     }
@@ -225,7 +227,7 @@ Promise.prototype = {
 };
 
 function resolve(promise, value) {
-  RSVP.async(function() {
+  config.async(function() {
     promise.trigger('promise:resolved', { detail: value });
     promise.isResolved = true;
     promise.resolvedValue = value;
@@ -233,7 +235,7 @@ function resolve(promise, value) {
 }
 
 function reject(promise, value) {
-  RSVP.async(function() {
+  config.async(function() {
     promise.trigger('promise:failed', { detail: value });
     promise.isRejected = true;
     promise.rejectedValue = value;
@@ -241,38 +243,45 @@ function reject(promise, value) {
 }
 
 function all(promises) {
-	var i, results = [];
-	var allPromise = new Promise();
-	var remaining = promises.length;
+  var i, results = [];
+  var allPromise = new Promise();
+  var remaining = promises.length;
 
   if (remaining === 0) {
     allPromise.resolve([]);
   }
 
-	var resolver = function(index) {
-		return function(value) {
-			resolve(index, value);
-		};
-	};
+  var resolver = function(index) {
+    return function(value) {
+      resolve(index, value);
+    };
+  };
 
-	var resolve = function(index, value) {
-		results[index] = value;
-		if (--remaining === 0) {
-			allPromise.resolve(results);
-		}
-	};
+  var resolve = function(index, value) {
+    results[index] = value;
+    if (--remaining === 0) {
+      allPromise.resolve(results);
+    }
+  };
 
-	var reject = function(error) {
-		allPromise.reject(error);
-	};
+  var reject = function(error) {
+    allPromise.reject(error);
+  };
 
-	for (i = 0; i < remaining; i++) {
-		promises[i].then(resolver(i), reject);
-	}
-	return allPromise;
+  for (i = 0; i < remaining; i++) {
+    promises[i].then(resolver(i), reject);
+  }
+  return allPromise;
 }
 
 EventTarget.mixin(Promise.prototype);
 
-RSVP = { async: async, Promise: Promise, Event: Event, EventTarget: EventTarget, all: all, raiseOnUncaughtExceptions: true };
-module.exports = RSVP;
+function configure(name, value) {
+  config[name] = value;
+}
+
+exports.Promise = Promise;
+exports.Event = Event;
+exports.EventTarget = EventTarget;
+exports.all = all;
+exports.configure = configure;
