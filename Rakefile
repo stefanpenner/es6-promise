@@ -58,7 +58,18 @@ test_files  = ["tests/test-adapter.js"]
 test_files += Dir["promises-tests/lib/tests/**/*.js"]
 test_files += Dir["promises-tests/node_modules/sinon/lib/{sinon.js,sinon/*.js}"]
 
-file "tests/tmp/test-bundle.js" => ["tests/tmp"].concat(test_files) do
+task :install_browserify do
+  if `which npm`.empty?
+    puts "You need NPM (for Browserify) to build the browser tests"
+    exit 1
+  end
+
+  if `which browserify`.empty?
+    sh "npm install browserify -g"
+  end
+end
+
+file "tests/tmp/test-bundle.js" => [:install_browserify, "tests/tmp"].concat(test_files) do
   sh "browserify #{test_files.join(" ")} > tests/tmp/test-bundle.js"
 end
 
