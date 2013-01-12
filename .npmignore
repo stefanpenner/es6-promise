@@ -1,5 +1,8 @@
 /.jshintrc
 /.npmignore
+/.bundle
+/component.json
+/index.js
 /bin
 /browser/
 /node_modules/
@@ -8,5 +11,6 @@
 /Gemfile.lock
 /tests/
 /promises-aplus-tests
+/promises-tests
 /promise-tests # for orphans left from earlier versions
 /lib
