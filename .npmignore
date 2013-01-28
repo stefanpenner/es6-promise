@@ -2,7 +2,6 @@
 /.npmignore
 /.bundle
 /component.json
-/index.js
 /bin
 /browser/
 /node_modules/
