@@ -2,7 +2,7 @@
 
 RSVP.js provides simple tools for organizing asynchronous code.
 
-Specifically, it is a tiny implementation of Promises/A and a
+Specifically, it is a tiny implementation of Promises/A+ and a
 mixin for turning objects into event targets.
 
 It works in node and the browser. You can get the browser build in
@@ -11,13 +11,8 @@ It works in node and the browser. You can get the browser build in
 ## Promises
 
 `RSVP.Promise` is an implementation of
-[Promises/A](http://wiki.commonjs.org/wiki/Promises/A) that passes the
-[promises test suite](https://github.com/domenic/promise-tests) written
-by Domenic Denicola.
-
-It passes both the primary suite, which tests explicit compliance with
-the Promises/A spec, and the extension tests, which test compliance with
-commonly accepted practices around promises in JavaScript.
+[Promises/A+](http://promises-aplus.github.com/promises-spec/) that passes the
+[test suite](https://github.com/promises-aplus/promises-tests).
 
 It delivers all promises asynchronously, even if the value is already
 available, to help you write consistent code that doesn't change if the
@@ -81,7 +76,7 @@ getJSON("/posts.json").then(function(json) {
 
 ### Chaining
 
-One of the really awesome features of Promises/A promises are that they
+One of the really awesome features of Promises/A+ promises are that they
 can be chained together. In other words, the return value of the first
 resolve handler will be passed to the second resolve handler.
 
