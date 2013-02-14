@@ -125,7 +125,8 @@
           callbacks, callbackTuple, callback, binding, event;
 
       if (callbacks = allCallbacks[eventName]) {
-        for (var i=0, l=callbacks.length; i<l; i++) {
+        // Don't cache the callbacks.length since it may grow
+        for (var i=0; i<callbacks.length; i++) {
           callbackTuple = callbacks[i];
           callback = callbackTuple[0];
           binding = callbackTuple[1];
