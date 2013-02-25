@@ -48,5 +48,6 @@ define(
       };
     }
 
+
     __exports__.async = async;
   });

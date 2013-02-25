@@ -1,5 +1,5 @@
 define(
-  ["rsvp/async", "rsvp/events", "exports"],
+  ["rsvp/async","rsvp/events","exports"],
   function(__dependency1__, __dependency2__, __exports__) {
     "use strict";
     var async = __dependency1__.async;
@@ -165,6 +165,7 @@ define(
       deferred.promise = promise;
       return deferred;
     }
+
 
     __exports__.Promise = Promise;
     __exports__.all = all;

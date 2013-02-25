@@ -96,5 +96,6 @@ define(
       }
     };
 
+
     __exports__.EventTarget = EventTarget;
   });

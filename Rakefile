@@ -1,5 +1,6 @@
 require "bundler/setup"
-require "js_module_transpiler"
+
+ENV['PATH'] = "#{Dir.pwd}/node_modules/.bin:#{ENV['PATH']}"
 
 directory "browser"
 directory "node_modules/rsvp"
@@ -16,9 +17,7 @@ def amd_module(filename)
     library = File.read(input)
 
     open output, "w" do |file|
-      require "js_module_transpiler"
-      converter = JsModuleTranspiler::Compiler.new(library)
-      file.puts converter.to_amd
+      file.puts %x{compile-modules --type amd --anonymous -s < #{input}}
     end
   end
 
@@ -32,9 +31,7 @@ def node_module(filename, output="node_modules/rsvp/#{filename}.js")
     library = File.read(input)
 
     open output, "w" do |file|
-      require "js_module_transpiler"
-      converter = JsModuleTranspiler::Compiler.new(library)
-      file.puts converter.to_cjs
+      file.puts %x{compile-modules --type cjs --anonymous -s < #{input}}
     end
   end
 
@@ -83,7 +80,7 @@ file node_main => ["node_modules/rsvp", node_async, node_events]
 # Minified build
 
 file "browser/rsvp.min.js" => "browser/rsvp.js" do
-  output = `cat browser/rsvp.js | uglifyjs`
+  output = `cat browser/rsvp.js | uglifyjs --mangle`
 
   open "browser/rsvp.min.js", "w" do |file|
     file.puts output
