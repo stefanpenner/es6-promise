@@ -142,7 +142,23 @@
     }
   };
 
-  var Promise = function() {
+  var noop = function() {};
+
+  var Promise = function(resolver) {
+    var promise = this;
+
+    var resolvePromise = function(value) {
+      resolve(promise, value);
+      resolvePromise = noop;
+      rejectPromise = noop;
+    };
+
+    var rejectPromise = function(value) {
+      reject(promise, value);
+      resolvePromise = noop;
+      rejectPromise = noop;
+    };
+
     this.on('promise:resolved', function(event) {
       this.trigger('success', { detail: event.detail });
     }, this);
@@ -150,9 +166,11 @@
     this.on('promise:failed', function(event) {
       this.trigger('error', { detail: event.detail });
     }, this);
-  };
 
-  var noop = function() {};
+    if (resolver) {
+      resolver(resolvePromise, rejectPromise);
+    }
+  };
 
   var invokeCallback = function(type, promise, callback, event) {
     var hasCallback = typeof callback === 'function',
@@ -173,16 +191,18 @@
 
     if (value && typeof value.then === 'function') {
       value.then(function(value) {
-        promise.resolve(value);
+        resolve(promise, value);
       }, function(error) {
-        promise.reject(error);
+        reject(promise, error);
       });
     } else if (hasCallback && succeeded) {
-      promise.resolve(value);
+      resolve(promise, value);
     } else if (failed) {
-      promise.reject(error);
-    } else {
-      promise[type](value);
+      reject(promise, error);
+    } else if (type === 'resolve') {
+      resolve(promise, value);
+    } else if (type === 'reject') {
+      reject(promise, value);
     }
   };
 
@@ -211,20 +231,6 @@
       });
 
       return thenPromise;
-    },
-
-    resolve: function(value) {
-      resolve(this, value);
-
-      this.resolve = noop;
-      this.reject = noop;
-    },
-
-    reject: function(value) {
-      reject(this, value);
-
-      this.resolve = noop;
-      this.reject = noop;
     }
   };
 
@@ -250,28 +256,28 @@
     var remaining = promises.length;
 
     if (remaining === 0) {
-      allPromise.resolve([]);
+      resolve(allPromise, []);
     }
 
     var resolver = function(index) {
       return function(value) {
-        resolve(index, value);
+        resolveAll(index, value);
       };
     };
 
-    var resolve = function(index, value) {
+    var resolveAll = function(index, value) {
       results[index] = value;
       if (--remaining === 0) {
-        allPromise.resolve(results);
+        resolve(allPromise, results);
       }
     };
 
-    var reject = function(error) {
-      allPromise.reject(error);
+    var rejectAll = function(error) {
+      reject(allPromise, error);
     };
 
     for (i = 0; i < remaining; i++) {
-      promises[i].then(resolver(i), reject);
+      promises[i].then(resolver(i), rejectAll);
     }
     return allPromise;
   }

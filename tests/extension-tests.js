@@ -6,34 +6,54 @@ describe("RSVP extensions", function() {
     });
 
     specify('fulfilled only after all of the other promises are fulfilled', function(done) {
-      var first = new RSVP.Promise();
-      var second = new RSVP.Promise();
+      var firstResolved, secondResolved, firstResolver, secondResolver;
+
+      var first = new RSVP.Promise(function(resolve) {
+        firstResolver = resolve;
+      });
+      first.then(function() {
+        firstResolved = true;
+      });
+
+      var second = new RSVP.Promise(function(resolve) {
+        secondResolver = resolve;
+      });
+      second.then(function() {
+        secondResolved = true;
+      });
 
       setTimeout(function() {
-        first.resolve(true);
+        firstResolver(true);
       }, 0);
 
       setTimeout(function() {
-        second.resolve(true);
+        secondResolver(true);
       }, 0);
 
       RSVP.all([first, second]).then(function() {
-        assert(first.isResolved);
-        assert(second.isResolved);
+        assert(firstResolved);
+        assert(secondResolved);
         done();
       });
     });
 
     specify('rejected as soon as a promise is rejected', function(done) {
-      var first = new RSVP.Promise();
-      var second = new RSVP.Promise();
+      var firstResolver, secondResolver;
+
+      var first = new RSVP.Promise(function(resolve, reject) {
+        firstResolver = { resolve: resolve, reject: reject };
+      });
+
+      var second = new RSVP.Promise(function(resolve, reject) {
+        secondResolver = { resolve: resolve, reject: reject };
+      });
 
       setTimeout(function() {
-        first.reject({});
+        firstResolver.reject({});
       }, 0);
 
       setTimeout(function() {
-        second.resolve(true);
+        secondResolver.resolve(true);
       }, 5000);
 
       RSVP.all([first, second]).then(function() {
@@ -46,13 +66,23 @@ describe("RSVP extensions", function() {
     });
 
     specify('passes the resolved values of each promise to the callback in the correct order', function(done) {
-      var first = new RSVP.Promise();
-      var second = new RSVP.Promise();
-      var third = new RSVP.Promise();
+      var firstResolver, secondResolver, thirdResolver;
 
-      third.resolve(3);
-      first.resolve(1);
-      second.resolve(2);
+      var first = new RSVP.Promise(function(resolve, reject) {
+        firstResolver = { resolve: resolve, reject: reject };
+      });
+
+      var second = new RSVP.Promise(function(resolve, reject) {
+        secondResolver = { resolve: resolve, reject: reject };
+      });
+
+      var third = new RSVP.Promise(function(resolve, reject) {
+        thirdResolver = { resolve: resolve, reject: reject };
+      });
+
+      thirdResolver.resolve(3);
+      firstResolver.resolve(1);
+      secondResolver.resolve(2);
 
       RSVP.all([first, second, third]).then(function(results) {
         assert(results.length === 3);

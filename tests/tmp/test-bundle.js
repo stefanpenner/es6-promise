@@ -558,7 +558,8 @@ var EventTarget = {
         callbacks, callbackTuple, callback, binding, event;
 
     if (callbacks = allCallbacks[eventName]) {
-      for (var i=0, l=callbacks.length; i<l; i++) {
+      // Don't cache the callbacks.length since it may grow
+      for (var i=0; i<callbacks.length; i++) {
         callbackTuple = callbacks[i];
         callback = callbackTuple[0];
         binding = callbackTuple[1];
@@ -574,7 +575,23 @@ var EventTarget = {
   }
 };
 
-var Promise = function() {
+var noop = function() {};
+
+var Promise = function(resolver) {
+  var promise = this;
+
+  var resolvePromise = function(value) {
+    resolve(promise, value);
+    resolvePromise = noop;
+    rejectPromise = noop;
+  };
+
+  var rejectPromise = function(value) {
+    reject(promise, value);
+    resolvePromise = noop;
+    rejectPromise = noop;
+  };
+
   this.on('promise:resolved', function(event) {
     this.trigger('success', { detail: event.detail });
   }, this);
@@ -582,9 +599,11 @@ var Promise = function() {
   this.on('promise:failed', function(event) {
     this.trigger('error', { detail: event.detail });
   }, this);
-};
 
-var noop = function() {};
+  if (resolver) {
+    resolver(resolvePromise, rejectPromise);
+  }
+};
 
 var invokeCallback = function(type, promise, callback, event) {
   var hasCallback = typeof callback === 'function',
@@ -643,20 +662,6 @@ Promise.prototype = {
     });
 
     return thenPromise;
-  },
-
-  resolve: function(value) {
-    resolve(this, value);
-
-    this.resolve = noop;
-    this.reject = noop;
-  },
-
-  reject: function(value) {
-    reject(this, value);
-
-    this.resolve = noop;
-    this.reject = noop;
   }
 };
 
@@ -3102,7 +3107,7 @@ require.define("/promises-tests/node_modules/sinon/lib/sinon.js",function(requir
  * @author Christian Johansen (christian@cjohansen.no)
  * @license BSD
  *
- * Copyright (c) 2010-2011 Christian Johansen
+ * Copyright (c) 2010-2013 Christian Johansen
  */
 "use strict";
 
@@ -3346,7 +3351,7 @@ var sinon = (function (buster) {
 
         calledInOrder: function (spies) {
             for (var i = 1, l = spies.length; i < l; i++) {
-                if (!spies[i - 1].calledBefore(spies[i])) {
+                if (!spies[i - 1].calledBefore(spies[i]) || !spies[i].called) {
                     return false;
                 }
             }
@@ -3388,6 +3393,13 @@ var sinon = (function (buster) {
             }
             var string = Object.prototype.toString.call(value);
             return string.substring(8, string.length - 1).toLowerCase();
+        },
+
+        createStubInstance: function (constructor) {
+            if (typeof constructor !== "function") {
+                throw new TypeError("The constructor should be a function.");
+            }
+            return sinon.stub(sinon.create(constructor.prototype));
         }
     };
 
@@ -4768,19 +4780,19 @@ require.define("fs",function(require,module,exports,__dirname,__filename,process
 });
 
 require.define("/promises-tests/node_modules/sinon/lib/sinon/spy.js",function(require,module,exports,__dirname,__filename,process,global){/**
- * @depend ../sinon.js
- * @depend match.js
- */
+  * @depend ../sinon.js
+  * @depend match.js
+  */
 /*jslint eqeqeq: false, onevar: false, plusplus: false*/
 /*global module, require, sinon*/
 /**
- * Spy functions
- *
- * @author Christian Johansen (christian@cjohansen.no)
- * @license BSD
- *
- * Copyright (c) 2010-2011 Christian Johansen
- */
+  * Spy functions
+  *
+  * @author Christian Johansen (christian@cjohansen.no)
+  * @license BSD
+  *
+  * Copyright (c) 2010-2013 Christian Johansen
+  */
 "use strict";
 
 (function (sinon) {
@@ -4804,7 +4816,7 @@ require.define("/promises-tests/node_modules/sinon/lib/sinon/spy.js",function(re
         }
 
         if (!object && !property) {
-            return spy.create(function () {});
+            return spy.create(function () { });
         }
 
         var method = object[property];
@@ -4877,7 +4889,7 @@ require.define("/promises-tests/node_modules/sinon/lib/sinon/spy.js",function(re
             var p;
             if (func.length) {
                 eval("p = (function proxy(" + vars.substring(0, func.length * 2 - 1) +
-                  ") { return p.invoke(func, this, slice.call(arguments)); });");
+                    ") { return p.invoke(func, this, slice.call(arguments)); });");
             }
             else {
                 p = function proxy() {
@@ -4918,7 +4930,7 @@ require.define("/promises-tests/node_modules/sinon/lib/sinon/spy.js",function(re
                 var name;
 
                 if (typeof func != "function") {
-                    func = function () {};
+                    func = function () { };
                 } else {
                     name = sinon.functionName(func);
                 }
@@ -4975,8 +4987,8 @@ require.define("/promises-tests/node_modules/sinon/lib/sinon/spy.js",function(re
                 }
 
                 return spyCall.create(this, this.thisValues[i], this.args[i],
-                                      this.returnValues[i], this.exceptions[i],
-                                      this.callIds[i]);
+                                        this.returnValues[i], this.exceptions[i],
+                                        this.callIds[i]);
             },
 
             calledBefore: function calledBefore(spyFn) {
@@ -5086,12 +5098,23 @@ require.define("/promises-tests/node_modules/sinon/lib/sinon/spy.js",function(re
             throw new Error(this.toString() + " cannot call arg since it was not yet invoked.");
         });
         spyApi.callArgWith = spyApi.callArg;
+        delegateToCalls(spyApi, "callArgOn", false, "callArgOnWith", function () {
+            throw new Error(this.toString() + " cannot call arg since it was not yet invoked.");
+        });
+        spyApi.callArgOnWith = spyApi.callArgOn;
         delegateToCalls(spyApi, "yield", false, "yield", function () {
             throw new Error(this.toString() + " cannot yield since it was not yet invoked.");
         });
         // "invokeCallback" is an alias for "yield" since "yield" is invalid in strict mode.
         spyApi.invokeCallback = spyApi.yield;
+        delegateToCalls(spyApi, "yieldOn", false, "yieldOn", function () {
+            throw new Error(this.toString() + " cannot yield since it was not yet invoked.");
+        });
         delegateToCalls(spyApi, "yieldTo", false, "yieldTo", function (property) {
+            throw new Error(this.toString() + " cannot yield to '" + property +
+                "' since it was not yet invoked.");
+        });
+        delegateToCalls(spyApi, "yieldToOn", false, "yieldToOn", function (property) {
             throw new Error(this.toString() + " cannot yield to '" + property +
                 "' since it was not yet invoked.");
         });
@@ -5109,7 +5132,11 @@ require.define("/promises-tests/node_modules/sinon/lib/sinon/spy.js",function(re
                 var calls = [];
 
                 for (var i = 0, l = spy.callCount; i < l; ++i) {
-                    push.call(calls, "    " + spy.getCall(i).toString());
+                    var stringifiedCall = "    " + spy.getCall(i).toString();
+                    if (/\n/.test(calls[i - 1])) {
+                        stringifiedCall = "\n" + stringifiedCall;
+                    }
+                    push.call(calls, stringifiedCall);
                 }
 
                 return calls.length > 0 ? "\n" + calls.join("\n") : "";
@@ -5181,14 +5208,14 @@ require.define("/promises-tests/node_modules/sinon/lib/sinon/spy.js",function(re
             },
 
             calledWithMatch: function calledWithMatch() {
-              for (var i = 0, l = arguments.length; i < l; i += 1) {
-                  var actual = this.args[i];
-                  var expectation = arguments[i];
-                  if (!sinon.match || !sinon.match(expectation).test(actual)) {
-                      return false;
-                  }
-              }
-              return true;
+                for (var i = 0, l = arguments.length; i < l; i += 1) {
+                    var actual = this.args[i];
+                    var expectation = arguments[i];
+                    if (!sinon.match || !sinon.match(expectation).test(actual)) {
+                        return false;
+                    }
+                }
+                return true;
             },
 
             calledWithExactly: function calledWithExactly() {
@@ -5201,7 +5228,7 @@ require.define("/promises-tests/node_modules/sinon/lib/sinon/spy.js",function(re
             },
 
             notCalledWithMatch: function notCalledWithMatch() {
-              return !this.calledWithMatch.apply(this, arguments);
+                return !this.calledWithMatch.apply(this, arguments);
             },
 
             returned: function returned(value) {
@@ -5236,16 +5263,28 @@ require.define("/promises-tests/node_modules/sinon/lib/sinon/spy.js",function(re
                 this.args[pos]();
             },
 
+            callArgOn: function (pos, thisValue) {
+                this.args[pos].apply(thisValue);
+            },
+
             callArgWith: function (pos) {
-                var args = slice.call(arguments, 1);
-                this.args[pos].apply(null, args);
+                this.callArgOnWith.apply(this, [pos, null].concat(slice.call(arguments, 1)));
+            },
+
+            callArgOnWith: function (pos, thisValue) {
+                var args = slice.call(arguments, 2);
+                this.args[pos].apply(thisValue, args);
             },
 
             "yield": function () {
+                this.yieldOn.apply(this, [null].concat(slice.call(arguments, 0)));
+            },
+
+            yieldOn: function (thisValue) {
                 var args = this.args;
                 for (var i = 0, l = args.length; i < l; ++i) {
                     if (typeof args[i] === "function") {
-                        args[i].apply(null, slice.call(arguments));
+                        args[i].apply(thisValue, slice.call(arguments, 1));
                         return;
                     }
                 }
@@ -5253,10 +5292,14 @@ require.define("/promises-tests/node_modules/sinon/lib/sinon/spy.js",function(re
             },
 
             yieldTo: function (prop) {
+                this.yieldToOn.apply(this, [prop, null].concat(slice.call(arguments, 1)));
+            },
+
+            yieldToOn: function (prop, thisValue) {
                 var args = this.args;
                 for (var i = 0, l = args.length; i < l; ++i) {
                     if (args[i] && typeof args[i][prop] === "function") {
-                        args[i][prop].apply(null, slice.call(arguments, 1));
+                        args[i][prop].apply(thisValue, slice.call(arguments, 2));
                         return;
                     }
                 }
@@ -5319,7 +5362,7 @@ require.define("/promises-tests/node_modules/sinon/lib/sinon/stub.js",function(r
  * @author Christian Johansen (christian@cjohansen.no)
  * @license BSD
  *
- * Copyright (c) 2010-2011 Christian Johansen
+ * Copyright (c) 2010-2013 Christian Johansen
  */
 "use strict";
 
@@ -5366,7 +5409,8 @@ require.define("/promises-tests/node_modules/sinon/lib/sinon/stub.js",function(r
 
     function getChangingValue(stub, property) {
         var index = stub.callCount - 1;
-        var prop = index in stub[property] ? stub[property][index] : stub[property + "Last"];
+        var values = stub[property];
+        var prop = index in values ? values[index] : values[values.length - 1];
         stub[property + "Last"] = prop;
 
         return prop;
@@ -5423,8 +5467,6 @@ require.define("/promises-tests/node_modules/sinon/lib/sinon/stub.js",function(r
     var nextTick = (function () {
         if (typeof process === "object" && typeof process.nextTick === "function") {
             return process.nextTick;
-        } else if (typeof msSetImmediate === "function") {
-            return msSetImmediate.bind(window);
         } else if (typeof setImmediate === "function") {
             return setImmediate;
         } else {
@@ -5441,8 +5483,6 @@ require.define("/promises-tests/node_modules/sinon/lib/sinon/stub.js",function(r
             if (typeof func != "function") {
                 throw new TypeError(getCallbackError(stub, func, args));
             }
-
-            var index = stub.callCount - 1;
 
             var callbackArguments = getChangingValue(stub, "callbackArguments");
             var callbackContext = getChangingValue(stub, "callbackContexts");
@@ -5507,6 +5547,25 @@ require.define("/promises-tests/node_modules/sinon/lib/sinon/stub.js",function(r
                 functionStub.toString = sinon.functionToString;
 
                 return functionStub;
+            },
+
+            resetBehavior: function () {
+                var i;
+
+                this.callArgAts = [];
+                this.callbackArguments = [];
+                this.callbackContexts = [];
+                this.callArgProps = [];
+
+                delete this.returnValue;
+                delete this.returnArgAt;
+                this.returnThis = false;
+
+                if (this.fakes) {
+                    for (i = 0; i < this.fakes.length; i++) {
+                        this.fakes[i].resetBehavior();
+                    }
+                }
             },
 
             returns: function returns(value) {
@@ -5677,7 +5736,7 @@ require.define("/promises-tests/node_modules/sinon/lib/sinon/mock.js",function(r
  * @author Christian Johansen (christian@cjohansen.no)
  * @license BSD
  *
- * Copyright (c) 2010-2011 Christian Johansen
+ * Copyright (c) 2010-2013 Christian Johansen
  */
 "use strict";
 
@@ -6046,7 +6105,8 @@ require.define("/promises-tests/node_modules/sinon/lib/sinon/mock.js",function(r
                 }
 
                 var callStr = sinon.spyCall.toString.call({
-                    proxy: this.method, args: args
+                    proxy: this.method || "anonymous mock expectation",
+                    args: args
                 });
 
                 var message = callStr.replace(", [...", "[, ...") + " " +
@@ -6104,7 +6164,7 @@ require.define("/promises-tests/node_modules/sinon/lib/sinon/collection.js",func
  * @author Christian Johansen (christian@cjohansen.no)
  * @license BSD
  *
- * Copyright (c) 2010-2011 Christian Johansen
+ * Copyright (c) 2010-2013 Christian Johansen
  */
 "use strict";
 
@@ -6259,7 +6319,7 @@ require.define("/promises-tests/node_modules/sinon/lib/sinon/assert.js",function
  * @author Christian Johansen (christian@cjohansen.no)
  * @license BSD
  *
- * Copyright (c) 2010-2011 Christian Johansen
+ * Copyright (c) 2010-2013 Christian Johansen
  */
 "use strict";
 
@@ -6441,7 +6501,7 @@ require.define("/promises-tests/node_modules/sinon/lib/sinon/sandbox.js",functio
  * @author Christian Johansen (christian@cjohansen.no)
  * @license BSD
  *
- * Copyright (c) 2010-2011 Christian Johansen
+ * Copyright (c) 2010-2013 Christian Johansen
  */
 "use strict";
 
@@ -6571,7 +6631,7 @@ require.define("/promises-tests/node_modules/sinon/lib/sinon/util/fake_timers.js
  * @author Christian Johansen (christian@cjohansen.no)
  * @license BSD
  *
- * Copyright (c) 2010-2011 Christian Johansen
+ * Copyright (c) 2010-2013 Christian Johansen
  */
 "use strict";
 
@@ -6713,6 +6773,8 @@ if (typeof sinon == "undefined") {
             if (firstException) {
               throw firstException;
             }
+
+            return this.now;
         },
 
         firstTimerInRange: function (from, to) {
@@ -6920,7 +6982,7 @@ require.define("/promises-tests/node_modules/sinon/lib/sinon/test.js",function(r
  * @author Christian Johansen (christian@cjohansen.no)
  * @license BSD
  *
- * Copyright (c) 2010-2011 Christian Johansen
+ * Copyright (c) 2010-2013 Christian Johansen
  */
 "use strict";
 
@@ -6996,7 +7058,7 @@ require.define("/promises-tests/node_modules/sinon/lib/sinon/test_case.js",funct
  * @author Christian Johansen (christian@cjohansen.no)
  * @license BSD
  *
- * Copyright (c) 2010-2011 Christian Johansen
+ * Copyright (c) 2010-2013 Christian Johansen
  */
 "use strict";
 
@@ -7343,29 +7405,26 @@ if (typeof RSVP !== 'undefined') {
 var adapter = {};
 
 adapter.fulfilled = function(value) {
-  var promise = new Promise();
-  promise.resolve(value);
-  return promise;
+  return new Promise(function(resolve, reject) {
+    resolve(value);
+  });
 };
 
 adapter.rejected = function(error) {
-  var promise = new Promise();
-  promise.reject(error);
-  return promise;
+  return new Promise(function(resolve, reject) {
+    reject(error);
+  });
 };
 
 adapter.pending = function () {
-  var promise = new Promise();
+  var pending = {};
 
-  return {
-    promise: promise,
-    fulfill: function(value) {
-      promise.resolve(value);
-    },
-    reject: function(error) {
-      promise.reject(error);
-    }
-  };
+  pending.promise = new Promise(function(resolve, reject) {
+    pending.fulfill = resolve;
+    pending.reject = reject;
+  });
+
+  return pending;
 };
 
 module.exports = global.adapter = adapter;
@@ -7950,6 +8009,28 @@ describe("3.2.5: `then` may be called multiple times on the same promise.", func
                     done();
                 });
             });
+
+            describe("even when one handler is added inside another handler", function () {
+                testFulfilled(dummy, function (promise, done) {
+                    var handler1 = sinon.spy();
+                    var handler2 = sinon.spy();
+                    var handler3 = sinon.spy();
+
+                    promise.then(function () {
+                        handler1();
+                        promise.then(handler3);
+                    });
+                    promise.then(handler2);
+
+                    promise.then(function () {
+                        // Give implementations a bit of extra time to flush their internal queue, if necessary.
+                        setTimeout(function () {
+                            sinon.assert.callOrder(handler1, handler2, handler3);
+                            done();
+                        }, 15);
+                    });
+                });
+            });
         });
     });
 
@@ -8045,6 +8126,28 @@ describe("3.2.5: `then` may be called multiple times on the same promise.", func
                     done();
                 });
             });
+
+            describe("even when one handler is added inside another handler", function () {
+                testRejected(dummy, function (promise, done) {
+                    var handler1 = sinon.spy();
+                    var handler2 = sinon.spy();
+                    var handler3 = sinon.spy();
+
+                    promise.then(null, function () {
+                        handler1();
+                        promise.then(null, handler3);
+                    });
+                    promise.then(null, handler2);
+
+                    promise.then(null, function () {
+                        // Give implementations a bit of extra time to flush their internal queue, if necessary.
+                        setTimeout(function () {
+                            sinon.assert.callOrder(handler1, handler2, handler3);
+                            done();
+                        }, 15);
+                    });
+                });
+            });
         });
     });
 });
@@ -8065,13 +8168,14 @@ var pending = adapter.pending;
 
 var dummy = { dummy: "dummy" }; // we fulfill or reject with this when we don't intend to test against it
 var sentinel = { sentinel: "sentinel" }; // a sentinel fulfillment value to test for with strict equality
+var other = { other: "other" }; // a value we don't want to be strict equal to
 
 describe("3.2.6: `then` must return a promise: `promise2 = promise1.then(onFulfilled, onRejected)`", function () {
     specify("is a promise", function () {
         var promise1 = pending().promise;
         var promise2 = promise1.then();
 
-        assert.strictEqual(typeof promise2, "object");
+        assert(typeof promise2 === "object" || typeof promise2 === "function");
         assert.notStrictEqual(promise2, null);
         assert.strictEqual(typeof promise2.then, "function");
     });
@@ -8345,6 +8449,7 @@ describe("3.2.6: `then` must return a promise: `promise2 = promise1.then(onFulfi
         testNonFunction(false, "`false`");
         testNonFunction(5, "`5`");
         testNonFunction({}, "an object");
+        testNonFunction([function () { return other; }], "an array containing a function");
     });
 
     describe("3.2.6.5: If `onRejected` is not a function and `promise1` is rejected, `promise2` must be rejected " +
@@ -8368,6 +8473,7 @@ describe("3.2.6: `then` must return a promise: `promise2 = promise1.then(onFulfi
         testNonFunction(false, "`false`");
         testNonFunction(5, "`5`");
         testNonFunction({}, "an object");
+        testNonFunction([function () { return other; }], "an array containing a function");
     });
 });
 
@@ -8432,7 +8538,7 @@ require.define("/promises-tests/node_modules/sinon/lib/sinon.js",function(requir
  * @author Christian Johansen (christian@cjohansen.no)
  * @license BSD
  *
- * Copyright (c) 2010-2011 Christian Johansen
+ * Copyright (c) 2010-2013 Christian Johansen
  */
 "use strict";
 
@@ -8676,7 +8782,7 @@ var sinon = (function (buster) {
 
         calledInOrder: function (spies) {
             for (var i = 1, l = spies.length; i < l; i++) {
-                if (!spies[i - 1].calledBefore(spies[i])) {
+                if (!spies[i - 1].calledBefore(spies[i]) || !spies[i].called) {
                     return false;
                 }
             }
@@ -8718,6 +8824,13 @@ var sinon = (function (buster) {
             }
             var string = Object.prototype.toString.call(value);
             return string.substring(8, string.length - 1).toLowerCase();
+        },
+
+        createStubInstance: function (constructor) {
+            if (typeof constructor !== "function") {
+                throw new TypeError("The constructor should be a function.");
+            }
+            return sinon.stub(sinon.create(constructor.prototype));
         }
     };
 
@@ -8776,7 +8889,7 @@ require.define("/promises-tests/node_modules/sinon/lib/sinon/assert.js",function
  * @author Christian Johansen (christian@cjohansen.no)
  * @license BSD
  *
- * Copyright (c) 2010-2011 Christian Johansen
+ * Copyright (c) 2010-2013 Christian Johansen
  */
 "use strict";
 
@@ -8957,7 +9070,7 @@ require.define("/promises-tests/node_modules/sinon/lib/sinon/collection.js",func
  * @author Christian Johansen (christian@cjohansen.no)
  * @license BSD
  *
- * Copyright (c) 2010-2011 Christian Johansen
+ * Copyright (c) 2010-2013 Christian Johansen
  */
 "use strict";
 
@@ -9356,7 +9469,7 @@ require.define("/promises-tests/node_modules/sinon/lib/sinon/mock.js",function(r
  * @author Christian Johansen (christian@cjohansen.no)
  * @license BSD
  *
- * Copyright (c) 2010-2011 Christian Johansen
+ * Copyright (c) 2010-2013 Christian Johansen
  */
 "use strict";
 
@@ -9725,7 +9838,8 @@ require.define("/promises-tests/node_modules/sinon/lib/sinon/mock.js",function(r
                 }
 
                 var callStr = sinon.spyCall.toString.call({
-                    proxy: this.method, args: args
+                    proxy: this.method || "anonymous mock expectation",
+                    args: args
                 });
 
                 var message = callStr.replace(", [...", "[, ...") + " " +
@@ -9786,7 +9900,7 @@ require.define("/promises-tests/node_modules/sinon/lib/sinon/sandbox.js",functio
  * @author Christian Johansen (christian@cjohansen.no)
  * @license BSD
  *
- * Copyright (c) 2010-2011 Christian Johansen
+ * Copyright (c) 2010-2013 Christian Johansen
  */
 "use strict";
 
@@ -9901,19 +10015,19 @@ if (typeof module == "object" && typeof require == "function") {
 require("/promises-tests/node_modules/sinon/lib/sinon/sandbox.js");
 
 require.define("/promises-tests/node_modules/sinon/lib/sinon/spy.js",function(require,module,exports,__dirname,__filename,process,global){/**
- * @depend ../sinon.js
- * @depend match.js
- */
+  * @depend ../sinon.js
+  * @depend match.js
+  */
 /*jslint eqeqeq: false, onevar: false, plusplus: false*/
 /*global module, require, sinon*/
 /**
- * Spy functions
- *
- * @author Christian Johansen (christian@cjohansen.no)
- * @license BSD
- *
- * Copyright (c) 2010-2011 Christian Johansen
- */
+  * Spy functions
+  *
+  * @author Christian Johansen (christian@cjohansen.no)
+  * @license BSD
+  *
+  * Copyright (c) 2010-2013 Christian Johansen
+  */
 "use strict";
 
 (function (sinon) {
@@ -9937,7 +10051,7 @@ require.define("/promises-tests/node_modules/sinon/lib/sinon/spy.js",function(re
         }
 
         if (!object && !property) {
-            return spy.create(function () {});
+            return spy.create(function () { });
         }
 
         var method = object[property];
@@ -10010,7 +10124,7 @@ require.define("/promises-tests/node_modules/sinon/lib/sinon/spy.js",function(re
             var p;
             if (func.length) {
                 eval("p = (function proxy(" + vars.substring(0, func.length * 2 - 1) +
-                  ") { return p.invoke(func, this, slice.call(arguments)); });");
+                    ") { return p.invoke(func, this, slice.call(arguments)); });");
             }
             else {
                 p = function proxy() {
@@ -10051,7 +10165,7 @@ require.define("/promises-tests/node_modules/sinon/lib/sinon/spy.js",function(re
                 var name;
 
                 if (typeof func != "function") {
-                    func = function () {};
+                    func = function () { };
                 } else {
                     name = sinon.functionName(func);
                 }
@@ -10108,8 +10222,8 @@ require.define("/promises-tests/node_modules/sinon/lib/sinon/spy.js",function(re
                 }
 
                 return spyCall.create(this, this.thisValues[i], this.args[i],
-                                      this.returnValues[i], this.exceptions[i],
-                                      this.callIds[i]);
+                                        this.returnValues[i], this.exceptions[i],
+                                        this.callIds[i]);
             },
 
             calledBefore: function calledBefore(spyFn) {
@@ -10219,12 +10333,23 @@ require.define("/promises-tests/node_modules/sinon/lib/sinon/spy.js",function(re
             throw new Error(this.toString() + " cannot call arg since it was not yet invoked.");
         });
         spyApi.callArgWith = spyApi.callArg;
+        delegateToCalls(spyApi, "callArgOn", false, "callArgOnWith", function () {
+            throw new Error(this.toString() + " cannot call arg since it was not yet invoked.");
+        });
+        spyApi.callArgOnWith = spyApi.callArgOn;
         delegateToCalls(spyApi, "yield", false, "yield", function () {
             throw new Error(this.toString() + " cannot yield since it was not yet invoked.");
         });
         // "invokeCallback" is an alias for "yield" since "yield" is invalid in strict mode.
         spyApi.invokeCallback = spyApi.yield;
+        delegateToCalls(spyApi, "yieldOn", false, "yieldOn", function () {
+            throw new Error(this.toString() + " cannot yield since it was not yet invoked.");
+        });
         delegateToCalls(spyApi, "yieldTo", false, "yieldTo", function (property) {
+            throw new Error(this.toString() + " cannot yield to '" + property +
+                "' since it was not yet invoked.");
+        });
+        delegateToCalls(spyApi, "yieldToOn", false, "yieldToOn", function (property) {
             throw new Error(this.toString() + " cannot yield to '" + property +
                 "' since it was not yet invoked.");
         });
@@ -10242,7 +10367,11 @@ require.define("/promises-tests/node_modules/sinon/lib/sinon/spy.js",function(re
                 var calls = [];
 
                 for (var i = 0, l = spy.callCount; i < l; ++i) {
-                    push.call(calls, "    " + spy.getCall(i).toString());
+                    var stringifiedCall = "    " + spy.getCall(i).toString();
+                    if (/\n/.test(calls[i - 1])) {
+                        stringifiedCall = "\n" + stringifiedCall;
+                    }
+                    push.call(calls, stringifiedCall);
                 }
 
                 return calls.length > 0 ? "\n" + calls.join("\n") : "";
@@ -10314,14 +10443,14 @@ require.define("/promises-tests/node_modules/sinon/lib/sinon/spy.js",function(re
             },
 
             calledWithMatch: function calledWithMatch() {
-              for (var i = 0, l = arguments.length; i < l; i += 1) {
-                  var actual = this.args[i];
-                  var expectation = arguments[i];
-                  if (!sinon.match || !sinon.match(expectation).test(actual)) {
-                      return false;
-                  }
-              }
-              return true;
+                for (var i = 0, l = arguments.length; i < l; i += 1) {
+                    var actual = this.args[i];
+                    var expectation = arguments[i];
+                    if (!sinon.match || !sinon.match(expectation).test(actual)) {
+                        return false;
+                    }
+                }
+                return true;
             },
 
             calledWithExactly: function calledWithExactly() {
@@ -10334,7 +10463,7 @@ require.define("/promises-tests/node_modules/sinon/lib/sinon/spy.js",function(re
             },
 
             notCalledWithMatch: function notCalledWithMatch() {
-              return !this.calledWithMatch.apply(this, arguments);
+                return !this.calledWithMatch.apply(this, arguments);
             },
 
             returned: function returned(value) {
@@ -10369,16 +10498,28 @@ require.define("/promises-tests/node_modules/sinon/lib/sinon/spy.js",function(re
                 this.args[pos]();
             },
 
+            callArgOn: function (pos, thisValue) {
+                this.args[pos].apply(thisValue);
+            },
+
             callArgWith: function (pos) {
-                var args = slice.call(arguments, 1);
-                this.args[pos].apply(null, args);
+                this.callArgOnWith.apply(this, [pos, null].concat(slice.call(arguments, 1)));
+            },
+
+            callArgOnWith: function (pos, thisValue) {
+                var args = slice.call(arguments, 2);
+                this.args[pos].apply(thisValue, args);
             },
 
             "yield": function () {
+                this.yieldOn.apply(this, [null].concat(slice.call(arguments, 0)));
+            },
+
+            yieldOn: function (thisValue) {
                 var args = this.args;
                 for (var i = 0, l = args.length; i < l; ++i) {
                     if (typeof args[i] === "function") {
-                        args[i].apply(null, slice.call(arguments));
+                        args[i].apply(thisValue, slice.call(arguments, 1));
                         return;
                     }
                 }
@@ -10386,10 +10527,14 @@ require.define("/promises-tests/node_modules/sinon/lib/sinon/spy.js",function(re
             },
 
             yieldTo: function (prop) {
+                this.yieldToOn.apply(this, [prop, null].concat(slice.call(arguments, 1)));
+            },
+
+            yieldToOn: function (prop, thisValue) {
                 var args = this.args;
                 for (var i = 0, l = args.length; i < l; ++i) {
                     if (args[i] && typeof args[i][prop] === "function") {
-                        args[i][prop].apply(null, slice.call(arguments, 1));
+                        args[i][prop].apply(thisValue, slice.call(arguments, 2));
                         return;
                     }
                 }
@@ -10453,7 +10598,7 @@ require.define("/promises-tests/node_modules/sinon/lib/sinon/stub.js",function(r
  * @author Christian Johansen (christian@cjohansen.no)
  * @license BSD
  *
- * Copyright (c) 2010-2011 Christian Johansen
+ * Copyright (c) 2010-2013 Christian Johansen
  */
 "use strict";
 
@@ -10500,7 +10645,8 @@ require.define("/promises-tests/node_modules/sinon/lib/sinon/stub.js",function(r
 
     function getChangingValue(stub, property) {
         var index = stub.callCount - 1;
-        var prop = index in stub[property] ? stub[property][index] : stub[property + "Last"];
+        var values = stub[property];
+        var prop = index in values ? values[index] : values[values.length - 1];
         stub[property + "Last"] = prop;
 
         return prop;
@@ -10557,8 +10703,6 @@ require.define("/promises-tests/node_modules/sinon/lib/sinon/stub.js",function(r
     var nextTick = (function () {
         if (typeof process === "object" && typeof process.nextTick === "function") {
             return process.nextTick;
-        } else if (typeof msSetImmediate === "function") {
-            return msSetImmediate.bind(window);
         } else if (typeof setImmediate === "function") {
             return setImmediate;
         } else {
@@ -10575,8 +10719,6 @@ require.define("/promises-tests/node_modules/sinon/lib/sinon/stub.js",function(r
             if (typeof func != "function") {
                 throw new TypeError(getCallbackError(stub, func, args));
             }
-
-            var index = stub.callCount - 1;
 
             var callbackArguments = getChangingValue(stub, "callbackArguments");
             var callbackContext = getChangingValue(stub, "callbackContexts");
@@ -10641,6 +10783,25 @@ require.define("/promises-tests/node_modules/sinon/lib/sinon/stub.js",function(r
                 functionStub.toString = sinon.functionToString;
 
                 return functionStub;
+            },
+
+            resetBehavior: function () {
+                var i;
+
+                this.callArgAts = [];
+                this.callbackArguments = [];
+                this.callbackContexts = [];
+                this.callArgProps = [];
+
+                delete this.returnValue;
+                delete this.returnArgAt;
+                this.returnThis = false;
+
+                if (this.fakes) {
+                    for (i = 0; i < this.fakes.length; i++) {
+                        this.fakes[i].resetBehavior();
+                    }
+                }
             },
 
             returns: function returns(value) {
@@ -10814,7 +10975,7 @@ require.define("/promises-tests/node_modules/sinon/lib/sinon/test.js",function(r
  * @author Christian Johansen (christian@cjohansen.no)
  * @license BSD
  *
- * Copyright (c) 2010-2011 Christian Johansen
+ * Copyright (c) 2010-2013 Christian Johansen
  */
 "use strict";
 
@@ -10891,7 +11052,7 @@ require.define("/promises-tests/node_modules/sinon/lib/sinon/test_case.js",funct
  * @author Christian Johansen (christian@cjohansen.no)
  * @license BSD
  *
- * Copyright (c) 2010-2011 Christian Johansen
+ * Copyright (c) 2010-2013 Christian Johansen
  */
 "use strict";
 

@@ -141,7 +141,17 @@ var EventTarget = {
   }
 };
 
-var Promise = function() {
+var Promise = function(resolver) {
+  var promise = this;
+
+  function resolvePromise(value) {
+    resolve(promise, value);
+  }
+
+  function rejectPromise(value) {
+    reject(promise, value);
+  }
+
   this.on('promise:resolved', function(event) {
     this.trigger('success', { detail: event.detail });
   }, this);
@@ -149,6 +159,10 @@ var Promise = function() {
   this.on('promise:failed', function(event) {
     this.trigger('error', { detail: event.detail });
   }, this);
+
+  if (resolver) {
+    resolver(resolvePromise, rejectPromise);
+  }
 };
 
 var noop = function() {};

@@ -15,29 +15,26 @@ if (typeof RSVP !== 'undefined') {
 var adapter = {};
 
 adapter.fulfilled = function(value) {
-  var promise = new Promise();
-  promise.resolve(value);
-  return promise;
+  return new Promise(function(resolve, reject) {
+    resolve(value);
+  });
 };
 
 adapter.rejected = function(error) {
-  var promise = new Promise();
-  promise.reject(error);
-  return promise;
+  return new Promise(function(resolve, reject) {
+    reject(error);
+  });
 };
 
 adapter.pending = function () {
-  var promise = new Promise();
+  var pending = {};
 
-  return {
-    promise: promise,
-    fulfill: function(value) {
-      promise.resolve(value);
-    },
-    reject: function(error) {
-      promise.reject(error);
-    }
-  };
+  pending.promise = new Promise(function(resolve, reject) {
+    pending.fulfill = resolve;
+    pending.reject = reject;
+  });
+
+  return pending;
 };
 
 module.exports = global.adapter = adapter;
