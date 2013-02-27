@@ -9,7 +9,7 @@ if (typeof RSVP !== 'undefined') {
   Promise = RSVP.Promise;
 } else {
   // Test the Node build
-  var Promise = require('../node/rsvp').Promise;
+  var Promise = require('../main').Promise;
 }
 
 var adapter = {};

@@ -1,5 +1,6 @@
-import { async } from "rsvp/async";
-import { EventTarget } from "rsvp/events";
+"use strict";
+var async = require("rsvp/async").async;
+var EventTarget = require("rsvp/events").EventTarget;
 
 var config = {};
 config.async = async;
@@ -150,4 +151,6 @@ function configure(name, value) {
   config[name] = value;
 }
 
-export { Promise, all, configure };
+exports.Promise = Promise;
+exports.all = all;
+exports.configure = configure;

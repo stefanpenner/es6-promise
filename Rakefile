@@ -2,55 +2,85 @@ require "bundler/setup"
 require "js_module_transpiler"
 
 directory "browser"
-directory "node"
-directory "tmp"
+directory "node_modules/rsvp"
 
-file "tmp/rsvp.js" => ["lib/loader.js", "lib/async.js", "lib/events.js", "lib/rsvp.js"] do
-  loader = File.read("lib/loader.js")
-  async = File.read("lib/async.js")
-  events = File.read("lib/events.js")
-  rsvp = File.read("lib/rsvp.js")
+def module_contents(file)
+  File.read("lib/#{file}.js")
+end
 
-  output = [
-    loader,
-    async,
-    events,
-    rsvp,
-    "export RSVP"
-  ]
+def amd_module(filename)
+  output = "browser/#{filename}.amd.js"
+  input = "lib/#{filename}.js"
 
-  File.open("tmp/rsvp.js", "w") do |file|
+  file output => ["browser", input] do
+    library = File.read(input)
+
+    open output, "w" do |file|
+      require "js_module_transpiler"
+      converter = JsModuleTranspiler::Compiler.new(library)
+      file.puts converter.to_amd
+    end
+  end
+
+  output
+end
+
+def node_module(filename, output="node_modules/rsvp/#{filename}.js")
+  input = "lib/#{filename}.js"
+
+  file output => ["browser", input] do
+    library = File.read(input)
+
+    open output, "w" do |file|
+      require "js_module_transpiler"
+      converter = JsModuleTranspiler::Compiler.new(library)
+      file.puts converter.to_cjs
+    end
+  end
+
+  output
+end
+
+def read(file)
+  File.read(file)
+end
+
+def name(filename, name)
+  body = read(filename)
+  body.sub(/define\(/, "define(#{name.inspect},")
+end
+
+# Build the AMD modules
+
+amd_async = amd_module "async"
+amd_events = amd_module "events"
+amd_rsvp = amd_module "rsvp"
+
+# Build the node modules
+
+node_async = node_module "async"
+node_events = node_module "events"
+node_main = node_module "rsvp", "main.js"
+
+# Build a browser build based on the AMD modules
+
+file "browser/rsvp.js" => ["browser", amd_async, amd_events, amd_rsvp] do
+  output = []
+  output << %|(function() {|
+  output.concat [read("lib/loader.js"), name(amd_async, "rsvp/async"), name(amd_events, "rsvp/events"), name(amd_rsvp, "rsvp")]
+  output << %|window.RSVP = requireModule('rsvp');|
+  output << %|})();|
+
+  open("browser/rsvp.js", "w") do |file|
     file.puts output.join("\n")
   end
 end
 
-file "browser/rsvp.js" => ["browser", "lib/rsvp.js"] do
-  library = File.read("lib/rsvp.js")
-  open "browser/rsvp.js", "w" do |file|
-    converter = JsModuleTranspiler::Compiler.new(File.read("./lib/rsvp.js"), "rsvp", into: "RSVP")
-    file.puts converter.to_globals
-  end
-end
+# Entry point for node build
 
-file "browser/rsvp.amd.js" => ["browser", "lib/rsvp.js"] do
-  library = File.read("lib/rsvp.js")
-  open "browser/rsvp.amd.js", "w" do |file|
-    require "js_module_transpiler"
+file node_main => ["node_modules/rsvp", node_async, node_events]
 
-    converter = JsModuleTranspiler::Compiler.new(File.read("./lib/rsvp.js"))
-    file.puts converter.to_amd
-  end
-end
-
-file "node/rsvp.js" => ["node", "lib/rsvp.js"] do
-  library = File.read("lib/rsvp.js")
-  open "node/rsvp.js", "w" do |file|
-    require "js_module_transpiler"
-
-    converter = JsModuleTranspiler::Compiler.new(File.read("./lib/rsvp.js"), "rsvp")
-    file.puts converter.to_cjs
-  end
-end
+# Minified build
 
 file "browser/rsvp.min.js" => "browser/rsvp.js" do
   output = `cat browser/rsvp.js | uglifyjs`
@@ -60,17 +90,11 @@ file "browser/rsvp.min.js" => "browser/rsvp.js" do
   end
 end
 
-file "tests/rsvp.js" => "lib/rsvp.js" do
-  library = File.read("lib/rsvp.js")
-  open "tests/rsvp.js", "w" do |file|
-    require "js_module_transpiler"
+# Build everything
 
-    converter = JsModuleTranspiler::Compiler.new(File.read("./lib/rsvp.js"), "rsvp")
-    file.puts converter.to_cjs
-  end
-end
+task :dist => [amd_async, amd_events, amd_rsvp, "browser/rsvp.js", "browser/rsvp.min.js", node_main]
 
-task :dist => ["browser/rsvp.js", "browser/rsvp.min.js", "browser/rsvp.amd.js", "node/rsvp.js"]
+# Testing
 
 directory "tests/tmp"
 
@@ -110,7 +134,7 @@ task :update_tests => "promises-tests" do
 end
 
 desc "Run the tests using Node"
-task :test => [:update_tests, "tests/rsvp.js"] do
+task :test => [:update_tests] do
   cd "promises-tests" do
     sh "node ./lib/cli.js ../tests/test-adapter.js"
   end
@@ -120,6 +144,8 @@ desc "Run the tests using the browser"
 task :browser_test => [:update_tests, "tests/tmp/test-bundle.js", :dist] do
   sh "open tests/index.html"
 end
+
+# Default task is build everything
 
 desc "Build RSVP.js"
 task :default => :dist
