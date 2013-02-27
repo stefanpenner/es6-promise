@@ -3,6 +3,26 @@ require "js_module_transpiler"
 
 directory "browser"
 directory "node"
+directory "tmp"
+
+file "tmp/rsvp.js" => ["lib/loader.js", "lib/async.js", "lib/events.js", "lib/rsvp.js"] do
+  loader = File.read("lib/loader.js")
+  async = File.read("lib/async.js")
+  events = File.read("lib/events.js")
+  rsvp = File.read("lib/rsvp.js")
+
+  output = [
+    loader,
+    async,
+    events,
+    rsvp,
+    "export RSVP"
+  ]
+
+  File.open("tmp/rsvp.js", "w") do |file|
+    file.puts output.join("\n")
+  end
+end
 
 file "browser/rsvp.js" => ["browser", "lib/rsvp.js"] do
   library = File.read("lib/rsvp.js")
