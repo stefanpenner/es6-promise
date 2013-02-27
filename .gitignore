@@ -1,4 +1,5 @@
 /node_modules
+/main.js
 /promise-tests/
 /promises-tests/
 /promises-aplus-tests/
