@@ -1,8 +1,8 @@
 {
   "name": "rsvp",
-  "version": "1.2.0",
+  "version": "2.0.0-rc1",
   "description": "A lightweight library that provides tools for organizing asynchronous code",
-  "main": "node/rsvp.js",
+  "main": "main.js",
   "directories": { "lib": "lib" },
   "devDependencies": {
     "jshint": "~0.9",
