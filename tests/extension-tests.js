@@ -1,5 +1,31 @@
 /*global RSVP, describe, specify, assert */
 describe("RSVP extensions", function() {
+  describe("RSVP.defer", function() {
+    specify("It should return a resolver and promise together", function(done) {
+      var deferred = RSVP.defer(), value = {};
+
+      // resolve first to confirm that the semantics are async
+      deferred.resolve(value);
+
+      deferred.promise.then(function(passedValue) {
+        assert(passedValue === value);
+        done();
+      });
+    });
+
+    specify("The provided resolver should support rejection", function(done) {
+      var deferred = RSVP.defer(), reason = {};
+
+      // resolve first to confirm that the semantics are async
+      deferred.reject(reason);
+
+      deferred.promise.then(null, function(passedReason) {
+        assert(passedReason === reason);
+        done();
+      });
+    });
+  });
+
   describe("RSVP.all", function() {
     specify('it should exist', function() {
       assert(RSVP.all);
