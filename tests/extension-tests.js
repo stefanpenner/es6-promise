@@ -125,5 +125,17 @@ describe("RSVP extensions", function() {
         done();
       });
     });
+
+    specify('works with a mix of promises and thenables and non-promises', function(done) {
+      var promise = new RSVP.Promise(function(resolve) { resolve(1); });
+      var syncThenable = { then: function (onFulfilled) { onFulfilled(2); } };
+      var asyncThenable = { then: function (onFulfilled) { setTimeout(function() { onFulfilled(3); }, 0); } };
+      var nonPromise = 4;
+
+      RSVP.all([promise, syncThenable, asyncThenable, nonPromise]).then(function(results) {
+        assert.deepEqual(results, [1, 2, 3, 4]);
+        done();
+      });
+    });
   });
 });
