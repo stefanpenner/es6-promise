@@ -1,5 +1,178 @@
-/*global RSVP, describe, specify, assert */
+/*global RSVP, describe, specify, it, assert */
 describe("RSVP extensions", function() {
+  describe("Promise constructor", function() {
+    it('should exist and have length 1', function() {
+      assert(RSVP.Promise);
+      assert.equal(RSVP.Promise.length, 1);
+    });
+
+    it('should fulfill if `resolve` is called with a value', function(done) {
+      var promise = new RSVP.Promise(function(resolve) { resolve('value'); });
+
+      promise.then(function(value) {
+        assert.equal(value, 'value');
+        done();
+      });
+    });
+
+    it('should reject if `reject` is called with a reason', function(done) {
+      var promise = new RSVP.Promise(function(resolve, reject) { reject('reason'); });
+
+      promise.then(function() {
+        assert(false);
+        done();
+      }, function(reason) {
+        assert.equal(reason, 'reason');
+        done();
+      });
+    });
+
+    it('should be a constructor', function() {
+      var promise = new RSVP.Promise(function() {});
+
+      assert.equal(Object.getPrototypeOf(promise), RSVP.Promise.prototype, '[[Prototype]] equals Promise.prototype');
+      assert.equal(promise.constructor, RSVP.Promise, 'constructor property of instances is set correctly');
+      assert.equal(RSVP.Promise.prototype.constructor, RSVP.Promise, 'constructor property of prototype is set correctly');
+    });
+
+    it('should work without `new`', function(done) {
+      var promise = RSVP.Promise(function(resolve) { resolve('value'); });
+
+      promise.then(function(value) {
+        assert.equal(value, 'value');
+        done();
+      });
+    });
+
+    it('should throw a `TypeError` if not given a function', function() {
+      assert.throws(function () {
+        var promise = new RSVP.Promise();
+      }, TypeError);
+
+      assert.throws(function () {
+        var promise = new RSVP.Promise({});
+      }, TypeError);
+
+      assert.throws(function () {
+        var promise = new RSVP.Promise('boo!');
+      }, TypeError);
+    });
+
+    describe('assimilation', function() {
+      it('should assimilate if `resolve` is called with a fulfilled promise', function(done) {
+        var originalPromise = new RSVP.Promise(function(resolve) { resolve('original value'); });
+        var promise = new RSVP.Promise(function(resolve) { resolve(originalPromise); });
+
+        promise.then(function(value) {
+          assert.equal(value, 'original value');
+          done();
+        });
+      });
+
+      it('should assimilate if `resolve` is called with a rejected promise', function(done) {
+        var originalPromise = new RSVP.Promise(function(resolve, reject) { reject('original reason'); });
+        var promise = new RSVP.Promise(function(resolve) { resolve(originalPromise); });
+
+        promise.then(function() {
+          assert(false);
+          done();
+        }, function(reason) {
+          assert.equal(reason, 'original reason');
+          done();
+        });
+      });
+
+      it('should assimilate if `resolve` is called with a fulfilled thenable', function(done) {
+        var originalThenable = {
+          then: function (onFulfilled) {
+            setTimeout(function() { onFulfilled('original value'); }, 0);
+          }
+        };
+        var promise = new RSVP.Promise(function(resolve) { resolve(originalThenable); });
+
+        promise.then(function(value) {
+          assert.equal(value, 'original value');
+          done();
+        });
+      });
+
+      it('should assimilate if `resolve` is called with a rejected thenable', function(done) {
+        var originalThenable = {
+          then: function (onFulfilled, onRejected) {
+            setTimeout(function() { onRejected('original reason'); }, 0);
+          }
+        };
+        var promise = new RSVP.Promise(function(resolve) { resolve(originalThenable); });
+
+        promise.then(function() {
+          assert(false);
+          done();
+        }, function(reason) {
+          assert.equal(reason, 'original reason');
+          done();
+        });
+      });
+
+      it('should assimilate two levels deep, for fulfillment', function(done) {
+        var originalPromise = new RSVP.Promise(function(resolve) { resolve('original value'); });
+        var nextPromise = new RSVP.Promise(function(resolve) { resolve(originalPromise); });
+        var promise = new RSVP.Promise(function(resolve) { resolve(nextPromise); });
+
+        promise.then(function(value) {
+          assert.equal(value, 'original value');
+          done();
+        });
+      });
+
+      it('should assimilate two levels deep, for rejection', function(done) {
+        var originalPromise = new RSVP.Promise(function(resolve, reject) { reject('original reason'); });
+        var nextPromise = new RSVP.Promise(function(resolve) { resolve(originalPromise); });
+        var promise = new RSVP.Promise(function(resolve) { resolve(nextPromise); });
+
+        promise.then(function() {
+          assert(false);
+          done();
+        }, function(reason) {
+          assert.equal(reason, 'original reason');
+          done();
+        });
+      });
+
+      it('should assimilate three levels deep, mixing thenables and promises (fulfilled case)', function(done) {
+        var originalPromise = new RSVP.Promise(function(resolve) { resolve('original value'); });
+        var intermediateThenable = {
+          then: function (onFulfilled) {
+            setTimeout(function() { onFulfilled(originalPromise); }, 0);
+          }
+        };
+        var promise = new RSVP.Promise(function(resolve) { resolve(intermediateThenable); });
+
+        promise.then(function(value) {
+          assert.equal(value, 'original value');
+          done();
+        });
+      });
+
+      it('should assimilate three levels deep, mixing thenables and promises (rejected case)', function(done) {
+        var originalPromise = new RSVP.Promise(function(resolve, reject) { reject('original reason'); });
+        var intermediateThenable = {
+          then: function (onFulfilled) {
+            setTimeout(function() { onFulfilled(originalPromise); }, 0);
+          }
+        };
+        var promise = new RSVP.Promise(function(resolve) { resolve(intermediateThenable); });
+
+        promise.then(function() {
+          assert(false);
+          done();
+        }, function(reason) {
+          assert.equal(reason, 'original reason');
+          done();
+        });
+      });
+    });
+  });
+
   describe("RSVP.defer", function() {
     specify("It should return a resolver and promise together", function(done) {
       var deferred = RSVP.defer(), value = {};
@@ -27,7 +200,7 @@ describe("RSVP extensions", function() {
   });
 
   describe("RSVP.all", function() {
-    specify('it should exist', function() {
+    it('should exist', function() {
       assert(RSVP.all);
     });
 
