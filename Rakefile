@@ -1,5 +1,6 @@
 require "bundler/setup"
-require "js_module_transpiler"
+
+ENV['PATH'] = "#{Dir.pwd}/node_modules/.bin:#{ENV['PATH']}"
 
 directory "browser"
 directory "node_modules/rsvp"
@@ -16,9 +17,7 @@ def amd_module(filename)
     library = File.read(input)
 
     open output, "w" do |file|
-      require "js_module_transpiler"
-      converter = JsModuleTranspiler::Compiler.new(library)
-      file.puts converter.to_amd
+      file.puts %x{compile-modules --type amd --anonymous -s < #{input}}
     end
   end
 
@@ -32,9 +31,7 @@ def node_module(filename, output="node_modules/rsvp/#{filename}.js")
     library = File.read(input)
 
     open output, "w" do |file|
-      require "js_module_transpiler"
-      converter = JsModuleTranspiler::Compiler.new(library)
-      file.puts converter.to_cjs
+      file.puts %x{compile-modules --type cjs --anonymous -s < #{input}}
     end
   end
 
@@ -83,16 +80,28 @@ file node_main => ["node_modules/rsvp", node_async, node_events]
 # Minified build
 
 file "browser/rsvp.min.js" => "browser/rsvp.js" do
-  output = `cat browser/rsvp.js | uglifyjs`
+  output = `uglifyjs browser/rsvp.js --mangle`
 
   open "browser/rsvp.min.js", "w" do |file|
     file.puts output
   end
 end
 
+task :install_transpiler do
+  if `which compile-modules`.empty?
+    sh "npm install es6-module-transpiler -g"
+  end
+end
+
+task :install_uglify do
+  if `which uglifyjs`.empty?
+    sh "npm install uglify-js -g"
+  end
+end
+
 # Build everything
 
-task :dist => [amd_async, amd_events, amd_rsvp, "browser/rsvp.js", "browser/rsvp.min.js", node_main]
+task :dist => [:install_transpiler, :install_uglify, amd_async, amd_events, amd_rsvp, "browser/rsvp.js", "browser/rsvp.min.js", node_main]
 
 # Testing
 
@@ -134,7 +143,7 @@ task :update_tests => "promises-tests" do
 end
 
 desc "Run the tests using Node"
-task :test => [:update_tests, node_main] do
+task :test => [:install_transpiler, :update_tests, node_main] do
   cd "promises-tests" do
     sh "node ./lib/cli.js ../tests/test-adapter.js"
   end
