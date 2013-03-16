@@ -199,6 +199,129 @@ describe("RSVP extensions", function() {
     });
   });
 
+  describe("RSVP.denodeify", function() {
+    specify('it should exist', function() {
+      assert(RSVP.denodeify);
+    });
+
+    specify('calls node function with any arguments passed', function(done) {
+      var args = null;
+
+      function nodeFunc(arg1, arg2, arg3, cb) {
+        args = [arg1, arg2, arg3];
+        cb();
+      }
+
+      var denodeifiedFunc = RSVP.denodeify(nodeFunc);
+
+      denodeifiedFunc(1, 2, 3).then(function() {
+        assert.deepEqual(args, [1, 2, 3]);
+        done();
+      });
+    });
+
+    specify('waits for promise/thenable arguments to settle before passing them to the node function', function(done) {
+      var args = null;
+
+      function nodeFunc(arg1, arg2, arg3, cb) {
+        args = [arg1, arg2, arg3];
+        cb();
+      }
+
+      var denodeifiedFunc = RSVP.denodeify(nodeFunc);
+
+      var promise = new RSVP.Promise(function(resolve) { resolve(1); });
+      var thenable = { then: function (onFulfilled) { onFulfilled(2); } };
+      var nonPromise = 3;
+      denodeifiedFunc(promise, thenable, nonPromise).then(function() {
+        assert.deepEqual(args, [1, 2, 3]);
+        done();
+      });
+    });
+
+    specify('fulfilled with value if node function calls back with a single argument', function(done) {
+      function nodeFunc(cb) {
+        cb(null, 'nodeFuncResult');
+      }
+
+      var denodeifiedFunc = RSVP.denodeify(nodeFunc);
+
+      denodeifiedFunc().then(function(value) {
+        assert.equal(value, 'nodeFuncResult');
+        done();
+      });
+    });
+
+    specify('fulfilled with array if node function calls back with multiple arguments', function(done) {
+      function nodeFunc(cb) {
+        cb(null, 1, 2, 3);
+      }
+
+      var denodeifiedFunc = RSVP.denodeify(nodeFunc);
+
+      denodeifiedFunc().then(function(value) {
+        assert.deepEqual(value, [1, 2, 3]);
+        done();
+      });
+    });
+
+    specify('rejected if node function calls back with error', function(done) {
+      function nodeFunc(cb) {
+        cb('bad!');
+      }
+
+      var denodeifiedFunc = RSVP.denodeify(nodeFunc);
+
+      denodeifiedFunc().then(function() {
+        assert(false);
+        done();
+      }, function(reason) {
+        assert.equal(reason, 'bad!');
+        done();
+      });
+    });
+
+    specify('rejected if node function throws an exception synchronously', function(done) {
+      function nodeFunc(cb) {
+        throw 'bad!';
+      }
+
+      var denodeifiedFunc = RSVP.denodeify(nodeFunc);
+
+      denodeifiedFunc().then(function() {
+        assert(false);
+        done();
+      }, function(reason) {
+        assert.equal(reason, 'bad!');
+        done();
+      });
+    });
+
+    specify('integration test showing how awesome this can be', function(done) {
+      function readFile(fileName, cb) {
+        setTimeout(function() {
+          cb(null, 'contents of ' + fileName);
+        }, 0);
+      }
+
+      var writtenTo = null;
+      function writeFile(fileName, text, cb) {
+        setTimeout(function () {
+          writtenTo = [fileName, text];
+          cb();
+        }, 0);
+      }
+
+      var denodeifiedReadFile = RSVP.denodeify(readFile);
+      var denodeifiedWriteFile = RSVP.denodeify(writeFile);
+
+      denodeifiedWriteFile('dest.txt', denodeifiedReadFile('src.txt')).then(function () {
+        assert.deepEqual(writtenTo, ['dest.txt', 'contents of src.txt']);
+        done();
+      });
+    });
+  });
+
   describe("RSVP.all", function() {
     it('should exist', function() {
       assert(RSVP.all);

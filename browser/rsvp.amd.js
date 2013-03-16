@@ -190,9 +190,41 @@ define(
       return deferred;
     }
 
+    function makeNodeCallbackFor(promise) {
+      return function (error, value) {
+        if (error) {
+          reject(promise, error);
+        } else if (arguments.length > 2) {
+          resolve(promise, Array.prototype.slice.call(arguments, 1));
+        } else {
+          resolve(promise, value);
+        }
+      };
+    }
+
+    function denodeify(nodeFunc) {
+      return function()  {
+        var nodeArgs = Array.prototype.slice.call(arguments);
+        var promise = new Promise(function() {});
+
+        all(nodeArgs).then(function(nodeArgs) {
+          nodeArgs.push(makeNodeCallbackFor(promise));
+
+          try {
+            nodeFunc.apply(this, nodeArgs);
+          } catch(e) {
+            reject(promise, e);
+          }
+        });
+
+        return promise;
+      };
+    }
+
 
     __exports__.Promise = Promise;
     __exports__.all = all;
     __exports__.defer = defer;
+    __exports__.denodeify = denodeify;
     __exports__.configure = configure;
   });
