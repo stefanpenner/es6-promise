@@ -200,6 +200,14 @@ define("rsvp",
     var Promise = function(resolver) {
       var promise = this;
 
+      if (typeof resolver !== 'function') {
+        throw new TypeError('You must pass a resolver function as the sole argument to the promise constructor');
+      }
+
+      if (!(promise instanceof Promise)) {
+        return new Promise(resolver);
+      }
+
       var resolvePromise = function(value) {
         resolve(promise, value);
         resolvePromise = noop;
@@ -220,9 +228,7 @@ define("rsvp",
         this.trigger('error', { detail: event.detail });
       }, this);
 
-      if (resolver) {
-        resolver(resolvePromise, rejectPromise);
-      }
+      resolver(resolvePromise, rejectPromise);
     };
 
     var invokeCallback = function(type, promise, callback, event) {
@@ -260,8 +266,10 @@ define("rsvp",
     };
 
     Promise.prototype = {
+      constructor: Promise,
+
       then: function(done, fail) {
-        var thenPromise = new Promise();
+        var thenPromise = new Promise(function() {});
 
         if (this.isFulfilled) {
           config.async(function() {
@@ -288,6 +296,18 @@ define("rsvp",
     };
 
     function resolve(promise, value) {
+      if (value && typeof value.then === 'function') {
+        value.then(function(val) {
+          resolve(promise, val);
+        }, function(val) {
+          reject(promise, val);
+        });
+      } else {
+        fulfill(promise, value);
+      }
+    }
+
+    function fulfill(promise, value) {
       config.async(function() {
         promise.trigger('promise:resolved', { detail: value });
         promise.isFulfilled = true;
@@ -305,7 +325,7 @@ define("rsvp",
 
     function all(promises) {
       var i, results = [];
-      var allPromise = new Promise();
+      var allPromise = new Promise(function() {});
       var remaining = promises.length;
 
       if (remaining === 0) {
