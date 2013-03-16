@@ -134,7 +134,7 @@ task :update_tests => "promises-tests" do
 end
 
 desc "Run the tests using Node"
-task :test => [:update_tests] do
+task :test => [:update_tests, node_main] do
   cd "promises-tests" do
     sh "node ./lib/cli.js ../tests/test-adapter.js"
   end
