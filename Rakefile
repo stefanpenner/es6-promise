@@ -2,7 +2,7 @@ require "bundler/setup"
 
 ENV['PATH'] = "#{Dir.pwd}/node_modules/.bin:#{ENV['PATH']}"
 
-directory "browser"
+directory "browser/rsvp"
 directory "node_modules/rsvp"
 
 def module_contents(file)
@@ -10,10 +10,11 @@ def module_contents(file)
 end
 
 def amd_module(filename)
-  output = "browser/#{filename}.amd.js"
-  input = "lib/#{filename}.js"
+  out_name = filename.sub(/\.js$/, '.amd.js')
+  output = "browser/#{out_name}"
+  input = "lib/#{filename}"
 
-  file output => ["browser", input] do
+  file output => ["browser/rsvp", input] do
     library = File.read(input)
 
     open output, "w" do |file|
@@ -24,8 +25,14 @@ def amd_module(filename)
   output
 end
 
-def node_module(filename, output="node_modules/rsvp/#{filename}.js")
-  input = "lib/#{filename}.js"
+def node_module(filename)
+  if filename == "rsvp.js"
+    output = "main.js"
+  else
+    output = "node_modules/#{filename}"
+  end
+
+  input = "lib/#{filename}"
 
   file output => ["browser", input] do
     library = File.read(input)
@@ -42,29 +49,45 @@ def read(file)
   File.read(file)
 end
 
-def name(filename, name)
+def named_module(name, filename)
+  name = name.sub(/\.js$/, '')
   body = read(filename)
   body.sub(/define\(/, "define(#{name.inspect},")
 end
 
+# Collect the modules
+
+modules = Dir.chdir "lib" do
+  Dir["**/*.js"] - ["loader.js"]
+end
+
 # Build the AMD modules
 
-amd_async = amd_module "async"
-amd_events = amd_module "events"
-amd_rsvp = amd_module "rsvp"
+amd_modules = modules.reduce({}) do |hash, mod|
+  hash.merge mod => amd_module(mod)
+end
 
 # Build the node modules
 
-node_async = node_module "async"
-node_events = node_module "events"
-node_main = node_module "rsvp", "main.js"
+node_modules = modules.reduce({}) do |hash, mod|
+  hash.merge mod => node_module(mod)
+end
+
+node_main = "main.js"
 
 # Build a browser build based on the AMD modules
 
-file "browser/rsvp.js" => ["browser", amd_async, amd_events, amd_rsvp] do
+browser_dependencies = ["browser/rsvp"] + amd_modules.values
+
+file "browser/rsvp.js" => browser_dependencies do
   output = []
   output << %|(function() {|
-  output.concat [read("lib/loader.js"), name(amd_async, "rsvp/async"), name(amd_events, "rsvp/events"), name(amd_rsvp, "rsvp")]
+  output << read("lib/loader.js")
+
+  amd_modules.each do |name, filename|
+    output << named_module(name, filename)
+  end
+
   output << %|window.RSVP = requireModule('rsvp');|
   output << %|})();|
 
@@ -75,7 +98,7 @@ end
 
 # Entry point for node build
 
-file node_main => ["node_modules/rsvp", node_async, node_events]
+file :node => ["node_modules/rsvp"] + node_modules.values
 
 # Minified build
 
@@ -101,7 +124,7 @@ end
 
 # Build everything
 
-task :dist => [:install_transpiler, :install_uglify, amd_async, amd_events, amd_rsvp, "browser/rsvp.js", "browser/rsvp.min.js", node_main]
+task :dist => [:install_transpiler, :install_uglify, "browser/rsvp.js", "browser/rsvp.min.js", :node]
 
 # Testing
 
@@ -143,7 +166,7 @@ task :update_tests => "promises-tests" do
 end
 
 desc "Run the tests using Node"
-task :test => [:install_transpiler, :update_tests, node_main] do
+task :test => [:install_transpiler, :update_tests, :node] do
   cd "promises-tests" do
     sh "node ./lib/cli.js ../tests/test-adapter.js"
   end
