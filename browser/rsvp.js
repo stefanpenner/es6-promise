@@ -32,23 +32,16 @@ var define, requireModule;
 })();
 
 define("rsvp/all",
-  ["rsvp/promise","exports"],
+  ["rsvp/defer","exports"],
   function(__dependency1__, __exports__) {
     "use strict";
-    var Promise = __dependency1__.Promise;
+    var defer = __dependency1__.defer;
 
     function all(promises) {
-      var i, results = [], resolve, reject;
-
-      var allPromise = new Promise(function(allResolver, allRejecter) {
-        resolve = allResolver;
-        reject = allRejecter;
-      });
-
-      var remaining = promises.length;
+      var results = [], deferred = defer(), remaining = promises.length;
 
       if (remaining === 0) {
-        resolve([]);
+        deferred.resolve([]);
       }
 
       var resolver = function(index) {
@@ -60,22 +53,22 @@ define("rsvp/all",
       var resolveAll = function(index, value) {
         results[index] = value;
         if (--remaining === 0) {
-          resolve(results);
+          deferred.resolve(results);
         }
       };
 
       var rejectAll = function(error) {
-        reject(error);
+        deferred.reject(error);
       };
 
-      for (i = 0; i < promises.length; i++) {
+      for (var i = 0; i < promises.length; i++) {
         if (promises[i] && typeof promises[i].then === 'function') {
           promises[i].then(resolver(i), rejectAll);
         } else {
           resolveAll(i, promises[i]);
         }
       }
-      return allPromise;
+      return deferred.promise;
     }
 
     __exports__.all = all;
@@ -270,6 +263,60 @@ define("rsvp/events",
     __exports__.EventTarget = EventTarget;
   });
 
+define("rsvp/hash",
+  ["rsvp/defer","exports"],
+  function(__dependency1__, __exports__) {
+    "use strict";
+    var defer = __dependency1__.defer;
+
+    function size(object) {
+      var size = 0;
+
+      for (var prop in object) {
+        size++;
+      }
+
+      return size;
+    }
+
+    function hash(promises) {
+      var results = {}, deferred = defer(), remaining = size(promises);
+
+      if (remaining === 0) {
+        deferred.resolve({});
+      }
+
+      var resolver = function(prop) {
+        return function(value) {
+          resolveAll(prop, value);
+        };
+      };
+
+      var resolveAll = function(prop, value) {
+        results[prop] = value;
+        if (--remaining === 0) {
+          deferred.resolve(results);
+        }
+      };
+
+      var rejectAll = function(error) {
+        deferred.reject(error);
+      };
+
+      for (var prop in promises) {
+        if (promises[prop] && typeof promises[prop].then === 'function') {
+          promises[prop].then(resolver(prop), rejectAll);
+        } else {
+          resolveAll(prop, promises[prop]);
+        }
+      }
+
+      return deferred.promise;
+    }
+
+    __exports__.hash = hash;
+  });
+
 define("rsvp/node",
   ["rsvp/promise","rsvp/all","exports"],
   function(__dependency1__, __dependency2__, __exports__) {
@@ -456,15 +503,16 @@ define("rsvp/promise",
   });
 
 define("rsvp",
-  ["rsvp/events","rsvp/promise","rsvp/node","rsvp/all","rsvp/defer","rsvp/config","exports"],
-  function(__dependency1__, __dependency2__, __dependency3__, __dependency4__, __dependency5__, __dependency6__, __exports__) {
+  ["rsvp/events","rsvp/promise","rsvp/node","rsvp/all","rsvp/hash","rsvp/defer","rsvp/config","exports"],
+  function(__dependency1__, __dependency2__, __dependency3__, __dependency4__, __dependency5__, __dependency6__, __dependency7__, __exports__) {
     "use strict";
     var EventTarget = __dependency1__.EventTarget;
     var Promise = __dependency2__.Promise;
     var denodeify = __dependency3__.denodeify;
     var all = __dependency4__.all;
-    var defer = __dependency5__.defer;
-    var config = __dependency6__.config;
+    var hash = __dependency5__.hash;
+    var defer = __dependency6__.defer;
+    var config = __dependency7__.config;
 
     function configure(name, value) {
       config[name] = value;
@@ -473,6 +521,7 @@ define("rsvp",
     __exports__.Promise = Promise;
     __exports__.EventTarget = EventTarget;
     __exports__.all = all;
+    __exports__.hash = hash;
     __exports__.defer = defer;
     __exports__.denodeify = denodeify;
     __exports__.configure = configure;

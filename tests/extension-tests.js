@@ -322,6 +322,92 @@ describe("RSVP extensions", function() {
     });
   });
 
+  describe("RSVP.hash", function() {
+    it('should exist', function() {
+      assert(RSVP.hash);
+    });
+
+    specify('fulfilled only after all of the promise values are fulfilled', function(done) {
+      var firstResolved, secondResolved, firstResolver, secondResolver;
+
+      var first = new RSVP.Promise(function(resolve) {
+        firstResolver = resolve;
+      });
+      first.then(function() {
+        firstResolved = true;
+      });
+
+      var second = new RSVP.Promise(function(resolve) {
+        secondResolver = resolve;
+      });
+      second.then(function() {
+        secondResolved = true;
+      });
+
+      setTimeout(function() {
+        firstResolver(true);
+      }, 0);
+
+      setTimeout(function() {
+        secondResolver(true);
+      }, 0);
+
+      RSVP.hash({ first: first, second: second }).then(function(values) {
+        assert(values.first);
+        assert(values.second);
+        done();
+      });
+    });
+
+    specify('rejected as soon as a promise is rejected', function(done) {
+      var firstResolver, secondResolver;
+
+      var first = new RSVP.Promise(function(resolve, reject) {
+        firstResolver = { resolve: resolve, reject: reject };
+      });
+
+      var second = new RSVP.Promise(function(resolve, reject) {
+        secondResolver = { resolve: resolve, reject: reject };
+      });
+
+      setTimeout(function() {
+        firstResolver.reject({});
+      }, 0);
+
+      setTimeout(function() {
+        secondResolver.resolve(true);
+      }, 5000);
+
+      RSVP.hash({ first: first, second: second }).then(function() {
+        assert(false);
+      }, function() {
+        assert(first.isRejected);
+        assert(!second.isResolved);
+        done();
+      });
+    });
+
+    specify('resolves an empty hash passed to RSVP.all()', function(done) {
+      RSVP.hash({}).then(function(results) {
+        assert.deepEqual(results, {});
+        done();
+      });
+    });
+
+    specify('works with a mix of promises and thenables and non-promises', function(done) {
+      var promise = new RSVP.Promise(function(resolve) { resolve(1); });
+      var syncThenable = { then: function (onFulfilled) { onFulfilled(2); } };
+      var asyncThenable = { then: function (onFulfilled) { setTimeout(function() { onFulfilled(3); }, 0); } };
+      var nonPromise = 4;
+
+      RSVP.hash({ promise: promise, syncThenable: syncThenable, asyncThenable: asyncThenable, nonPromise: nonPromise }).then(function(results) {
+        assert.deepEqual(results, { promise: 1, syncThenable: 2, asyncThenable: 3, nonPromise: 4 });
+        done();
+      });
+    });
+
+  });
+
   describe("RSVP.all", function() {
     it('should exist', function() {
       assert(RSVP.all);

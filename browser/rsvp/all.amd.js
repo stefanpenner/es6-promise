@@ -1,21 +1,14 @@
 define(
-  ["rsvp/promise","exports"],
+  ["rsvp/defer","exports"],
   function(__dependency1__, __exports__) {
     "use strict";
-    var Promise = __dependency1__.Promise;
+    var defer = __dependency1__.defer;
 
     function all(promises) {
-      var i, results = [], resolve, reject;
-
-      var allPromise = new Promise(function(allResolver, allRejecter) {
-        resolve = allResolver;
-        reject = allRejecter;
-      });
-
-      var remaining = promises.length;
+      var results = [], deferred = defer(), remaining = promises.length;
 
       if (remaining === 0) {
-        resolve([]);
+        deferred.resolve([]);
       }
 
       var resolver = function(index) {
@@ -27,22 +20,22 @@ define(
       var resolveAll = function(index, value) {
         results[index] = value;
         if (--remaining === 0) {
-          resolve(results);
+          deferred.resolve(results);
         }
       };
 
       var rejectAll = function(error) {
-        reject(error);
+        deferred.reject(error);
       };
 
-      for (i = 0; i < promises.length; i++) {
+      for (var i = 0; i < promises.length; i++) {
         if (promises[i] && typeof promises[i].then === 'function') {
           promises[i].then(resolver(i), rejectAll);
         } else {
           resolveAll(i, promises[i]);
         }
       }
-      return allPromise;
+      return deferred.promise;
     }
 
     __exports__.all = all;
