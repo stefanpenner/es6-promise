@@ -705,12 +705,21 @@ describe("RSVP extensions", function() {
             assert(calledResolved === 0, 'never resolved');
             assert(calledRejected === 1, 'rejected only once');
             assert(error === expectedError, 'rejected promise with x');
-            done();
           });
 
           rejector(expectedError);
           rejector(expectedError);
-          resolver();
+
+          rejector('foo');
+
+          resolver('bar');
+          resolver('baz');
+
+          setTimeout(function(){
+            assert(calledRejected === 1, 'only rejected once');
+            assert(calledResolved === 0, 'never resolved');
+            done();
+          }, 50);
         });
 
         describe("2.3.4 If calling then throws an exception e", function(){
