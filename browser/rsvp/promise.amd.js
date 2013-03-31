@@ -8,7 +8,8 @@ define(
     var noop = function() {};
 
     var Promise = function(resolver) {
-      var promise = this;
+      var promise = this,
+      resolved = false;
 
       if (typeof resolver !== 'function') {
         throw new TypeError('You must pass a resolver function as the sole argument to the promise constructor');
@@ -19,15 +20,15 @@ define(
       }
 
       var resolvePromise = function(value) {
+        if (resolved) { return; }
+        resolved = true;
         resolve(promise, value);
-        resolvePromise = noop;
-        rejectPromise = noop;
       };
 
       var rejectPromise = function(value) {
+        if (resolved) { return; }
+        resolved = true;
         reject(promise, value);
-        resolvePromise = noop;
-        rejectPromise = noop;
       };
 
       this.on('promise:resolved', function(event) {
@@ -134,6 +135,7 @@ define(
         promise.rejectedReason = value;
       });
     }
+
 
     __exports__.Promise = Promise;
   });

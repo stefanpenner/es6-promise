@@ -372,7 +372,8 @@ define("rsvp/promise",
     var noop = function() {};
 
     var Promise = function(resolver) {
-      var promise = this;
+      var promise = this,
+      resolved = false;
 
       if (typeof resolver !== 'function') {
         throw new TypeError('You must pass a resolver function as the sole argument to the promise constructor');
@@ -383,15 +384,15 @@ define("rsvp/promise",
       }
 
       var resolvePromise = function(value) {
+        if (resolved) { return; }
+        resolved = true;
         resolve(promise, value);
-        resolvePromise = noop;
-        rejectPromise = noop;
       };
 
       var rejectPromise = function(value) {
+        if (resolved) { return; }
+        resolved = true;
         reject(promise, value);
-        resolvePromise = noop;
-        rejectPromise = noop;
       };
 
       this.on('promise:resolved', function(event) {
@@ -499,12 +500,54 @@ define("rsvp/promise",
       });
     }
 
+
     __exports__.Promise = Promise;
   });
 
+define("rsvp/resolve",
+  ["rsvp/promise","exports"],
+  function(__dependency1__, __exports__) {
+    "use strict";
+    var Promise = __dependency1__.Promise;
+
+
+    function objectOrFunction(x) {
+      return typeof x === "function" || (typeof x === "object" && x !== null);
+    }
+
+    function resolve(thenable){
+      var promise = new Promise(function(resolve, reject){
+        var then;
+
+        try {
+          if ( objectOrFunction(thenable) ) {
+            then = thenable.then;
+
+            if (typeof then === "function") {
+              then.call(thenable, resolve, reject);
+            } else {
+              resolve(thenable);
+            }
+
+          } else {
+            resolve(thenable);
+          }
+
+        } catch(error) {
+          reject(error);
+        }
+      });
+
+      return promise;
+    }
+
+
+    __exports__.resolve = resolve;
+  });
+
 define("rsvp",
-  ["rsvp/events","rsvp/promise","rsvp/node","rsvp/all","rsvp/hash","rsvp/defer","rsvp/config","exports"],
-  function(__dependency1__, __dependency2__, __dependency3__, __dependency4__, __dependency5__, __dependency6__, __dependency7__, __exports__) {
+  ["rsvp/events","rsvp/promise","rsvp/node","rsvp/all","rsvp/hash","rsvp/defer","rsvp/config","rsvp/resolve","exports"],
+  function(__dependency1__, __dependency2__, __dependency3__, __dependency4__, __dependency5__, __dependency6__, __dependency7__, __dependency8__, __exports__) {
     "use strict";
     var EventTarget = __dependency1__.EventTarget;
     var Promise = __dependency2__.Promise;
@@ -513,10 +556,12 @@ define("rsvp",
     var hash = __dependency5__.hash;
     var defer = __dependency6__.defer;
     var config = __dependency7__.config;
+    var resolve = __dependency8__.resolve;
 
     function configure(name, value) {
       config[name] = value;
     }
+
 
     __exports__.Promise = Promise;
     __exports__.EventTarget = EventTarget;
@@ -525,6 +570,7 @@ define("rsvp",
     __exports__.defer = defer;
     __exports__.denodeify = denodeify;
     __exports__.configure = configure;
+    __exports__.resolve = resolve;
   });
 
 window.RSVP = requireModule('rsvp');
