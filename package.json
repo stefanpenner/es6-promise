@@ -1,6 +1,6 @@
 {
   "name": "rsvp",
-  "version": "2.0.0-rc1",
+  "version": "2.0.0",
   "description": "A lightweight library that provides tools for organizing asynchronous code",
   "main": "main.js",
   "directories": { "lib": "lib" },
