@@ -27,19 +27,20 @@ section below on TaskJS for more information.
 ### Basic Usage
 
 ```javascript
-var promise = new Promise();
+var promise = new RSVP.Promise(function(resolve, reject){
+  // succeed
+  resolve(value);
+  // or reject
+  reject(error);
+});
 
 promise.then(function(value) {
   // success
 }, function(value) {
   // failure
 });
-
-// later...
-
-promise.resolve(value) // triggers first callback
-promise.reject(error) // triggers second callback
 ```
+
 
 Once a promise has been resolved or rejected, it cannot be resolved or
 rejected again.
@@ -48,21 +49,21 @@ Here is an example of a simple XHR2 wrapper written using RSVP.js:
 
 ```javascript
 var getJSON = function(url) {
-  var promise = new RSVP.Promise();
+  var promise = new RSVP.Promise(function(resolve, reject){
+    var client = new XMLHttpRequest();
+    client.open("GET", url);
+    client.onreadystatechange = handler;
+    client.responseType = "json";
+    client.setRequestHeader("Accept", "application/json");
+    client.send();
 
-  var client = new XMLHttpRequest();
-  client.open("GET", url);
-  client.onreadystatechange = handler;
-  client.responseType = "json";
-  client.setRequestHeader("Accept", "application/json");
-  client.send();
-
-  function handler() {
-    if (this.readyState === this.DONE) {
-      if (this.status === 200) { promise.resolve(this.response); }
-      else { promise.reject(this); }
-    }
-  };
+    function handler() {
+      if (this.readyState === this.DONE) {
+        if (this.status === 200) { resolve(this.response); }
+        else { reject(this); }
+      }
+    };
+  });
 
   return promise;
 };
