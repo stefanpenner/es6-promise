@@ -5,7 +5,13 @@ define(
     var config = __dependency1__.config;
     var EventTarget = __dependency2__.EventTarget;
 
-    var noop = function() {};
+    function objectOrFunction(x) {
+      return isFunction(x) || (typeof x === "object" && x !== null);
+    }
+
+    function isFunction(x){
+      return typeof x === "function";
+    }
 
     var Promise = function(resolver) {
       var promise = this,
@@ -43,7 +49,7 @@ define(
     };
 
     var invokeCallback = function(type, promise, callback, event) {
-      var hasCallback = typeof callback === 'function',
+      var hasCallback = isFunction(callback),
           value, error, succeeded, failed;
 
       if (hasCallback) {
@@ -59,7 +65,7 @@ define(
         succeeded = true;
       }
 
-      if (value && typeof value.then === 'function') {
+      if (objectOrFunction(value) && isFunction(value.then)) {
         value.then(function(value) {
           resolve(promise, value);
         }, function(error) {
@@ -109,7 +115,9 @@ define(
     EventTarget.mixin(Promise.prototype);
 
     function resolve(promise, value) {
-      if (value && typeof value.then === 'function') {
+      if (value && (value === promise) || (objectOrFunction(value) && isFunction(value.promise) && value.promise() === promise)) {
+        fulfill(promise, value);
+      } else if (objectOrFunction(value) && isFunction(value.then)) {
         value.then(function(val) {
           resolve(promise, val);
         }, function(val) {
