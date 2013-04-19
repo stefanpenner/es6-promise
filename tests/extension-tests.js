@@ -134,6 +134,27 @@ describe("RSVP extensions", function() {
         });
       });
 
+
+      it('should assimilate two levels deep, for fulfillment of self fulfilling promises', function(done) {
+        var originalPromise, promise;
+        originalPromise = new RSVP.Promise(function(resolve) {
+          setTimeout(function() {
+            resolve(originalPromise);
+          }, 0)
+        });
+
+        promise = new RSVP.Promise(function(resolve) {
+          setTimeout(function() {
+            resolve(originalPromise);
+          }, 0);
+        });
+
+        promise.then(function(value) {
+          assert.equal(value, originalPromise);
+          done();
+        });
+      });
+
       it('should assimilate two levels deep, for fulfillment', function(done) {
         var originalPromise = new RSVP.Promise(function(resolve) { resolve('original value'); });
         var nextPromise = new RSVP.Promise(function(resolve) { resolve(originalPromise); });
