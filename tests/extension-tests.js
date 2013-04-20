@@ -7,7 +7,7 @@ describe("RSVP extensions", function() {
 
       aDefer.promise.then(function(a){
         setTimeout(function(){
-          bDefer.resolve(bDefer);
+          bDefer.resolve(bDefer.promise);
         }, 1);
 
         return bDefer.promise;
