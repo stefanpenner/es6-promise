@@ -1,5 +1,26 @@
 /*global RSVP, describe, specify, it, assert */
 describe("RSVP extensions", function() {
+  describe("self fulfillment", function(){
+    it("treats self fulfillment as the recursive base case", function(done){
+      var aDefer = new RSVP.defer(),
+      bDefer = new RSVP.defer();
+
+      aDefer.promise.then(function(a){
+        setTimeout(function(){
+          bDefer.resolve(bDefer.promise);
+        }, 1);
+
+        return bDefer.promise;
+      });
+
+      bDefer.promise.then(function(c){
+        done();
+      })
+
+      aDefer.resolve(aDefer.promise);
+    });
+  });
+
   describe("Promise constructor", function() {
     it('should exist and have length 1', function() {
       assert(RSVP.Promise);
@@ -109,6 +130,27 @@ describe("RSVP extensions", function() {
           done();
         }, function(reason) {
           assert.equal(reason, 'original reason');
+          done();
+        });
+      });
+
+
+      it('should assimilate two levels deep, for fulfillment of self fulfilling promises', function(done) {
+        var originalPromise, promise;
+        originalPromise = new RSVP.Promise(function(resolve) {
+          setTimeout(function() {
+            resolve(originalPromise);
+          }, 0)
+        });
+
+        promise = new RSVP.Promise(function(resolve) {
+          setTimeout(function() {
+            resolve(originalPromise);
+          }, 0);
+        });
+
+        promise.then(function(value) {
+          assert.equal(value, originalPromise);
           done();
         });
       });
