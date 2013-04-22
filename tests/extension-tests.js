@@ -3,21 +3,25 @@ describe("RSVP extensions", function() {
   describe("self fulfillment", function(){
     it("treats self fulfillment as the recursive base case", function(done){
       var aDefer = new RSVP.defer(),
-      bDefer = new RSVP.defer();
+      bDefer = new RSVP.defer(),
+      promiseA = aDefer.promise,
+      promiseB = bDefer.promise;
 
-      aDefer.promise.then(function(a){
+      promiseA.then(function(a){
         setTimeout(function(){
-          bDefer.resolve(bDefer.promise);
+          bDefer.resolve(promiseB);
         }, 1);
 
-        return bDefer.promise;
+        return promiseB;
       });
 
-      bDefer.promise.then(function(c){
+      promiseB.then(function(c){
         done();
       })
 
-      aDefer.resolve(aDefer.promise);
+      aDefer.resolve(promiseA);
+    });
+  });
     });
   });
 
