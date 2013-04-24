@@ -22,8 +22,6 @@ describe("RSVP extensions", function() {
       aDefer.resolve(promiseA);
     });
   });
-    });
-  });
 
   describe("Promise constructor", function() {
     it('should exist and have length 1', function() {

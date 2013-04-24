@@ -31,47 +31,32 @@ var define, requireModule;
   };
 })();
 
-define("rsvp/all",
-  ["rsvp/defer","exports"],
-  function(__dependency1__, __exports__) {
+define("rsvp",
+  ["rsvp/events","rsvp/promise","rsvp/node","rsvp/all","rsvp/hash","rsvp/defer","rsvp/config","rsvp/resolve","exports"],
+  function(__dependency1__, __dependency2__, __dependency3__, __dependency4__, __dependency5__, __dependency6__, __dependency7__, __dependency8__, __exports__) {
     "use strict";
-    var defer = __dependency1__.defer;
+    var EventTarget = __dependency1__.EventTarget;
+    var Promise = __dependency2__.Promise;
+    var denodeify = __dependency3__.denodeify;
+    var all = __dependency4__.all;
+    var hash = __dependency5__.hash;
+    var defer = __dependency6__.defer;
+    var config = __dependency7__.config;
+    var resolve = __dependency8__.resolve;
 
-    function all(promises) {
-      var results = [], deferred = defer(), remaining = promises.length;
-
-      if (remaining === 0) {
-        deferred.resolve([]);
-      }
-
-      var resolver = function(index) {
-        return function(value) {
-          resolveAll(index, value);
-        };
-      };
-
-      var resolveAll = function(index, value) {
-        results[index] = value;
-        if (--remaining === 0) {
-          deferred.resolve(results);
-        }
-      };
-
-      var rejectAll = function(error) {
-        deferred.reject(error);
-      };
-
-      for (var i = 0; i < promises.length; i++) {
-        if (promises[i] && typeof promises[i].then === 'function') {
-          promises[i].then(resolver(i), rejectAll);
-        } else {
-          resolveAll(i, promises[i]);
-        }
-      }
-      return deferred.promise;
+    function configure(name, value) {
+      config[name] = value;
     }
 
+
+    __exports__.Promise = Promise;
+    __exports__.EventTarget = EventTarget;
     __exports__.all = all;
+    __exports__.hash = hash;
+    __exports__.defer = defer;
+    __exports__.denodeify = denodeify;
+    __exports__.configure = configure;
+    __exports__.resolve = resolve;
   });
 
 define("rsvp/async",
@@ -126,141 +111,6 @@ define("rsvp/async",
 
 
     __exports__.async = async;
-  });
-
-define("rsvp/config",
-  ["rsvp/async","exports"],
-  function(__dependency1__, __exports__) {
-    "use strict";
-    var async = __dependency1__.async;
-
-    var config = {};
-    config.async = async;
-
-    __exports__.config = config;
-  });
-
-define("rsvp/defer",
-  ["rsvp/promise","exports"],
-  function(__dependency1__, __exports__) {
-    "use strict";
-    var Promise = __dependency1__.Promise;
-
-    function defer() {
-      var deferred = {};
-
-      var promise = new Promise(function(resolve, reject) {
-        deferred.resolve = resolve;
-        deferred.reject = reject;
-      });
-
-      deferred.promise = promise;
-      return deferred;
-    }
-
-    __exports__.defer = defer;
-  });
-
-define("rsvp/events",
-  ["exports"],
-  function(__exports__) {
-    "use strict";
-    var Event = function(type, options) {
-      this.type = type;
-
-      for (var option in options) {
-        if (!options.hasOwnProperty(option)) { continue; }
-
-        this[option] = options[option];
-      }
-    };
-
-    var indexOf = function(callbacks, callback) {
-      for (var i=0, l=callbacks.length; i<l; i++) {
-        if (callbacks[i][0] === callback) { return i; }
-      }
-
-      return -1;
-    };
-
-    var callbacksFor = function(object) {
-      var callbacks = object._promiseCallbacks;
-
-      if (!callbacks) {
-        callbacks = object._promiseCallbacks = {};
-      }
-
-      return callbacks;
-    };
-
-    var EventTarget = {
-      mixin: function(object) {
-        object.on = this.on;
-        object.off = this.off;
-        object.trigger = this.trigger;
-        return object;
-      },
-
-      on: function(eventNames, callback, binding) {
-        var allCallbacks = callbacksFor(this), callbacks, eventName;
-        eventNames = eventNames.split(/\s+/);
-        binding = binding || this;
-
-        while (eventName = eventNames.shift()) {
-          callbacks = allCallbacks[eventName];
-
-          if (!callbacks) {
-            callbacks = allCallbacks[eventName] = [];
-          }
-
-          if (indexOf(callbacks, callback) === -1) {
-            callbacks.push([callback, binding]);
-          }
-        }
-      },
-
-      off: function(eventNames, callback) {
-        var allCallbacks = callbacksFor(this), callbacks, eventName, index;
-        eventNames = eventNames.split(/\s+/);
-
-        while (eventName = eventNames.shift()) {
-          if (!callback) {
-            allCallbacks[eventName] = [];
-            continue;
-          }
-
-          callbacks = allCallbacks[eventName];
-
-          index = indexOf(callbacks, callback);
-
-          if (index !== -1) { callbacks.splice(index, 1); }
-        }
-      },
-
-      trigger: function(eventName, options) {
-        var allCallbacks = callbacksFor(this),
-            callbacks, callbackTuple, callback, binding, event;
-
-        if (callbacks = allCallbacks[eventName]) {
-          // Don't cache the callbacks.length since it may grow
-          for (var i=0; i<callbacks.length; i++) {
-            callbackTuple = callbacks[i];
-            callback = callbackTuple[0];
-            binding = callbackTuple[1];
-
-            if (typeof options !== 'object') {
-              options = { detail: options };
-            }
-
-            event = new Event(eventName, options);
-            callback.call(binding, event);
-          }
-        }
-      }
-    };
-
-
-    __exports__.EventTarget = EventTarget;
   });
 
 define("rsvp/hash",
@@ -360,6 +210,123 @@ define("rsvp/node",
     }
 
     __exports__.denodeify = denodeify;
+  });
+
+define("rsvp/defer",
+  ["rsvp/promise","exports"],
+  function(__dependency1__, __exports__) {
+    "use strict";
+    var Promise = __dependency1__.Promise;
+
+    function defer() {
+      var deferred = {};
+
+      var promise = new Promise(function(resolve, reject) {
+        deferred.resolve = resolve;
+        deferred.reject = reject;
+      });
+
+      deferred.promise = promise;
+      return deferred;
+    }
+
+    __exports__.defer = defer;
+  });
+
+define("rsvp/config",
+  ["rsvp/async","exports"],
+  function(__dependency1__, __exports__) {
+    "use strict";
+    var async = __dependency1__.async;
+
+    var config = {};
+    config.async = async;
+
+    __exports__.config = config;
+  });
+
+define("rsvp/all",
+  ["rsvp/defer","exports"],
+  function(__dependency1__, __exports__) {
+    "use strict";
+    var defer = __dependency1__.defer;
+
+    function all(promises) {
+      var results = [], deferred = defer(), remaining = promises.length;
+
+      if (remaining === 0) {
+        deferred.resolve([]);
+      }
+
+      var resolver = function(index) {
+        return function(value) {
+          resolveAll(index, value);
+        };
+      };
+
+      var resolveAll = function(index, value) {
+        results[index] = value;
+        if (--remaining === 0) {
+          deferred.resolve(results);
+        }
+      };
+
+      var rejectAll = function(error) {
+        deferred.reject(error);
+      };
+
+      for (var i = 0; i < promises.length; i++) {
+        if (promises[i] && typeof promises[i].then === 'function') {
+          promises[i].then(resolver(i), rejectAll);
+        } else {
+          resolveAll(i, promises[i]);
+        }
+      }
+      return deferred.promise;
+    }
+
+    __exports__.all = all;
+  });
+
+define("rsvp/resolve",
+  ["rsvp/promise","exports"],
+  function(__dependency1__, __exports__) {
+    "use strict";
+    var Promise = __dependency1__.Promise;
+
+
+    function objectOrFunction(x) {
+      return typeof x === "function" || (typeof x === "object" && x !== null);
+    }
+
+    function resolve(thenable){
+      var promise = new Promise(function(resolve, reject){
+        var then;
+
+        try {
+          if ( objectOrFunction(thenable) ) {
+            then = thenable.then;
+
+            if (typeof then === "function") {
+              then.call(thenable, resolve, reject);
+            } else {
+              resolve(thenable);
+            }
+
+          } else {
+            resolve(thenable);
+          }
+
+        } catch(error) {
+          reject(error);
+        }
+      });
+
+      return promise;
+    }
+
+
+    __exports__.resolve = resolve;
   });
 
 define("rsvp/promise",
@@ -517,73 +484,106 @@ define("rsvp/promise",
     __exports__.Promise = Promise;
   });
 
-define("rsvp/resolve",
-  ["rsvp/promise","exports"],
-  function(__dependency1__, __exports__) {
+define("rsvp/events",
+  ["exports"],
+  function(__exports__) {
     "use strict";
-    var Promise = __dependency1__.Promise;
+    var Event = function(type, options) {
+      this.type = type;
 
+      for (var option in options) {
+        if (!options.hasOwnProperty(option)) { continue; }
 
-    function objectOrFunction(x) {
-      return typeof x === "function" || (typeof x === "object" && x !== null);
-    }
+        this[option] = options[option];
+      }
+    };
 
-    function resolve(thenable){
-      var promise = new Promise(function(resolve, reject){
-        var then;
+    var indexOf = function(callbacks, callback) {
+      for (var i=0, l=callbacks.length; i<l; i++) {
+        if (callbacks[i][0] === callback) { return i; }
+      }
 
-        try {
-          if ( objectOrFunction(thenable) ) {
-            then = thenable.then;
+      return -1;
+    };
 
-            if (typeof then === "function") {
-              then.call(thenable, resolve, reject);
-            } else {
-              resolve(thenable);
-            }
+    var callbacksFor = function(object) {
+      var callbacks = object._promiseCallbacks;
 
-          } else {
-            resolve(thenable);
+      if (!callbacks) {
+        callbacks = object._promiseCallbacks = {};
+      }
+
+      return callbacks;
+    };
+
+    var EventTarget = {
+      mixin: function(object) {
+        object.on = this.on;
+        object.off = this.off;
+        object.trigger = this.trigger;
+        return object;
+      },
+
+      on: function(eventNames, callback, binding) {
+        var allCallbacks = callbacksFor(this), callbacks, eventName;
+        eventNames = eventNames.split(/\s+/);
+        binding = binding || this;
+
+        while (eventName = eventNames.shift()) {
+          callbacks = allCallbacks[eventName];
+
+          if (!callbacks) {
+            callbacks = allCallbacks[eventName] = [];
           }
 
-        } catch(error) {
-          reject(error);
+          if (indexOf(callbacks, callback) === -1) {
+            callbacks.push([callback, binding]);
+          }
         }
-      });
+      },
 
-      return promise;
-    }
+      off: function(eventNames, callback) {
+        var allCallbacks = callbacksFor(this), callbacks, eventName, index;
+        eventNames = eventNames.split(/\s+/);
+
+        while (eventName = eventNames.shift()) {
+          if (!callback) {
+            allCallbacks[eventName] = [];
+            continue;
+          }
+
+          callbacks = allCallbacks[eventName];
+
+          index = indexOf(callbacks, callback);
+
+          if (index !== -1) { callbacks.splice(index, 1); }
+        }
+      },
+
+      trigger: function(eventName, options) {
+        var allCallbacks = callbacksFor(this),
+            callbacks, callbackTuple, callback, binding, event;
+
+        if (callbacks = allCallbacks[eventName]) {
+          // Don't cache the callbacks.length since it may grow
+          for (var i=0; i<callbacks.length; i++) {
+            callbackTuple = callbacks[i];
+            callback = callbackTuple[0];
+            binding = callbackTuple[1];
+
+            if (typeof options !== 'object') {
+              options = { detail: options };
+            }
+
+            event = new Event(eventName, options);
+            callback.call(binding, event);
+          }
+        }
+      }
+    };
 
 
-    __exports__.resolve = resolve;
-  });
-
-define("rsvp",
-  ["rsvp/events","rsvp/promise","rsvp/node","rsvp/all","rsvp/hash","rsvp/defer","rsvp/config","rsvp/resolve","exports"],
-  function(__dependency1__, __dependency2__, __dependency3__, __dependency4__, __dependency5__, __dependency6__, __dependency7__, __dependency8__, __exports__) {
-    "use strict";
-    var EventTarget = __dependency1__.EventTarget;
-    var Promise = __dependency2__.Promise;
-    var denodeify = __dependency3__.denodeify;
-    var all = __dependency4__.all;
-    var hash = __dependency5__.hash;
-    var defer = __dependency6__.defer;
-    var config = __dependency7__.config;
-    var resolve = __dependency8__.resolve;
-
-    function configure(name, value) {
-      config[name] = value;
-    }
-
-
-    __exports__.Promise = Promise;
     __exports__.EventTarget = EventTarget;
-    __exports__.all = all;
-    __exports__.hash = hash;
-    __exports__.defer = defer;
-    __exports__.denodeify = denodeify;
-    __exports__.configure = configure;
-    __exports__.resolve = resolve;
   });
 
 window.RSVP = requireModule('rsvp');
