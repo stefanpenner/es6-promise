@@ -81,6 +81,15 @@ describe("RSVP extensions", function() {
       }, TypeError);
     });
 
+    it('should reject on resolver exception', function(done) {
+      var promise = RSVP.Promise(function() {
+        throw 'error';
+      }).then(null, function(e) {
+        assert.equal(e, 'error');
+        done();
+      });
+    });
+
     describe('assimilation', function() {
       it('should assimilate if `resolve` is called with a fulfilled promise', function(done) {
         var originalPromise = new RSVP.Promise(function(resolve) { resolve('original value'); });
