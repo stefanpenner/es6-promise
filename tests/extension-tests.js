@@ -574,6 +574,23 @@ describe("RSVP extensions", function() {
     });
   });
 
+  describe("RSVP.reject", function(){
+    specify("it should exist", function(){
+      assert(RSVP.reject);
+    });
+
+    describe('it rejects', function(){
+      var reason = 'the reason',
+      promise = RSVP.reject(reason);
+
+      promise.then(function(){
+        assert(false, 'should not fulfill');
+      }, function(actualReason){
+        assert.equal(reason, actualReason);
+      });
+    });
+  });
+
   describe("RSVP.resolve", function(){
     specify("it should exist", function(){
       assert(RSVP.resolve);

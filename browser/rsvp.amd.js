@@ -1,6 +1,6 @@
 define(
-  ["rsvp/events","rsvp/promise","rsvp/node","rsvp/all","rsvp/hash","rsvp/defer","rsvp/config","rsvp/resolve","exports"],
-  function(__dependency1__, __dependency2__, __dependency3__, __dependency4__, __dependency5__, __dependency6__, __dependency7__, __dependency8__, __exports__) {
+  ["rsvp/events","rsvp/promise","rsvp/node","rsvp/all","rsvp/hash","rsvp/defer","rsvp/config","rsvp/resolve","rsvp/reject","exports"],
+  function(__dependency1__, __dependency2__, __dependency3__, __dependency4__, __dependency5__, __dependency6__, __dependency7__, __dependency8__, __dependency9__, __exports__) {
     "use strict";
     var EventTarget = __dependency1__.EventTarget;
     var Promise = __dependency2__.Promise;
@@ -10,6 +10,7 @@ define(
     var defer = __dependency6__.defer;
     var config = __dependency7__.config;
     var resolve = __dependency8__.resolve;
+    var reject = __dependency9__.reject;
 
     function configure(name, value) {
       config[name] = value;
@@ -24,4 +25,5 @@ define(
     __exports__.denodeify = denodeify;
     __exports__.configure = configure;
     __exports__.resolve = resolve;
+    __exports__.reject = reject;
   });

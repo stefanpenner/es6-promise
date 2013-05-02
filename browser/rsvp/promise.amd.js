@@ -45,7 +45,11 @@ define(
         this.trigger('error', { detail: event.detail });
       }, this);
 
-      resolver(resolvePromise, rejectPromise);
+      try {
+        resolver(resolvePromise, rejectPromise);
+      } catch(e) {
+        rejectPromise(e);
+      }
     };
 
     var invokeCallback = function(type, promise, callback, event) {
@@ -65,12 +69,8 @@ define(
         succeeded = true;
       }
 
-      if (objectOrFunction(value) && isFunction(value.then)) {
-        value.then(function(value) {
-          resolve(promise, value);
-        }, function(error) {
-          reject(promise, error);
-        });
+      if (handleThenable(promise, value)) {
+        return;
       } else if (hasCallback && succeeded) {
         resolve(promise, value);
       } else if (failed) {
@@ -115,22 +115,43 @@ define(
     EventTarget.mixin(Promise.prototype);
 
     function resolve(promise, value) {
-
       if (promise === value) {
         fulfill(promise, value);
-      } else if (objectOrFunction(value) && isFunction(value.then)) {
-        value.then(function(val) {
-          if (value !== val) {
-            resolve(promise, val);
-          } else {
-            fulfill(promise, val);
-          }
-        }, function(val) {
-          reject(promise, val);
-        });
-      } else {
+      } else if (!handleThenable(promise, value)) {
         fulfill(promise, value);
       }
+    }
+
+    function handleThenable(promise, value) {
+      var then = null;
+
+      if (objectOrFunction(value)) {
+        try {
+          then = value.then;
+        } catch(e) {
+          reject(promise, e);
+          return true;
+        }
+
+        if (isFunction(then)) {
+          try {
+            then.call(value, function(val) {
+              if (value !== val) {
+                resolve(promise, val);
+              } else {
+                fulfill(promise, val);
+              }
+            }, function(val) {
+              reject(promise, val);
+            });
+          } catch (e) {
+            reject(promise, e);
+          }
+          return true;
+        }
+      }
+
+      return false;
     }
 
     function fulfill(promise, value) {
