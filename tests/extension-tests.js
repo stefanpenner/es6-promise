@@ -613,6 +613,12 @@ describe("RSVP extensions", function() {
       assert(RSVP.resolve);
     });
 
+    specify("it short circuits if RSVP.promise", function(){
+
+      var deferred = new RSVP.defer();
+      assert.equal(RSVP.resolve(deferred.promise), deferred.promise);
+    });
+
     describe("1. If x is a promise, adopt its state ", function(){
       specify("1.1 If x is pending, promise must remain pending until x is fulfilled or rejected.", function(done){
         var expectedValue, resolver, thenable, wrapped;
