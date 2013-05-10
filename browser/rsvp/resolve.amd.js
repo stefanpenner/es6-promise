@@ -8,12 +8,12 @@ define(
       return typeof x === "function" || (typeof x === "object" && x !== null);
     }
 
-    function resolve(thenable){
+    function resolve(thenable) {
       if (thenable instanceof Promise) {
         return thenable;
       }
 
-      var promise = new Promise(function(resolve, reject){
+      var promise = new Promise(function(resolve, reject) {
         var then;
 
         try {
