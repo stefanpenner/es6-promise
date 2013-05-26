@@ -114,8 +114,8 @@ Errors also propagate:
 getJSON("/posts.json").then(function(posts) {
 
 }).then(null, function(error) {
-  // even though no error callback was passed to the
-  // first `.then`, the error propagates
+  // since no rejection handler was passed to the
+  // first `.then`, the error propagates.
 });
 ```
 
