@@ -1,7 +1,5 @@
 /*global RSVP*/
 
-'use strict';
-
 var Promise;
 
 if (typeof RSVP !== 'undefined') {
@@ -9,7 +7,13 @@ if (typeof RSVP !== 'undefined') {
   Promise = RSVP.Promise;
 } else {
   // Test the Node build
-  var Promise = require('../main').Promise;
+  RSVP = require('../dist/commonjs/main');
+  Promise = require('../dist/commonjs/main').Promise;
+  assert = require('./vendor/assert');
+}
+
+if (typeof window === 'undefined' && typeof global !== 'undefined') {
+  window = global;
 }
 
 var adapter = {};
