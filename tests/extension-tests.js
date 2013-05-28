@@ -483,6 +483,20 @@ describe("RSVP extensions", function() {
       assert(RSVP.all);
     });
 
+    it('throws when not passed an array', function() {
+      assert.throws(function () {
+        var all = RSVP.all();
+      }, TypeError);
+
+      assert.throws(function () {
+        var all = RSVP.all('');
+      }, TypeError);
+
+      assert.throws(function () {
+        var all = RSVP.all({});
+      }, TypeError);
+    });
+
     specify('fulfilled only after all of the other promises are fulfilled', function(done) {
       var firstResolved, secondResolved, firstResolver, secondResolver;
 
