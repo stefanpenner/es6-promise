@@ -41,7 +41,6 @@ promise.then(function(value) {
 });
 ```
 
-
 Once a promise has been resolved or rejected, it cannot be resolved or
 rejected again.
 
@@ -89,7 +88,7 @@ getJSON("/posts.json").then(function(json) {
   return json.post;
 }).then(function(post) {
   // proceed
-});;
+});
 ```
 
 The really awesome part comes when you return a promise from the first
@@ -101,7 +100,7 @@ getJSON("/post/1.json").then(function(post) {
   return getJSON(post.commentURL);
 }).then(function(comments) {
   // proceed with access to posts and comments
-});;
+});
 ```
 
 This allows you to flatten out nested callbacks, and is the main feature
