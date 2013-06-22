@@ -1,15 +1,2 @@
-/.jshintrc
-/.npmignore
-/.bundle
-/component.json
-/bin
-/browser/
 /node_modules/
-/Rakefile
-/Gemfile
-/Gemfile.lock
-/tests/
-/promises-aplus-tests
-/promises-tests
-/promise-tests # for orphans left from earlier versions
-/lib
+/tmp

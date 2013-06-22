@@ -1,6 +1,5 @@
 /node_modules
+/promises_tests
 /main.js
-/promise-tests/
-/promises-tests/
-/promises-aplus-tests/
-/.bundle
+/tmp
+/dist
