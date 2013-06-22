@@ -38,6 +38,9 @@ define("rsvp/all",
     var Promise = __dependency1__.Promise;
 
     function all(promises) {
+      if(toString.call(promises) !== "[object Array]") {
+        throw new TypeError('You must pass an array to all.');
+      }
       return new Promise(function(resolve, reject) {
         var results = [], remaining = promises.length,
         promise;
@@ -318,7 +321,51 @@ define("rsvp/hash",
     __exports__.hash = hash;
   });
 
+define("rsvp/node",
+  ["rsvp/promise","rsvp/all","exports"],
+  function(__dependency1__, __dependency2__, __exports__) {
+    "use strict";
+    var Promise = __dependency1__.Promise;
+    var all = __dependency2__.all;
 
+    function makeNodeCallbackFor(resolve, reject) {
+      return function (error, value) {
+        if (error) {
+          reject(error);
+        } else if (arguments.length > 2) {
+          resolve(Array.prototype.slice.call(arguments, 1));
+        } else {
+          resolve(value);
+        }
+      };
+    }
+
+    function denodeify(nodeFunc) {
+      return function()  {
+        var nodeArgs = Array.prototype.slice.call(arguments), resolve, reject;
+        var thisArg = this;
+
+        var promise = new Promise(function(nodeResolve, nodeReject) {
+          resolve = nodeResolve;
+          reject = nodeReject;
+        });
+
+        all(nodeArgs).then(function(nodeArgs) {
+          nodeArgs.push(makeNodeCallbackFor(resolve, reject));
+
+          try {
+            nodeFunc.apply(thisArg, nodeArgs);
+          } catch(e) {
+            reject(e);
+          }
+        });
+
+        return promise;
+      };
+    }
+
+    __exports__.denodeify = denodeify;
+  });
 
 define("rsvp/promise",
   ["rsvp/config","rsvp/events","exports"],
@@ -367,12 +414,20 @@ define("rsvp/promise",
         this.trigger('error', { detail: event.detail });
       }, this);
 
+      this.on('error', onerror);
+
       try {
         resolver(resolvePromise, rejectPromise);
       } catch(e) {
         rejectPromise(e);
       }
     };
+
+    function onerror(event) {
+      if (config.onerror) {
+        config.onerror(event.detail);
+      }
+    }
 
     var invokeCallback = function(type, promise, callback, event) {
       var hasCallback = isFunction(callback),
@@ -408,6 +463,8 @@ define("rsvp/promise",
       constructor: Promise,
 
       then: function(done, fail) {
+        this.off('error', onerror);
+
         var thenPromise = new Promise(function() {});
 
         if (this.isFulfilled) {

@@ -5,6 +5,9 @@ define(
     var Promise = __dependency1__.Promise;
 
     function all(promises) {
+      if(toString.call(promises) !== "[object Array]") {
+        throw new TypeError('You must pass an array to all.');
+      }
       return new Promise(function(resolve, reject) {
         var results = [], remaining = promises.length,
         promise;

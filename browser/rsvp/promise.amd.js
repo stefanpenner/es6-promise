@@ -45,12 +45,20 @@ define(
         this.trigger('error', { detail: event.detail });
       }, this);
 
+      this.on('error', onerror);
+
       try {
         resolver(resolvePromise, rejectPromise);
       } catch(e) {
         rejectPromise(e);
       }
     };
+
+    function onerror(event) {
+      if (config.onerror) {
+        config.onerror(event.detail);
+      }
+    }
 
     var invokeCallback = function(type, promise, callback, event) {
       var hasCallback = isFunction(callback),
@@ -86,6 +94,8 @@ define(
       constructor: Promise,
 
       then: function(done, fail) {
+        this.off('error', onerror);
+
         var thenPromise = new Promise(function() {});
 
         if (this.isFulfilled) {
