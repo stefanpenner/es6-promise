@@ -465,7 +465,7 @@ define("rsvp/promise",
       then: function(done, fail) {
         this.off('error', onerror);
 
-        var thenPromise = new Promise(function() {});
+        var thenPromise = new this.constructor(function() {});
 
         if (this.isFulfilled) {
           config.async(function() {
