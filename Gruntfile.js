@@ -4,7 +4,8 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-microlib');
 
   // Custom phantomjs test task
-  this.registerTask('test:phantom', "Runs tests through the command line using PhantomJS", ['build', 'tests', 'mocha_phantomjs']);
+  this.registerTask('test:phantom', "Runs tests through the command line using PhantomJS", [
+                    'build', 'tests', 'mocha_phantomjs']);
 
   // Custom Node test task
   this.registerTask('test:node', ['build', 'tests', 'mochaTest']);
@@ -25,31 +26,9 @@ module.exports = function(grunt) {
 
     pkg: grunt.file.readJSON('package.json'),
 
-    browserify: {
-      tests: {
-        src: ['test/test-adapter.js',
-              'node_modules/promises-aplus-tests/lib/tests/**/*.js',
-              'node_modules/promises-aplus-tests/node_modules/sinon/lib/{sinon.js,sinon/*.js}'],
-        dest: 'tmp/tests-bundle.js'
-      }
-    },
-
-    mocha_phantomjs: {
-      phantom: {
-        options: {
-          urls: ["test/index.html"],
-        }
-      }
-    },
-
-    mochaTest: {
-      test: {
-        src: ['test/vendor/assert.js', 'test/test-adapter.js', 'node_modules/promises-aplus-tests/lib/tests/**/*.js', 'tmp/tests.cjs.js'],
-        options: {
-          reporter: 'spec'
-        },
-      }
-    }
+    mochaTest: require('./options/mocha_test.js'),
+    browserify: require('./options/browserify.js'),
+    mocha_phantomjs: require('./options/mocha_phantom.js')
   };
 
   // Merge config into emberConfig, overwriting existing settings
