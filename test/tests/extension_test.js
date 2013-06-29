@@ -90,6 +90,42 @@ describe("RSVP extensions", function() {
       });
     });
 
+    it('should not resolve multiple times', function(done) {
+      var resolver, rejector, fulfilled = 0, rejected = 0;
+      var thenable = {
+        then: function(resolve, reject) {
+          resolver = resolve;
+          rejector = reject;
+        }
+      };
+
+      var promise = RSVP.Promise(function(resolve) {
+        resolve(1);
+      });
+
+      promise.then(function(value){
+        return thenable;
+      }).then(function(value){
+        fulfilled++;
+      }, function(reason) {
+        rejected++;
+      });
+
+      setTimeout(function() {
+        resolver(1);
+        resolver(1);
+        rejector(1);
+        rejector(1);
+
+        setTimeout(function() {
+          assert.equal(fulfilled, 1);
+          assert.equal(rejected, 0);
+          done();
+        }, 20);
+      }, 20);
+
+    });
+
     describe('assimilation', function() {
       it('should assimilate if `resolve` is called with a fulfilled promise', function(done) {
         var originalPromise = new RSVP.Promise(function(resolve) { resolve('original value'); });
@@ -665,12 +701,6 @@ describe("RSVP extensions", function() {
       assert(RSVP.resolve);
     });
 
-    specify("it short circuits if RSVP.promise", function(){
-
-      var deferred = new RSVP.defer();
-      assert.equal(RSVP.resolve(deferred.promise), deferred.promise);
-    });
-
     describe("1. If x is a promise, adopt its state ", function(){
       specify("1.1 If x is pending, promise must remain pending until x is fulfilled or rejected.", function(done){
         var expectedValue, resolver, thenable, wrapped;
@@ -948,3 +978,57 @@ describe("RSVP extensions", function() {
     });
   });
 });
+
+
+// thanks to @wizardwerdna for the test case -> https://github.com/tildeio/rsvp.js/issues/66
+// Only run these tests in node (phantomjs cannot handle them)
+if (typeof module !== 'undefined' && module.exports) {
+
+  describe("using reduce to sum integers using promises", function(){
+    var resolve = RSVP.resolve;
+
+    it("should build the promise pipeline without error", function(){
+      var array, iters, pZero, i;
+
+      array = [];
+      iters = 1000;
+
+      for (i=1; i<=iters; i++) {
+        array.push(i);
+      }
+
+      pZero = resolve(0);
+
+      array.reduce(function(promise, nextVal) {
+        return promise.then(function(currentVal) {
+          return resolve(currentVal + nextVal);
+        });
+      }, pZero);
+    });
+
+    it("should get correct answer without blowing the nextTick stack", function(done){
+      var pZero, array, iters, result, i;
+
+      pZero = resolve(0);
+
+      array = [];
+      iters = 1000;
+
+      for (i=1; i<=iters; i++) {
+        array.push(i);
+      }
+
+      result = array.reduce(function(promise, nextVal) {
+        return promise.then(function(currentVal) {
+          return resolve(currentVal + nextVal);
+        });
+      }, pZero);
+
+      result.then(function(value){
+        assert.equal(value, (iters*(iters+1)/2));
+        done();
+      });
+    });
+  });
+
+}
