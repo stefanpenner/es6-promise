@@ -90,6 +90,42 @@ describe("RSVP extensions", function() {
       });
     });
 
+    it('should not resolve multiple times', function(done) {
+      var resolver, rejector, fulfilled = 0, rejected = 0;
+      var thenable = {
+        then: function(resolve, reject) {
+          resolver = resolve;
+          rejector = reject;
+        }
+      };
+
+      var promise = RSVP.Promise(function(resolve) {
+        resolve(1);
+      });
+
+      promise.then(function(value){
+        return thenable;
+      }).then(function(value){
+        fulfilled++;
+      }, function(reason) {
+        rejected++;
+      });
+
+      setTimeout(function() {
+        resolver(1);
+        resolver(1);
+        rejector(1);
+        rejector(1);
+
+        setTimeout(function() {
+          assert.equal(fulfilled, 1);
+          assert.equal(rejected, 0);
+          done();
+        }, 20);
+      }, 20);
+
+    });
+
     describe('assimilation', function() {
       it('should assimilate if `resolve` is called with a fulfilled promise', function(done) {
         var originalPromise = new RSVP.Promise(function(resolve) { resolve('original value'); });
