@@ -8,6 +8,10 @@ mixin for turning objects into event targets.
 It works in node and the browser. You can get the browser build in
 `browser/rsvp.js` and `browser/rsvp.min.js`.
 
+## downloads
+
+- [rsvp-latest](http://rsvpjs-builds.s3.amazonaws.com/rsvp-latest.js)
+
 ## Promises
 
 `RSVP.Promise` is an implementation of
