@@ -1,4 +1,32 @@
 /*global describe, specify, it, assert */
+
+if (typeof Object.getPrototypeOf !== "function") {
+  Object.getPrototypeOf = "".__proto__ === String.prototype
+    ? function (object) {
+      return object.__proto__;
+    }
+    : function (object) {
+      // May break if the constructor has been tampered with
+      return object.constructor.prototype;
+    };
+}
+
+function objectEquals(obj1, obj2) {
+  for (var i in obj1) {
+    if (obj1.hasOwnProperty(i)) {
+      if (!obj2.hasOwnProperty(i)) return false;
+      if (obj1[i] != obj2[i]) return false;
+    }
+  }
+  for (var i in obj2) {
+    if (obj2.hasOwnProperty(i)) {
+      if (!obj1.hasOwnProperty(i)) return false;
+      if (obj1[i] != obj2[i]) return false;
+    }
+  }
+  return true;
+}
+
 describe("RSVP extensions", function() {
   describe("self fulfillment", function(){
     it("treats self fulfillment as the recursive base case", function(done){
@@ -304,7 +332,7 @@ describe("RSVP extensions", function() {
       var denodeifiedFunc = RSVP.denodeify(nodeFunc);
 
       denodeifiedFunc(1, 2, 3).then(function() {
-        assert.deepEqual(args, [1, 2, 3]);
+        assert(objectEquals(args, [1, 2, 3]));
         done();
       });
     });
@@ -340,7 +368,7 @@ describe("RSVP extensions", function() {
       var thenable = { then: function (onFulfilled) { onFulfilled(2); } };
       var nonPromise = 3;
       denodeifiedFunc(promise, thenable, nonPromise).then(function() {
-        assert.deepEqual(args, [1, 2, 3]);
+        assert(objectEquals(args, [1, 2, 3]));
         done();
       });
     });
@@ -366,7 +394,7 @@ describe("RSVP extensions", function() {
       var denodeifiedFunc = RSVP.denodeify(nodeFunc);
 
       denodeifiedFunc().then(function(value) {
-        assert.deepEqual(value, [1, 2, 3]);
+        assert(objectEquals(value, [1, 2, 3]));
         done();
       });
     });
@@ -422,7 +450,7 @@ describe("RSVP extensions", function() {
       var denodeifiedWriteFile = RSVP.denodeify(writeFile);
 
       denodeifiedWriteFile('dest.txt', denodeifiedReadFile('src.txt')).then(function () {
-        assert.deepEqual(writtenTo, ['dest.txt', 'contents of src.txt']);
+        assert(objectEquals(writtenTo, ['dest.txt', 'contents of src.txt']));
         done();
       });
     });
@@ -495,7 +523,7 @@ describe("RSVP extensions", function() {
 
     specify('resolves an empty hash passed to RSVP.all()', function(done) {
       RSVP.hash({}).then(function(results) {
-        assert.deepEqual(results, {});
+        assert(objectEquals(results, {}), 'expected fulfillment');
         done();
       });
     });
@@ -507,7 +535,7 @@ describe("RSVP extensions", function() {
       var nonPromise = 4;
 
       RSVP.hash({ promise: promise, syncThenable: syncThenable, asyncThenable: asyncThenable, nonPromise: nonPromise }).then(function(results) {
-        assert.deepEqual(results, { promise: 1, syncThenable: 2, asyncThenable: 3, nonPromise: 4 });
+        assert(objectEquals(results, { promise: 1, syncThenable: 2, asyncThenable: 3, nonPromise: 4 }));
         done();
       });
     });
@@ -635,7 +663,7 @@ describe("RSVP extensions", function() {
       var nonPromise = 4;
 
       RSVP.all([promise, syncThenable, asyncThenable, nonPromise]).then(function(results) {
-        assert.deepEqual(results, [1, 2, 3, 4]);
+        assert(objectEquals(results, [1, 2, 3, 4]));
         done();
       });
     });
@@ -766,6 +794,9 @@ describe("RSVP extensions", function() {
         accessCount = 0;
         thenable = { };
 
+        // we likely don't need to test this, if the browser doesn't support it
+        if (typeof Object.defineProperty !== "function") { done(); return; }
+
         Object.defineProperty(thenable, 'then', {
           get: function(){
             accessCount++;
@@ -792,6 +823,9 @@ describe("RSVP extensions", function() {
 
         expectedError = new Error();
         thenable = { };
+
+        // we likely don't need to test this, if the browser doesn't support it
+        if (typeof Object.defineProperty !== "function") { done(); return; }
 
         Object.defineProperty(thenable, 'then', {
           get: function(){
