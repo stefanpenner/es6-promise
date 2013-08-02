@@ -116,7 +116,7 @@ Errors also propagate:
 ```javascript
 getJSON("/posts.json").then(function(posts) {
 
-}).fail(function(error) {
+}).then(null, function(error) {
   // since no rejection handler was passed to the
   // first `.then`, the error propagates.
 });
@@ -131,8 +131,19 @@ getJSON("/post/1.json").then(function(post) {
   return getJSON(post.commentURL);
 }).then(function(comments) {
   // proceed with access to posts and comments
-}).fail(function(error) {
+}).then(null, function(error) {
   // handle errors in either of the two requests
+});
+```
+
+You can also use `fail` for error handling, which is a shortcut for
+`then(null, rejection)`, like so:
+
+```javascript
+getJSON("/post/1.json").then(function(post) {
+  return getJSON(post.commentURL);
+}).fail(function(error) {
+  // handle errors
 });
 ```
 
