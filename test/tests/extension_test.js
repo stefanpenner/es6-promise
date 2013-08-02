@@ -1,5 +1,7 @@
 /*global describe, specify, it, assert */
 
+var local = (typeof global === "undefined") ? this : global;
+
 if (typeof Object.getPrototypeOf !== "function") {
   Object.getPrototypeOf = "".__proto__ === String.prototype
     ? function (object) {
@@ -721,6 +723,47 @@ describe("RSVP extensions", function() {
         assert.equal(error, thrownError, "The handler should handle the error");
         done();
       });
+    });
+  });
+
+  describe("RSVP.rethrow", function() {
+    var onerror, oldSetTimeout = global.setTimeout;
+
+    after(function() {
+      global.setTimeout = oldSetTimeout;
+    });
+
+    it("should exist", function() {
+      assert(RSVP.rethrow);
+    });
+
+    it("rethrows an error", function(done) {
+      var thrownError = new Error('I am an error.');
+
+      local.setTimeout = function (callback) {
+        done();
+        var errorWasThrown = false;
+
+        try {
+          callback.call(this, arguments);
+        } catch(e) {
+          errorWasThrown = true;
+        }
+        assert(errorWasThrown, 'expect that an error was thrown');
+      };
+
+      function expectRejection(reason) {
+        assertEqual(reason, thrownError);
+      }
+
+      function doNotExpectFulfillment(value) {
+        done();
+        assert(false, value);
+      }
+
+      RSVP.reject(thrownError).
+        fail(RSVP.rethrow).
+        then(doNotExpectFulfillment, expectRejection);
     });
   });
 

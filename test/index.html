@@ -6,15 +6,15 @@
 </head>
 <body>
   <div id="mocha"></div>
-  <script src="../dist/rsvp-2.0.0.js"></script>
+  <script src="../dist/rsvp-2.0.1.js"></script>
   <script src="vendor/assert.js"></script>
   <script src="vendor/mocha.js"></script>
-  <script>mocha.setup({ ui: 'bdd', timeout: 200 })</script>
+  <script>mocha.setup({ ui: 'bdd', timeout: 200 }); mocha.globals(['setTimeout']);</script>
   <script src="../tmp/tests-bundle.js"></script>
   <script src="tests/extension_test.js"></script>
   <script>
     if (window.mochaPhantomJS) { mochaPhantomJS.run(); }
-    else { mocha.run(); }
+    else { mocha.globals(['setTimeout']); mocha.run(); }
   </script>
 </body>
 </html>
