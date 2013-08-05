@@ -11,6 +11,7 @@ It works in node and the browser. You can get the browser build in
 ## downloads
 
 - [rsvp-latest](http://rsvpjs-builds.s3.amazonaws.com/rsvp-latest.js)
+- [rsvp-latest (amd)](http://rsvpjs-builds.s3.amazonaws.com/rsvp-latest.amd.js)
 
 ## Promises
 
