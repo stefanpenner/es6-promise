@@ -1,6 +1,17 @@
 /*global describe, specify, it, assert */
 
-var local = (typeof global === "undefined") ? this : global;
+var local = (typeof global === "undefined") ? this : global,
+    oldSetTimeout, newSetTimeout;
+local.setTimeout = local.setTimeout;
+oldSetTimeout = local.setTimeout;
+newSetTimeout = function(callback) {
+  var errorWasThrown;
+  try {
+    callback.call(this, arguments);
+  } catch(e) {
+    errorWasThrown = true;
+  }
+};
 
 if (typeof Object.getPrototypeOf !== "function") {
   Object.getPrototypeOf = "".__proto__ === String.prototype
@@ -727,7 +738,7 @@ describe("RSVP extensions", function() {
   });
 
   describe("RSVP.rethrow", function() {
-    var onerror, oldSetTimeout = global.setTimeout;
+    var onerror;
 
     after(function() {
       global.setTimeout = oldSetTimeout;
@@ -740,19 +751,8 @@ describe("RSVP extensions", function() {
     it("rethrows an error", function(done) {
       var thrownError = new Error('I am an error.');
 
-      local.setTimeout = function (callback) {
-        done();
-        var errorWasThrown = false;
-
-        try {
-          callback.call(this, arguments);
-        } catch(e) {
-          errorWasThrown = true;
-        }
-        assert(errorWasThrown, 'expect that an error was thrown');
-      };
-
       function expectRejection(reason) {
+        done();
         assertEqual(reason, thrownError);
       }
 
@@ -760,6 +760,8 @@ describe("RSVP extensions", function() {
         done();
         assert(false, value);
       }
+
+      global.setTimeout = newSetTimeout;
 
       RSVP.reject(thrownError).
         fail(RSVP.rethrow).
