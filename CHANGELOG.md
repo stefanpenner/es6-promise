@@ -1,5 +1,9 @@
 # master
 
+# 2.0.3
+
+* Fix useSetTimeout bug
+
 # 2.0.2
 
 * Adding RSVP#rethrow
