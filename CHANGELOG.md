@@ -1,5 +1,9 @@
 # master
 
+# 2.0.4
+
+* Fix npm package
+
 # 2.0.3
 
 * Fix useSetTimeout bug
