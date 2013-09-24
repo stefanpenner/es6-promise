@@ -168,6 +168,31 @@ RSVP.all(promises).then(function(posts) {
 });
 ```
 
+## Hash of promises
+
+If you need to reference many proises at once (like `all()`), but would like
+to avoid encoding the actual promise order you can use `hash()`. If you pass
+an object literal (where the values are promises) to the `hash()` method it will
+return a new promise that will be fulfilled when all of the promises have been
+fulfilled; or rejected immediately if any promise is rejected.
+
+The key difference to the `all()` function is that both the fulfillment value
+and the argument to the `hash()` function are object literals. This allows
+you to simply reference the results directly off the returned object without
+having to remember the initial order like you would with `all()`.
+
+```javascript
+var promises = {
+  posts: getJSON("/posts.json"),
+  users: getJSON("/users.json")
+};
+
+RSVP.hash(promises).then(function(results) {
+  console.log(results.users) // print the users.json results
+  console.log(results.posts) // print the posts.json results
+});
+```
+
 ## TaskJS
 
 The [TaskJS](http://taskjs.org/) library makes it possible to take
