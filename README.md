@@ -188,7 +188,7 @@ RSVP.all(promises).then(function(posts) {
 
 ## Hash of promises
 
-If you need to reference many proises at once (like `all()`), but would like
+If you need to reference many promises at once (like `all()`), but would like
 to avoid encoding the actual promise order you can use `hash()`. If you pass
 an object literal (where the values are promises) to the `hash()` method it will
 return a new promise that will be fulfilled when all of the promises have been
