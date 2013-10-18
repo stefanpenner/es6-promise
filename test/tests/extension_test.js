@@ -718,6 +718,7 @@ describe("RSVP extensions", function() {
         reject(thrownError);
       }).then(function() {
         // doesn't get here
+        assert(false);
       });
     });
 
@@ -752,12 +753,10 @@ describe("RSVP extensions", function() {
       var thrownError = new Error('I am an error.');
 
       function expectRejection(reason) {
-        done();
-        assertEqual(reason, thrownError);
+        assert.equal(reason, thrownError);
       }
 
       function doNotExpectFulfillment(value) {
-        done();
         assert(false, value);
       }
 
@@ -765,7 +764,8 @@ describe("RSVP extensions", function() {
 
       RSVP.reject(thrownError).
         fail(RSVP.rethrow).
-        then(doNotExpectFulfillment, expectRejection);
+        then(doNotExpectFulfillment, expectRejection).
+        then(done,done);
     });
   });
 
