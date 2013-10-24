@@ -1056,6 +1056,59 @@ describe("RSVP extensions", function() {
       });
     });
   });
+
+  describe("RSVP.async", function() {
+
+    var values;
+    beforeEach(function() {
+      values = [];
+    });
+
+    afterEach(function() {
+      RSVP.configure('async', RSVP.asyncDefault);
+    });
+
+    function append(value) {
+      values.push(value);
+    }
+
+    function runTest(done) {
+      RSVP.resolve(1).then(append);
+
+      RSVP.async(function(value) {
+        assert.deepEqual(values, [1]);
+        values.push(value);
+      }, 2);
+
+      RSVP.resolve(3).then(append);
+
+      RSVP.async(function() {
+        assert.deepEqual(values, [1,2,3]);
+        if (done) {
+          done();
+        }
+      });
+    }
+
+    it("schedules items to RSVP's internal queue", function(done) {
+      runTest(done);
+    });
+
+    it("can be configured to use a different schedule via configure('async', fn)", function() {
+      var actions = [];
+      RSVP.configure('async', function(callback, promise) {
+        actions.push([callback, promise]);
+      });
+
+      runTest();
+
+      // Flush custom deferred action queue
+      while(actions.length) {
+        var action = actions.shift();
+        action[0](action[1]);
+      }
+    });
+  });
 });
 
 
