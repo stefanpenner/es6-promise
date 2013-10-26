@@ -1,8 +1,31 @@
 module.exports = function(grunt) {
-  // Load grunt-microlib config & tasks
-  var emberConfig = require('grunt-microlib').init.bind(this)(grunt);
-  grunt.loadNpmTasks('grunt-microlib');
-  grunt.loadNpmTasks('grunt-s3');
+  require('load-grunt-tasks')(grunt);
+  var config = require('load-grunt-config')(grunt, {
+    configPath: 'tasks/options',
+    init: false
+  });
+
+  grunt.loadTasks('tasks');
+
+  this.registerTask('default', ['build']);
+
+// Run client-side tests on the command line.
+  this.registerTask('test', 'Runs tests through the command line using PhantomJS', [
+    'build', 'tests', 'connect', 'qunit'
+  ]);
+
+  // Run a server. This is ideal for running the QUnit tests in the browser.
+  this.registerTask('server', ['build', 'tests', 'connect', 'watch:server']);
+
+
+  // Build test files
+  this.registerTask('tests', 'Builds the test package', ['concat:deps', 'browserify:tests',
+                    'transpile:testsAmd', 'transpile:testsCommonjs', 'buildTests:dist']);
+
+  // Build a new version of the library
+  this.registerTask('build', 'Builds a distributable version of <%= cfg.name %>',
+                    ['clean', 'transpile:amd', 'transpile:commonjs', 'concat:amd',
+                      'concat:browser', 'browser:dist', 'jshint', 'uglify:browser']);
 
   // Custom phantomjs test task
   this.registerTask('test:phantom', "Runs tests through the command line using PhantomJS", [
@@ -13,32 +36,12 @@ module.exports = function(grunt) {
 
   this.registerTask('test', ['build', 'tests', 'mocha_phantomjs', 'mochaTest']);
 
-  var config = {
-    cfg: {
-      // Name of the project
-      name: 'rsvp.js',
-
-      // Name of the root module (i.e. 'rsvp' -> 'lib/rsvp.js')
-      barename: 'rsvp',
-
-      // Name of the global namespace to export to
-      namespace: 'RSVP'
-    },
-    env: process.env,
-
-    pkg: grunt.file.readJSON('package.json'),
-
-    mochaTest: require('./options/mocha_test.js'),
-    browserify: require('./options/browserify.js'),
-    mocha_phantomjs: require('./options/mocha_phantom.js'),
-    s3: require('./options/s3'),
-  };
-
-  // Merge config into emberConfig, overwriting existing settings
-  grunt.initConfig(grunt.util._.merge(emberConfig, config));
-
+  config.env = process.env;
+  config.pkg = grunt.file.readJSON('package.json');
   // Load custom tasks from NPM
   grunt.loadNpmTasks('grunt-browserify');
   grunt.loadNpmTasks('grunt-mocha-phantomjs');
   grunt.loadNpmTasks('grunt-mocha-test');
+  // Merge config into emberConfig, overwriting existing settings
+  grunt.initConfig(config);
 };
