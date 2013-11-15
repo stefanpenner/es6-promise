@@ -154,16 +154,18 @@ are being 'swallowed', and not properly raised. This makes is extremely
 difficult to track down where a given issue is coming from. Thankfully,
 `RSVP` has a solution for this problem built in.
 
-You can provide an `onerror` function that will be called with the error
-details if any errors occur within your promise. This function can be anything
-but a common practice is to call `console.assert` to dump the error to the
-console.
+You can register functions to be called when an uncaught error occurs
+within your promises. These callback functions can be anything, but a common
+practice is to call `console.assert` to dump the error to the console.
 
 ```javascript
-RSVP.configure('onerror', function(error) {
-  console.assert(false, error);
+RSVP.on('error', function(event) {
+  console.assert(false, event.detail);
 });
 ```
+
+**NOTE:** Usage of `RSVP.configure('onerror', yourCustomFunction);` is
+deprecated in favor of using `RSVP.on`.
 
 ## Arrays of promises
 

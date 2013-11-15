@@ -699,11 +699,48 @@ describe("RSVP extensions", function() {
     });
   });
 
+  describe("RSVP.on", function(){
+    after(function() {
+      RSVP.off('error');
+    });
+
+    it("When provided, any unhandled exceptions are sent to it", function(done) {
+      var thrownError = new Error();
+
+      RSVP.on('error', function(event) {
+        assert.equal(event.detail, thrownError, "The thrown error is passed in");
+        done();
+      });
+
+      new RSVP.Promise(function(resolve, reject) {
+        reject(thrownError);
+      }).then(function() {
+        // doesn't get here
+        assert(false);
+      });
+    });
+
+    it("When provided, handled exceptions are not sent to it", function(done) {
+      var thrownError = new Error();
+
+      RSVP.on('error', function(event) {
+        assert(false, "Should not get here");
+      });
+
+      new RSVP.Promise(function(resolve, reject) {
+        reject(thrownError);
+      }).then(null, function(error) {
+        assert.equal(error, thrownError, "The handler should handle the error");
+        done();
+      });
+    });
+  });
+
   describe("RSVP.onerror", function(){
     var onerror;
 
     after(function() {
-      RSVP.configure('onerror', null);
+      RSVP.off('error');
     });
 
     it("When provided, any unhandled exceptions are sent to it", function(done) {
