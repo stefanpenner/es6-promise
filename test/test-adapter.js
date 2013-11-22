@@ -1,44 +1,27 @@
 /*global RSVP*/
 
-var Promise;
+var defer, resolve, reject;
 
 if (typeof RSVP !== 'undefined') {
   // Test the browser build
-  Promise = RSVP.Promise;
+  resolve = RSVP.resolve;
+  reject = RSVP.reject;
+  defer = RSVP.defer;
 } else {
   // Test the Node build
   RSVP = require('../dist/commonjs/main');
-  Promise = require('../dist/commonjs/main').Promise;
   assert = require('./vendor/assert');
+  defer = require('../dist/commonjs/main').defer;
+  resolve = require('../dist/commonjs/main').resolve;
+  reject = require('../dist/commonjs/main').reject;
 }
 
 if (typeof window === 'undefined' && typeof global !== 'undefined') {
   window = global;
 }
 
-var adapter = {};
-
-adapter.fulfilled = function(value) {
-  return new Promise(function(resolve, reject) {
-    resolve(value);
-  });
+module.exports = global.adapter = {
+  resolved: resolve,
+  rejected: reject,
+  deferred: defer
 };
-
-adapter.rejected = function(error) {
-  return new Promise(function(resolve, reject) {
-    reject(error);
-  });
-};
-
-adapter.pending = function () {
-  var pending = {};
-
-  pending.promise = new Promise(function(resolve, reject) {
-    pending.fulfill = resolve;
-    pending.reject = reject;
-  });
-
-  return pending;
-};
-
-module.exports = global.adapter = adapter;
