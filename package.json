@@ -9,7 +9,6 @@
   },
   "devDependencies": {
     "jshint": "~0.9",
-    "grunt-microlib": "git://github.com/thomasboyt/grunt-microlib.git",
     "promises-aplus-tests": "git://github.com/stefanpenner/promises-tests.git",
     "grunt-mocha-test": "~0.5.0",
     "grunt-s3": "~0.2.0-alpha.2",
@@ -28,8 +27,14 @@
     "grunt-contrib-jshint": "~0.7.0",
     "grunt-contrib-qunit": "~0.3.0",
     "grunt-contrib-connect": "~0.5.0",
-    "load-grunt-config": "~0.5.0"
-    "grunt-cli": "~0.1.11"
+    "load-grunt-config": "~0.5.0",
+    "grunt-s3": "~0.2.0-alpha.2",
+    "grunt-browserify": "~1.2.11",
+    "grunt-cli": "~0.1.11",
+    "grunt": "~0.4.2",
+    "brfs": "0.0.8",
+    "mocha-phantomjs": "~3.1.6",
+    "grunt-mocha-phantomjs": "~0.3.1"
   },
   "scripts": {
     "test": "grunt test",
