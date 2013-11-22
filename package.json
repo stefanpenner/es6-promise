@@ -9,7 +9,7 @@
   "devDependencies": {
     "jshint": "~0.9",
     "grunt-microlib": "git://github.com/thomasboyt/grunt-microlib.git",
-    "promises-aplus-tests": "~2.0.2",
+    "promises-aplus-tests": "git://github.com/stefanpenner/promises-tests.git",
     "grunt-mocha-test": "~0.5.0",
     "grunt-s3": "~0.2.0-alpha.2",
     "grunt-browserify": "~1.2.11",
