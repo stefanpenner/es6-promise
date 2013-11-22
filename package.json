@@ -29,6 +29,7 @@
     "grunt-contrib-qunit": "~0.3.0",
     "grunt-contrib-connect": "~0.5.0",
     "load-grunt-config": "~0.5.0"
+    "grunt-cli": "~0.1.11"
   },
   "scripts": {
     "test": "grunt test",
