@@ -14,7 +14,8 @@
     "grunt-browserify": "~1.0.2",
     "grunt-mocha-phantomjs": "~0.3.0",
     "grunt-mocha-test": "~0.5.0",
-    "grunt-s3": "~0.2.0-alpha.2"
+    "grunt-s3": "~0.2.0-alpha.2",
+    "grunt-cli": "~0.1.11"
   },
   "scripts": {
     "test": "grunt test",
