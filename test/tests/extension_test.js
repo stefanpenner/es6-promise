@@ -1146,8 +1146,61 @@ describe("RSVP extensions", function() {
       }
     });
   });
-});
 
+  describe("Promise.cast", function () {
+    it("If SameValue(constructor, C) is true, return x.", function(){
+      var promise = RSVP.resolve(1);
+      var casted = RSVP.Promise.cast(promise);
+
+      assert.deepEqual(casted, promise);
+    });
+
+    it("If SameValue(constructor, C) is false, and isThenable(C) is true, return PromiseResolve(promise, x).", function(){
+      var promise = { then: function() { } };
+      var casted = RSVP.Promise.cast(promise);
+
+      assert(casted instanceof RSVP.Promise);
+      assert(casted !== promise);
+    });
+
+    it("If SameValue(constructor, C) is false, and isPromiseSubClass(C) is true, return PromiseResolve(promise, x).", function(done) {
+      function PromiseSubclass() {
+        RSVP.Promise.apply(this, arguments);
+      }
+
+      PromiseSubclass.prototype = Object.create(RSVP.Promise.prototype);
+      PromiseSubclass.prototype.constructor = PromiseSubclass;
+      PromiseSubclass.cast = RSVP.Promise.cast;
+
+      var promise = RSVP.resolve(1);
+      var casted = PromiseSubclass.cast(promise);
+
+      assert(casted instanceof RSVP.Promise);
+      assert(casted instanceof PromiseSubclass);
+      assert(casted !== promise);
+
+      casted.then(function(value) {
+        assert.equal(value, 1);
+        done();
+      });
+    });
+
+    it("If SameValue(constructor, C) is false, and isThenable(C) is false, return PromiseResolve(promise, x).", function(){
+      var value = 1;
+      var casted = RSVP.Promise.cast(value);
+
+      assert(casted instanceof RSVP.Promise);
+      assert(casted !== value);
+    });
+
+    it("casts null correctly", function(done){
+      RSVP.Promise.cast(null).then(function(value){
+        assert.equal(value, null);
+        done();
+      });
+    });
+  });
+});
 
 // thanks to @wizardwerdna for the test case -> https://github.com/tildeio/rsvp.js/issues/66
 // Only run these tests in node (phantomjs cannot handle them)
