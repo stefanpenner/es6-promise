@@ -518,15 +518,25 @@ describe("RSVP extensions", function() {
         firstResolver.reject({});
       }, 0);
 
-      setTimeout(function() {
-        secondResolver.resolve(true);
-      }, 5000);
+      var firstWasRejected, secondCompleted;
 
-      RSVP.hash({ first: first, second: second }).then(function() {
+      first.fail(function(){
+        firstWasRejected = true;
+      });
+
+      second['finally'](function(){
+        secondCompleted = true;
+      });
+
+      RSVP.hash({
+        first: first,
+        second: second
+      }).then(function() {
         assert(false);
+        done();
       }, function() {
-        assert(first.isRejected);
-        assert(!second.isResolved);
+        assert(firstWasRejected);
+        assert(!secondCompleted);
         done();
       });
     });
@@ -632,15 +642,21 @@ describe("RSVP extensions", function() {
         firstResolver.reject({});
       }, 0);
 
-      setTimeout(function() {
-        secondResolver.resolve(true);
-      }, 5000);
+      var firstWasRejected, secondCompleted;
+
+      first.fail(function(){
+        firstWasRejected = true;
+      });
+
+      second['finally'](function(){
+        secondCompleted = true;
+      });
 
       RSVP.all([first, second]).then(function() {
         assert(false);
       }, function() {
-        assert(first.isRejected);
-        assert(!second.isResolved);
+        assert(firstWasRejected);
+        assert(!secondCompleted);
         done();
       });
     });
