@@ -7,6 +7,7 @@
   "directories": {
     "lib": "lib"
   },
+  "devDependencies": {
     "brfs": "0.0.8",
     "grunt": "~0.4.2",
     "grunt-browserify": "~1.2.11",
@@ -27,8 +28,7 @@
     "load-grunt-config": "~0.5.0",
     "load-grunt-tasks": "~0.2.0",
     "mocha-phantomjs": "~3.1.6",
-    "promises-aplus-tests": "git://github.com/stefanpenner/promises-tests.git",
-  "devDependencies": {
+    "promises-aplus-tests": "git://github.com/stefanpenner/promises-tests.git"
   },
   "scripts": {
     "test": "grunt test",
