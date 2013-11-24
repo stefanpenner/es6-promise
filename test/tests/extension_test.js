@@ -534,9 +534,23 @@ describe("RSVP extensions", function() {
       });
     });
 
-    specify('resolves an empty hash passed to RSVP.all()', function(done) {
+    specify('resolves an empty hash passed to RSVP.hash()', function(done) {
       RSVP.hash({}).then(function(results) {
         assert(objectEquals(results, {}), 'expected fulfillment');
+        done();
+      });
+    });
+
+    specify('works with null', function(done) {
+      RSVP.hash({foo: null}).then(function(results) {
+        assert(objectEquals(results.foo, null));
+        done();
+      });
+    });
+
+    specify('works with a truthy value', function(done) {
+      RSVP.hash({foo: 1}).then(function(results) {
+        assert(objectEquals(results.foo, true));
         done();
       });
     });
@@ -665,6 +679,13 @@ describe("RSVP extensions", function() {
     specify('resolves an empty array passed to RSVP.all()', function(done) {
       RSVP.all([]).then(function(results) {
         assert(results.length === 0);
+        done();
+      });
+    });
+
+    specify('works with null', function(done) {
+      RSVP.all([null]).then(function(results) {
+        assert.equal(results[0], null);
         done();
       });
     });
