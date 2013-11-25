@@ -99,31 +99,28 @@ describe("RSVP extensions", function() {
       assert.equal(RSVP.Promise.prototype.constructor, RSVP.Promise, 'constructor property of prototype is set correctly');
     });
 
-    it('should work without `new`', function(done) {
-      var promise = RSVP.Promise(function(resolve) { resolve('value'); });
-
-      promise.then(function(value) {
-        assert.equal(value, 'value');
-        done();
-      });
+    it('should NOT work without `new`', function() {
+      assert.throws(function(){
+        RSVP.Promise(function(resolve) { resolve('value'); });
+      }, TypeError)
     });
 
     it('should throw a `TypeError` if not given a function', function() {
       assert.throws(function () {
-        var promise = new RSVP.Promise();
+        new RSVP.Promise();
       }, TypeError);
 
       assert.throws(function () {
-        var promise = new RSVP.Promise({});
+        new RSVP.Promise({});
       }, TypeError);
 
       assert.throws(function () {
-        var promise = new RSVP.Promise('boo!');
+        new RSVP.Promise('boo!');
       }, TypeError);
     });
 
     it('should reject on resolver exception', function(done) {
-      var promise = RSVP.Promise(function() {
+     new RSVP.Promise(function() {
         throw 'error';
       }).then(null, function(e) {
         assert.equal(e, 'error');
@@ -140,7 +137,7 @@ describe("RSVP extensions", function() {
         }
       };
 
-      var promise = RSVP.Promise(function(resolve) {
+      var promise = new RSVP.Promise(function(resolve) {
         resolve(1);
       });
 
