@@ -315,6 +315,7 @@ function listener (event) {
   event.eventName // one of ['created', 'chained', 'fulfilled', 'rejected']
   event.detail    // fulfillment value or rejection reason, if applicable
   event.label     // label passed to promise's constructor
+  event.timeStamp // milliseconds elapsed since 1 January 1970 00:00:00 UTC up until now
 }
 
 RSVP.Promise.on('created', listener);

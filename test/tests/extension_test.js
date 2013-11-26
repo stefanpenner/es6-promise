@@ -1216,6 +1216,10 @@ describe("RSVP extensions", function() {
           assert(parsedGuid.key, 'has a key');
           assert(parsedGuid.index, 'has a count');
 
+          assert.equal(event.eventName, 'created');
+          assert(event.timeStamp, 'has a timeStamp');
+          assert.ok(!event.detail, 'a created event has no detail');
+
           done();
         });
 
@@ -1258,8 +1262,11 @@ describe("RSVP extensions", function() {
           rejectionCount++;
           assert.equal(rejectionCount, 1, 'emitted the rejection event only once');
 
+          assert.equal(event.eventName, 'rejected');
           assert(event.guid, 'has a guid');
           assert.equal(event.detail, reason, 'correct rejection reason');
+          assert(event.timeStamp, 'has a timeStamp');
+
           done();
         });
 
@@ -1280,8 +1287,11 @@ describe("RSVP extensions", function() {
           fulfillmentCount++;
           assert.equal(fulfillmentCount, 1, 'emitted the fulfilment event only once');
 
+          assert.equal(event.eventName, 'fulfilled');
           assert(event.guid, 'has a guid');
           assert.equal(event.detail, value, 'correct fulfillment value');
+          assert(event.timeStamp, 'has a timeStamp');
+
           done();
         });
 
@@ -1315,6 +1325,9 @@ describe("RSVP extensions", function() {
 
           assert(parsedChild.key);
           assert(parsedChild.index);
+
+          assert.equal(event.eventName, 'chained');
+          assert(event.timeStamp, 'has a timeStamp');
 
           done();
         });
