@@ -1297,7 +1297,6 @@ describe("RSVP extensions", function() {
       specify('emits chained event', function(done) {
         var value = 'fulfillment value';
         var promise = RSVP.resolve(value);
-        var parentGuid = promise._guid;
 
         RSVP.Promise.on('chained', function(event){
           var parent = event.guid;
@@ -1312,7 +1311,7 @@ describe("RSVP extensions", function() {
           assert(parsedParent.key);
           assert(parsedParent.index);
 
-          assert.equal(event.guid, parentGuid, 'has correct parent reference');
+          assert.equal(event.guid, promise._guidKey + promise._id, 'has correct parent reference');
 
           assert(parsedChild.key);
           assert(parsedChild.index);
