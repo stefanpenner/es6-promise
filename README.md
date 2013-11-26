@@ -306,6 +306,26 @@ The example will work as expected. If you mix `RSVP.EventTarget` into a
 constructor's prototype, each instance of that constructor will get its
 own callbacks.
 
+## Instrumentation
+
+```js
+function listener (event) {
+  event.guid      // guid of promise
+  event.childGuid // child of child promise (for chained via `then`)
+  event.eventName // one of ['created', 'chained', 'fulfilled', 'rejected']
+  event.detail    // fulfillment value or rejection reason, if applicable
+  event.label     // label passed to promise's constructor
+}
+
+RSVP.Promise.on('created', listener);
+RSVP.Promise.on('chained', listener);
+RSVP.Promise.on('fulfilled', listener);
+RSVP.Promise.on('rejected', listener);
+```
+
+Events are only triggered when `RSVP.Promise.instrument` is true, although
+listeners can be registered at any time.
+
 ## Building & Testing
 
 This package uses the [grunt-microlib](https://github.com/thomasboyt/grunt-microlib) package for building.
