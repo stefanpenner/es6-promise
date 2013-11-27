@@ -733,15 +733,15 @@ describe("RSVP extensions", function() {
     });
   });
 
-  describe("RSVP.Promise.on", function(){
+  describe("RSVP.on", function(){
     after(function() {
-      RSVP.Promise.off('error');
+      RSVP.off('error');
     });
 
     it("When provided, any unhandled exceptions are sent to it", function(done) {
       var thrownError = new Error();
 
-      RSVP.Promise.on('error', function(reason) {
+      RSVP.on('error', function(reason) {
         assert.equal(reason, thrownError, "The thrown error is passed in");
         done();
       });
@@ -757,7 +757,7 @@ describe("RSVP extensions", function() {
     it("When provided, handled exceptions are not sent to it", function(done) {
       var thrownError = new Error();
 
-      RSVP.Promise.on('error', function(event) {
+      RSVP.on('error', function(event) {
         assert(false, "Should not get here");
       });
 
@@ -774,7 +774,7 @@ describe("RSVP extensions", function() {
     var onerror;
 
     after(function() {
-      RSVP.Promise.off('error');
+      RSVP.off('error');
     });
 
     it("When provided, any unhandled exceptions are sent to it", function(done) {
@@ -1130,27 +1130,27 @@ describe("RSVP extensions", function() {
 
   describe("inspection", function(){
     beforeEach(function () {
-      RSVP.Promise.instrument = true;
+      RSVP.configure('instrument', true);
     });
 
     afterEach(function(){
-      RSVP.Promise.instrument = false;
+      RSVP.configure('instrument', false);
     });
 
     describe("when `instrument` is falsy", function () {
       beforeEach(function () {
-        RSVP.Promise.instrument = false;
+        RSVP.configure('instrument', false);
       });
 
       afterEach(function(){
-        RSVP.Promise.off('created');
-        RSVP.Promise.off('chained');
-        RSVP.Promise.off('fulfilled');
-        RSVP.Promise.off('rejected');
+        RSVP.off('created');
+        RSVP.off('chained');
+        RSVP.off('fulfilled');
+        RSVP.off('rejected');
       });
 
       specify("created is not fired", function (done) {
-        RSVP.Promise.on('created', function () {
+        RSVP.on('created', function () {
           assert(false, 'created erroneously fired');
         });
 
@@ -1158,7 +1158,7 @@ describe("RSVP extensions", function() {
       });
 
       specify("chained is not fired", function (done) {
-        RSVP.Promise.on('chained', function () {
+        RSVP.on('chained', function () {
           assert(false, 'chained erroneously fired');
         });
 
@@ -1166,7 +1166,7 @@ describe("RSVP extensions", function() {
       });
 
       specify("fulfilled is not fired", function (done) {
-        RSVP.Promise.on('fulfilled', function () {
+        RSVP.on('fulfilled', function () {
           assert(false, 'fulfilled erroneously fired');
         });
 
@@ -1174,7 +1174,7 @@ describe("RSVP extensions", function() {
       });
 
       specify("rejected is not fired", function (done) {
-        RSVP.Promise.on('rejected', function () {
+        RSVP.on('rejected', function () {
           assert(false, 'rejected erroneously fired');
         });
 
@@ -1197,7 +1197,7 @@ describe("RSVP extensions", function() {
 
     describe("creation", function(){
       afterEach(function(){
-        RSVP.Promise.off('created');
+        RSVP.off('created');
       });
 
       specify("it emits a creation event", function(done){
@@ -1205,7 +1205,7 @@ describe("RSVP extensions", function() {
         var promise;
         var deferred;
 
-        RSVP.Promise.on('created', function(event){
+        RSVP.on('created', function(event){
           assert(true, 'event was called');
           assert.equal(creationCount, 0 ,'creation event was only emitted once');
           creationCount++;
@@ -1231,7 +1231,7 @@ describe("RSVP extensions", function() {
         var creationCount = 0;
         var lastIndex = 0;
 
-        RSVP.Promise.on('created', function(event){
+        RSVP.on('created', function(event){
           assert(true, 'event was called');
           creationCount++;
           var parsedGuid = parseGuid(event.guid);
@@ -1251,14 +1251,14 @@ describe("RSVP extensions", function() {
 
     describe("rejection", function(done){
       afterEach(function(){
-        RSVP.Promise.off('rejected');
+        RSVP.off('rejected');
       });
 
       specify('emits rejection event', function(done){
         var rejectionCount = 0;
         var reason = new Error('Rejection Reason');
 
-        RSVP.Promise.on('rejected', function(event){
+        RSVP.on('rejected', function(event){
           rejectionCount++;
           assert.equal(rejectionCount, 1, 'emitted the rejection event only once');
 
@@ -1276,14 +1276,14 @@ describe("RSVP extensions", function() {
 
     describe("fulfillment", function(){
       afterEach(function(){
-        RSVP.Promise.off('fulfilled');
+        RSVP.off('fulfilled');
       });
 
       specify('emits fulfillment event', function(done){
         var fulfillmentCount= 0;
         var value = 'fulfillment value';
 
-        RSVP.Promise.on('fulfilled', function(event){
+        RSVP.on('fulfilled', function(event){
           fulfillmentCount++;
           assert.equal(fulfillmentCount, 1, 'emitted the fulfilment event only once');
 
@@ -1301,14 +1301,14 @@ describe("RSVP extensions", function() {
 
     describe("chained", function(){
       afterEach(function(){
-        RSVP.Promise.off('chained');
+        RSVP.off('chained');
       });
 
       specify('emits chained event', function(done) {
         var value = 'fulfillment value';
         var promise = RSVP.resolve(value);
 
-        RSVP.Promise.on('chained', function(event){
+        RSVP.on('chained', function(event){
           var parent = event.guid;
           var child = event.childGuid;
 
