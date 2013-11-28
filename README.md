@@ -310,7 +310,7 @@ own callbacks.
 
 ```js
 function listener (event) {
-  event.guid      // guid of promise
+  event.guid      // guid of promise. Must be globally unique, not just within the implementation
   event.childGuid // child of child promise (for chained via `then`)
   event.eventName // one of ['created', 'chained', 'fulfilled', 'rejected']
   event.detail    // fulfillment value or rejection reason, if applicable
