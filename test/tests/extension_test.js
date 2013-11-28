@@ -364,21 +364,24 @@ describe("RSVP extensions", function() {
       });
     });
 
-    specify('allows rebinding thisArg via denodeify', function(done) {
-      var thisArg = null;
-      function nodeFunc(cb) {
-        thisArg = this;
-        cb();
-      }
+    if (typeof window.navigator === "object" && window.navigator.userAgent.indexOf('PhantomJS') === -1) {
+      // don't run this node specific test in phantom. "use strict" + this has issues.
+      specify('allows rebinding thisArg via denodeify', function(done) {
+        var thisArg = null;
+        function nodeFunc(cb) {
+          thisArg = this;
+          cb();
+        }
 
-      var expectedThis = { expect: "me" };
-      var denodeifiedFunc = RSVP.denodeify(nodeFunc, expectedThis);
+        var expectedThis = { expect: "me" };
+        var denodeifiedFunc = RSVP.denodeify(nodeFunc, expectedThis);
 
-      denodeifiedFunc().then(function() {
-        assert.equal(thisArg, expectedThis);
-        done();
+        denodeifiedFunc().then(function() {
+          assert.equal(thisArg, expectedThis);
+          done();
+        });
       });
-    });
+    }
 
     specify('waits for promise/thenable arguments to settle before passing them to the node function', function(done) {
       var args = null;
