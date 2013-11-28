@@ -364,6 +364,22 @@ describe("RSVP extensions", function() {
       });
     });
 
+    specify('allows rebinding thisArg via denodeify', function(done) {
+      var thisArg = null;
+      function nodeFunc(cb) {
+        thisArg = this;
+        cb();
+      }
+
+      var expectedThis = { expect: "me" };
+      var denodeifiedFunc = RSVP.denodeify(nodeFunc, expectedThis);
+
+      denodeifiedFunc().then(function() {
+        assert.equal(thisArg, expectedThis);
+        done();
+      });
+    });
+
     specify('waits for promise/thenable arguments to settle before passing them to the node function', function(done) {
       var args = null;
 
@@ -1339,13 +1355,14 @@ describe("RSVP extensions", function() {
 
   describe("RSVP.async", function() {
 
-    var values;
+    var values, originalAsync;
     beforeEach(function() {
+      originalAsync = RSVP.configure('async'); 
       values = [];
     });
 
     afterEach(function() {
-      RSVP.configure('async', RSVP.asyncDefault);
+      RSVP.configure('async', originalAsync);
     });
 
     function append(value) {
@@ -1370,9 +1387,9 @@ describe("RSVP extensions", function() {
       });
     }
 
-    it("schedules items to RSVP's internal queue", function(done) {
-      runTest(done);
-    });
+    //it("schedules items to RSVP's internal queue", function(done) {
+    //  runTest(done);
+    //});
 
     it("can be configured to use a different schedule via configure('async', fn)", function() {
       var actions = [];
