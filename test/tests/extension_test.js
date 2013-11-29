@@ -789,6 +789,144 @@ describe("RSVP extensions", function() {
     });
   });
 
+  describe("RSVP.race", function() {
+    it("should exist", function() {
+      assert(RSVP.race);
+    });
+
+    it("throws when not passed an array", function() {
+      assert.throws(function () {
+        var race = RSVP.race();
+      }, TypeError);
+
+      assert.throws(function () {
+        var race = RSVP.race('');
+      }, TypeError);
+
+      assert.throws(function () {
+        var race = RSVP.race({});
+      }, TypeError);
+    });
+
+    specify('fulfilled after one of the other promises are fulfilled', function(done) {
+      var firstResolved, secondResolved, firstResolver, secondResolver;
+
+      var first = new RSVP.Promise(function(resolve) {
+        firstResolver = resolve;
+      });
+      first.then(function() {
+        firstResolved = true;
+      });
+
+      var second = new RSVP.Promise(function(resolve) {
+        secondResolver = resolve;
+      });
+      second.then(function() {
+        secondResolved = true;
+      });
+
+      setTimeout(function() {
+        firstResolver(true);
+      }, 100);
+
+      setTimeout(function() {
+        secondResolver(true);
+      }, 0);
+
+      RSVP.race([first, second]).then(function() {
+        assert(secondResolved);
+        assert.equal(firstResolved, undefined);
+        done();
+      });
+    });
+
+    specify('if one of the promises is not thenable fulfills with it first', function(done) {
+      var firstResolver, secondResolver, nonPromise = 5;
+
+      var first = new RSVP.Promise(function(resolve, reject) {
+        resolve(true);
+      });
+
+      var second = new RSVP.Promise(function(resolve, reject) {
+        resolve(false);
+      });
+
+      RSVP.race([first, second, nonPromise]).then(function(value) {
+        assert.equal(value, 5);
+        done();
+      });
+    });
+
+    specify('rejected as soon as a promise is rejected', function(done) {
+      var firstResolver, secondResolver;
+
+      var first = new RSVP.Promise(function(resolve, reject) {
+        firstResolver = { resolve: resolve, reject: reject };
+      });
+
+      var second = new RSVP.Promise(function(resolve, reject) {
+        secondResolver = { resolve: resolve, reject: reject };
+      });
+
+      setTimeout(function() {
+        firstResolver.reject({});
+      }, 0);
+
+      var firstWasRejected, secondCompleted;
+
+      first.fail(function(){
+        firstWasRejected = true;
+      });
+
+      second['finally'](function(){
+        secondCompleted = true;
+      });
+
+      RSVP.race([first, second]).then(function() {
+        assert(false);
+      }, function() {
+        assert(firstWasRejected);
+        assert(!secondCompleted);
+        done();
+      });
+    });
+
+    specify('resolves an empty array to forever pending Promise', function(done) {
+      var foreverPendingPromise = RSVP.race([]),
+          wasSettled            = false;
+
+      foreverPendingPromise.then(function() {
+        wasSettled = true;
+      }, function() {
+        wasSettled = true;
+      });
+
+      setTimeout(function() {
+        assert(!wasSettled);
+        done();
+      }, 100);
+    });
+
+    specify('works with a mix of promises and thenables', function(done) {
+      var promise = new RSVP.Promise(function(resolve) { setTimeout(function() { resolve(1); }, 10); }),
+          syncThenable = { then: function (onFulfilled) { onFulfilled(2); } };
+
+      RSVP.race([promise, syncThenable]).then(function(result) {
+        assert(result, 2);
+        done();
+      });
+    });
+
+    specify('works with a mix of thenables and non-promises', function (done) {
+      var asyncThenable = { then: function (onFulfilled) { setTimeout(function() { onFulfilled(3); }, 0); } },
+          nonPromise = 4;
+      RSVP.race([asyncThenable, nonPromise]).then(function(result) {
+        assert(result, 4);
+        done();
+      });
+    });
+  });
+
   describe("RSVP.onerror", function(){
     var onerror;
 
@@ -880,9 +1018,9 @@ describe("RSVP extensions", function() {
         wrapped.then(function(value){
           assert(value === expectedValue);
           done();
-        })
-        resolver(expectedValue);
+        });
 
+        resolver(expectedValue);
       });
 
       specify("1.2 If/when x is fulfilled, fulfill promise with the same value.", function(done){
