@@ -23,7 +23,6 @@
     "grunt-mocha-phantomjs": "~0.3.1",
     "grunt-mocha-test": "~0.5.0",
     "grunt-s3": "~0.2.0-alpha.2",
-    "grunt-s3": "~0.2.0-alpha.2",
     "jshint": "~0.9",
     "load-grunt-config": "~0.5.0",
     "load-grunt-tasks": "~0.2.0",
