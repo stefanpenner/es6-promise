@@ -757,6 +757,29 @@ describe("RSVP extensions", function() {
       RSVP.off('error');
     });
 
+    it("can be off'd", function(){
+      var broCount = 0;
+      var obj = {};
+      RSVP.EventTarget.mixin(obj);
+
+      function brohandler(){
+        broCount++;
+      }
+
+      obj.on('bro', brohandler);
+
+      assert.equal(broCount, 0, 'bro was only trigged once');
+
+      obj.trigger('bro');
+
+      assert.equal(broCount, 1, 'bro was only trigged once');
+
+      obj.off('bro', brohandler);
+      obj.trigger('bro');
+
+      assert.equal(broCount, 1, 'bro was only trigged once');
+    });
+
     it("When provided, any unhandled exceptions are sent to it", function(done) {
       var thrownError = new Error();
 
