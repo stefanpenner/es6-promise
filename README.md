@@ -337,3 +337,4 @@ Custom tasks:
 * `grunt test` - Run Mocha tests through Node and PhantomJS.
 * `grunt test:phantom` - Run Mocha tests through PhantomJS (browser build).
 * `grunt test:node` - Run Mocha tests through Node (CommonJS build).
+* `grunt docs` - Run YUIDoc, outputting API documentation to `docs` folder.

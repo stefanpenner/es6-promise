@@ -36,12 +36,18 @@ module.exports = function(grunt) {
 
   this.registerTask('test', ['build', 'tests', 'mocha_phantomjs', 'mochaTest']);
 
+  // Custom YUIDoc task
+  this.registerTask('docs', ['yuidoc']);
+
   config.env = process.env;
   config.pkg = grunt.file.readJSON('package.json');
+
   // Load custom tasks from NPM
   grunt.loadNpmTasks('grunt-browserify');
   grunt.loadNpmTasks('grunt-mocha-phantomjs');
   grunt.loadNpmTasks('grunt-mocha-test');
+  grunt.loadNpmTasks('grunt-contrib-yuidoc');
+
   // Merge config into emberConfig, overwriting existing settings
   grunt.initConfig(config);
 };
