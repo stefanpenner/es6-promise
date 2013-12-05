@@ -217,7 +217,7 @@ RSVP.hash(promises).then(function(results) {
 
 RSVP also has a RSVP.defer() method that returns a deferred object of the form 
 `{ promise, resolve(x), reject(r) }`. This creates a deferred object without 
-specifying how it will be resolved. However, the `RSV.Promise` constructor is 
+specifying how it will be resolved. However, the `RSVP.Promise` constructor is 
 generally a better and less error-prone choice; we recommend using it in 
 preference to `RSVP.defer()`.
 
