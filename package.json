@@ -1,8 +1,8 @@
 {
-  "name": "rsvp",
-  "namespace": "RSVP",
+  "name": "ES6-Promises",
+  "namespace": "Promise",
   "version": "2.0.4",
-  "description": "A lightweight library that provides tools for organizing asynchronous code",
+  "description": "A polyfill for ES6-style Promises, tracking rsvp",
   "main": "dist/commonjs/main.js",
   "directories": {
     "lib": "lib"
@@ -47,6 +47,6 @@
     "futures",
     "events"
   ],
-  "author": "Tilde, Inc.",
+  "author": "Tilde, Inc. (Conversion to ES6 API by Jake Archibald)",
   "license": "MIT"
 }
