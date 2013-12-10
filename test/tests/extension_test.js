@@ -329,7 +329,6 @@ describe("RSVP extensions", function() {
     });
 
     specify('rejected as soon as a promise is rejected', function(done) {
-      console.log("HI");
       var firstResolver, secondResolver;
 
       var first = new Promise(function(resolve, reject) {
@@ -346,7 +345,7 @@ describe("RSVP extensions", function() {
 
       var firstWasRejected, secondCompleted;
 
-      first.catch(function(){
+      first['catch'](function(){
         firstWasRejected = true;
       });
 
@@ -523,7 +522,7 @@ describe("RSVP extensions", function() {
 
       var firstWasRejected, secondCompleted;
 
-      first.catch(function(){
+      first['catch'](function(){
         firstWasRejected = true;
       });
 
@@ -579,7 +578,7 @@ describe("RSVP extensions", function() {
     });
   });
 
-  describe("Promise.resolve", function(){
+  describe("RSVP.resolve", function(){
     specify("it should exist", function(){
       assert(Promise.resolve);
     });
