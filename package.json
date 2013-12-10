@@ -37,10 +37,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/tildeio/rsvp.js.git"
+    "url": "git://github.com/jakearchibald/ES6-Promises.git"
   },
   "bugs": {
-    "url": "https://github.com/tildeio/rsvp.js/issues"
+    "url": "https://github.com/jakearchibald/ES6-Promises/issues"
   },
   "keywords": [
     "promises",
