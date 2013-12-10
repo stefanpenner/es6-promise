@@ -5,7 +5,7 @@ module.exports = function(grunt) {
 
       output.push.apply(output, f.src.map(grunt.file.read));
 
-      output.push("window.<%= pkg.namespace %> = requireModule('<%= pkg.name %>');");
+      output.push("window.<%= pkg.namespace %> = requireModule('promise').Promise;");
       output.push('}(window));');
 
       grunt.file.write(f.dest, grunt.template.process(output.join('\n')));
