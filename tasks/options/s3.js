@@ -1,5 +1,5 @@
 // the base for dist files
-var baseDistFile = 'dist/rsvp-<%= pkg.version %>.';
+var baseDistFile = 'dist/<%= pkg.name %>-<%= pkg.version %>.';
 var builds = ['amd.', '' /* normal rsvp.js */ ];
 var s3Uploads = [];
 builds.forEach(function(build){

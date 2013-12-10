@@ -28,12 +28,12 @@ module.exports = {
     files: [{
       expand: true,
       cwd: 'lib/',
-      src: ['<%= pkg.name %>/*.js'],
+      src: ['promise/*.js'],
       dest: 'dist/commonjs/',
       ext: '.js'
     },
     {
-      src: ['lib/<%= pkg.name %>.js'],
+      src: ['lib/promise.js'],
       dest: 'dist/commonjs/main.js'
     }]
   },

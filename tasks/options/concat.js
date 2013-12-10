@@ -1,7 +1,7 @@
 module.exports = {
   amd: {
-    src: ['tmp/<%= pkg.name %>/**/*.amd.js', 'tmp/<%= pkg.name %>.amd.js'],
-    dest: 'dist/<%= pkg.name %>-<%= pkg.version %>.amd.js',
+    src: ['tmp/promise/**/*.amd.js', 'tmp/promise.amd.js'],
+    dest: 'dist/promise-<%= pkg.version %>.amd.js',
     options: {
       banner: '/**\n' +
               '  @class RSVP\n' +
@@ -11,8 +11,8 @@ module.exports = {
   },
 
   amdNoVersion: {
-    src: ['tmp/<%= pkg.name %>/**/*.amd.js', 'tmp/<%= pkg.name %>.amd.js'],
-    dest: 'dist/<%= pkg.name %>.amd.js'
+    src: ['tmp/promise/**/*.amd.js', 'tmp/promise.amd.js'],
+    dest: 'dist/promise.amd.js'
   },
 
   deps: {
@@ -21,7 +21,7 @@ module.exports = {
   },
 
   browser: {
-    src: ['vendor/loader.js', 'tmp/<%= pkg.name %>/**/*.amd.js', 'tmp/<%= pkg.name %>.amd.js'],
-    dest: 'tmp/<%= pkg.name %>.browser1.js'
+    src: ['vendor/loader.js', 'tmp/promise/**/*.amd.js', 'tmp/promise.amd.js'],
+    dest: 'tmp/promise.browser1.js'
   }
 };

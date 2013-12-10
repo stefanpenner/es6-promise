@@ -1,10 +1,10 @@
 module.exports = {
   dist: {
-    src: 'tmp/<%= pkg.name %>.browser1.js',
-    dest: 'dist/<%= pkg.name %>-<%= pkg.version %>.js'
+    src: 'tmp/promise.browser1.js',
+    dest: 'dist/promise-<%= pkg.version %>.js'
   },
   distNoVersion: {
-    src: 'tmp/<%= pkg.name %>.browser1.js',
-    dest: 'dist/<%= pkg.name %>.js'
+    src: 'tmp/promise.browser1.js',
+    dest: 'dist/promise.js'
   }
 };
