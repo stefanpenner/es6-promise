@@ -1,19 +1,17 @@
 /*global RSVP*/
 
-var defer, resolve, reject;
+var resolve, reject;
 
-if (typeof RSVP !== 'undefined') {
+if (typeof Promise !== 'undefined') {
   // Test the browser build
-  resolve = RSVP.resolve;
-  reject = RSVP.reject;
-  defer = RSVP.defer;
+  resolve = Promise.resolve;
+  reject = Promise.reject;
 } else {
   // Test the Node build
-  RSVP = require('../dist/commonjs/main');
+  Promise = require('../dist/commonjs/main').Promise;
   assert = require('./vendor/assert');
-  defer = require('../dist/commonjs/main').defer;
-  resolve = require('../dist/commonjs/main').resolve;
-  reject = require('../dist/commonjs/main').reject;
+  resolve = Promise.resolve;
+  reject = Promise.reject;
 }
 
 if (typeof window === 'undefined' && typeof global !== 'undefined') {
@@ -23,5 +21,19 @@ if (typeof window === 'undefined' && typeof global !== 'undefined') {
 module.exports = global.adapter = {
   resolved: resolve,
   rejected: reject,
-  deferred: defer
+  deferred: function defer() {
+    var deferred = {
+      // pre-allocate shape
+      resolve: undefined,
+      reject:  undefined,
+      promise: undefined
+    };
+
+    deferred.promise = new Promise(function(resolve, reject) {
+      deferred.resolve = resolve;
+      deferred.reject = reject;
+    });
+
+    return deferred;
+  }
 };
