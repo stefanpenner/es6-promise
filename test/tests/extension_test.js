@@ -539,7 +539,7 @@ describe("RSVP extensions", function() {
 
       var firstWasRejected, secondCompleted;
 
-      first.fail(function(){
+      first['catch'](function(){
         firstWasRejected = true;
       });
 
@@ -663,7 +663,7 @@ describe("RSVP extensions", function() {
 
       var firstWasRejected, secondCompleted;
 
-      first.fail(function(){
+      first['catch'](function(){
         firstWasRejected = true;
       });
 
@@ -897,7 +897,7 @@ describe("RSVP extensions", function() {
 
       var firstWasRejected, secondCompleted;
 
-      first.fail(function(){
+      first['catch'](function(){
         firstWasRejected = true;
       });
 
@@ -1013,8 +1013,7 @@ describe("RSVP extensions", function() {
 
       global.setTimeout = newSetTimeout;
 
-      RSVP.reject(thrownError).
-        fail(RSVP.rethrow).
+      RSVP.reject(thrownError)['catch'](RSVP.rethrow).
         then(doNotExpectFulfillment, expectRejection).
         then(done,done);
     });
@@ -1358,7 +1357,7 @@ describe("RSVP extensions", function() {
           assert(false, 'rejected erroneously fired');
         });
 
-        RSVP.reject().fail(done);
+        RSVP.reject()['catch'](done);
       });
     });
 
