@@ -33,7 +33,7 @@ module.exports = {
       ext: '.js'
     },
     {
-      src: ['lib/promise.js'],
+      src: ['lib/*.js'],
       dest: 'dist/commonjs/main.js'
     }]
   },

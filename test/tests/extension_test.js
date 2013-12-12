@@ -926,8 +926,6 @@ describe("RSVP extensions", function() {
 if (typeof module !== 'undefined' && module.exports) {
 
   describe("using reduce to sum integers using promises", function(){
-    var resolve = Promise.resolve;
-
     it("should build the promise pipeline without error", function(){
       var array, iters, pZero, i;
 
@@ -938,11 +936,11 @@ if (typeof module !== 'undefined' && module.exports) {
         array.push(i);
       }
 
-      pZero = resolve(0);
+      pZero = Promise.resolve(0);
 
       array.reduce(function(promise, nextVal) {
         return promise.then(function(currentVal) {
-          return resolve(currentVal + nextVal);
+          return Promise.resolve(currentVal + nextVal);
         });
       }, pZero);
     });
@@ -950,7 +948,7 @@ if (typeof module !== 'undefined' && module.exports) {
     it("should get correct answer without blowing the nextTick stack", function(done){
       var pZero, array, iters, result, i;
 
-      pZero = resolve(0);
+      pZero = Promise.resolve(0);
 
       array = [];
       iters = 1000;
@@ -961,7 +959,7 @@ if (typeof module !== 'undefined' && module.exports) {
 
       result = array.reduce(function(promise, nextVal) {
         return promise.then(function(currentVal) {
-          return resolve(currentVal + nextVal);
+          return Promise.resolve(currentVal + nextVal);
         });
       }, pZero);
 

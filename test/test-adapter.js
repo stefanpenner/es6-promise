@@ -2,16 +2,25 @@
 
 var resolve, reject;
 
+function bind(func, thisVal) {
+  if (func.bind) {
+    return func.bind(thisVal);
+  }
+  return function() {
+    return func.apply(thisVal, arguments);
+  };
+}
+
 if (typeof Promise !== 'undefined') {
   // Test the browser build
-  resolve = Promise.resolve;
-  reject = Promise.reject;
+  resolve = bind(Promise.resolve, Promise);
+  reject = bind(Promise.reject, Promise);
 } else {
   // Test the Node build
   Promise = require('../dist/commonjs/main').Promise;
   assert = require('./vendor/assert');
-  resolve = Promise.resolve;
-  reject = Promise.reject;
+  resolve = bind(Promise.resolve, Promise);
+  reject = bind(Promise.reject, Promise);
 }
 
 if (typeof window === 'undefined' && typeof global !== 'undefined') {
