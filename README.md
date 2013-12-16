@@ -6,8 +6,8 @@ TODO: point to html5rocks article
 
 ## Downloads
 
-* [promise](http://s3.amazonaws.com/es6-promises/promise-2.0.4.js)
-* [promise-min](http://s3.amazonaws.com/es6-promises/promise-2.0.4.min.js) (~2k gzipped)
+* [promise](http://s3.amazonaws.com/es6-promises/promise-0.1.0.js)
+* [promise-min](http://s3.amazonaws.com/es6-promises/promise-0.1.0.min.js) (~2k gzipped)
 
 ## Building & Testing
 
