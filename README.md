@@ -2,7 +2,7 @@
 
 This is a polyfill of [ES6 Promises](https://github.com/domenic/promises-unwrapping), which is basically a remapping of [rsvp.js](https://github.com/tildeio/rsvp.js).
 
-TODO: point to html5rocks article
+For API details and how to use promises, see the <a href="http://www.html5rocks.com/en/tutorials/es6/promises/">JavaScript Promises HTML5Rocks article</a>.
 
 ## Downloads
 
