@@ -1,6 +1,6 @@
 # ES6-Promises
 
-This is a polyfill of [ES6 Promises](https://github.com/domenic/promises-unwrapping), which is basically a remapping of [rsvp.js](https://github.com/tildeio/rsvp.js).
+This is a polyfill of [ES6 Promises](https://github.com/domenic/promises-unwrapping). The implementation is basically an API remapping of [rsvp.js](https://github.com/tildeio/rsvp.js).
 
 For API details and how to use promises, see the <a href="http://www.html5rocks.com/en/tutorials/es6/promises/">JavaScript Promises HTML5Rocks article</a>.
 
@@ -8,6 +8,20 @@ For API details and how to use promises, see the <a href="http://www.html5rocks.
 
 * [promise](http://s3.amazonaws.com/es6-promises/promise-0.1.0.js)
 * [promise-min](http://s3.amazonaws.com/es6-promises/promise-0.1.0.min.js) (~2k gzipped)
+
+## Node.js
+
+To install:
+
+```sh
+npm install es6-promise
+```
+
+To use:
+
+```js
+var Promise = require('es6-promise').Promise;
+```
 
 ## Building & Testing
 
