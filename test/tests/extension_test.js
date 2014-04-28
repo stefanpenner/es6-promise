@@ -578,7 +578,7 @@ describe("RSVP extensions", function() {
     });
   });
 
-  describe("RSVP.resolve", function(){
+  describe("Promise.resolve", function(){
     specify("it should exist", function(){
       assert(Promise.resolve);
     });
@@ -864,19 +864,17 @@ describe("RSVP extensions", function() {
         assert(callCount === 0, 'expected async, was sync');
       });
     });
-  });
 
-  describe("Promise.cast", function () {
     it("If SameValue(constructor, C) is true, return x.", function(){
       var promise = Promise.resolve(1);
-      var casted = Promise.cast(promise);
+      var casted = Promise.resolve(promise);
 
       assert.deepEqual(casted, promise);
     });
 
     it("If SameValue(constructor, C) is false, and isThenable(C) is true, return PromiseResolve(promise, x).", function(){
       var promise = { then: function() { } };
-      var casted = Promise.cast(promise);
+      var casted = Promise.resolve(promise);
 
       assert(casted instanceof Promise);
       assert(casted !== promise);
@@ -889,10 +887,10 @@ describe("RSVP extensions", function() {
 
       PromiseSubclass.prototype = Object.create(Promise.prototype);
       PromiseSubclass.prototype.constructor = PromiseSubclass;
-      PromiseSubclass.cast = Promise.cast;
+      PromiseSubclass.resolve = Promise.resolve;
 
       var promise = Promise.resolve(1);
-      var casted = PromiseSubclass.cast(promise);
+      var casted = PromiseSubclass.resolve(promise);
 
       assert(casted instanceof Promise);
       assert(casted instanceof PromiseSubclass);
@@ -906,14 +904,14 @@ describe("RSVP extensions", function() {
 
     it("If SameValue(constructor, C) is false, and isThenable(C) is false, return PromiseResolve(promise, x).", function(){
       var value = 1;
-      var casted = Promise.cast(value);
+      var casted = Promise.resolve(value);
 
       assert(casted instanceof Promise);
       assert(casted !== value);
     });
 
     it("casts null correctly", function(done){
-      Promise.cast(null).then(function(value){
+      Promise.resolve(null).then(function(value){
         assert.equal(value, null);
         done();
       });
