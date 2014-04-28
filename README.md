@@ -23,6 +23,24 @@ To use:
 var Promise = require('es6-promise').Promise;
 ```
 
+## Usage in IE<10
+
+`catch` is a reserved word in IE<10, meaning `promise.catch(func)` throws a syntax error. To work around this, to a string to access the property:
+
+```js
+promise['catch'](function(err) {
+  // ...
+});
+```
+
+Or use `.then` instead:
+
+```js
+promise.then(undefined, function(err) {
+  // ...
+});
+```
+
 ## Building & Testing
 
 This package uses the [grunt-microlib](https://github.com/thomasboyt/grunt-microlib) package for building.
