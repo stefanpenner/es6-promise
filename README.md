@@ -23,9 +23,9 @@ To use:
 var Promise = require('es6-promise').Promise;
 ```
 
-## Usage in IE<10
+## Usage in IE<9
 
-`catch` is a reserved word in IE<10, meaning `promise.catch(func)` throws a syntax error. To work around this, use a string to access the property:
+`catch` is a reserved word in IE<9, meaning `promise.catch(func)` throws a syntax error. To work around this, use a string to access the property:
 
 ```js
 promise['catch'](function(err) {
