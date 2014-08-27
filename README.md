@@ -23,9 +23,9 @@ To use:
 var Promise = require('es6-promise').Promise;
 ```
 
-## Usage in IE<10
+## Usage in IE<9
 
-`catch` is a reserved word in IE<10, meaning `promise.catch(func)` throws a syntax error. To work around this, use a string to access the property:
+`catch` is a reserved word in IE<9, meaning `promise.catch(func)` throws a syntax error. To work around this, use a string to access the property:
 
 ```js
 promise['catch'](function(err) {
@@ -43,10 +43,4 @@ promise.then(undefined, function(err) {
 
 ## Building & Testing
 
-This package uses the [grunt-microlib](https://github.com/thomasboyt/grunt-microlib) package for building.
-
-Custom tasks:
-
-* `grunt test` - Run Mocha tests through Node and PhantomJS.
-* `grunt test:phantom` - Run Mocha tests through PhantomJS (browser build).
-* `grunt test:node` - Run Mocha tests through Node (CommonJS build).
+* `npm run build-all && npm test` - Run Mocha tests through Node and PhantomJS.

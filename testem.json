@@ -1,0 +1,11 @@
+{
+  "test_page": "test/index.html",
+  "parallel": 5,
+  "before_tests": "npm run build-all",
+  "launchers": {
+    "Mocha": {
+      "command": "./node_modules/.bin/mocha test/main.js"
+    }
+  },
+  "launch_in_ci":  ["PhantomJS", "Mocha"]
+}
