@@ -1,5 +1,5 @@
-importScripts('../../dist/rsvp.js');
-new RSVP.Promise(function(resolve, reject) {
+importScripts('../../dist/es6-promise.js');
+new ES6Promise.Promise(function(resolve, reject) {
   self.onmessage = function (e) {
     if (e.data === 'ping') {
       resolve('pong');

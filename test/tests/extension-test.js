@@ -465,15 +465,15 @@ describe("extensions", function() {
     });
   }
 
-  function testRace(race) {
+  describe('race', function() {
     it("should exist", function() {
-      assert(race);
+      assert(Promise.race);
     });
 
     it("throws when not passed an array", function(done) {
-      var nothing = assertRejection(race());
-      var string  = assertRejection(race(''));
-      var object  = assertRejection(race({}));
+      var nothing = assertRejection(Promise.race());
+      var string  = assertRejection(Promise.race(''));
+      var object  = assertRejection(Promise.race({}));
 
       Promise.all([
         nothing,
@@ -507,7 +507,7 @@ describe("extensions", function() {
         secondResolver(true);
       }, 0);
 
-      race([first, second]).then(function() {
+      Promise.race([first, second]).then(function() {
         assert(secondResolved);
         assert.equal(firstResolved, undefined);
         done();
@@ -525,7 +525,7 @@ describe("extensions", function() {
         resolve(false);
       });
 
-      race([first, second, nonPromise]).then(function(value) {
+      Promise.race([first, second, nonPromise]).then(function(value) {
         assert.equal(value, true);
         done();
       });
@@ -558,7 +558,7 @@ describe("extensions", function() {
         secondCompleted = true;
       });
 
-      race([first, second]).then(function() {
+      Promise.race([first, second]).then(function() {
         assert(false);
       }, function() {
         assert(firstWasRejected);
@@ -568,7 +568,7 @@ describe("extensions", function() {
     });
 
     specify('resolves an empty array to forever pending Promise', function(done) {
-      var foreverPendingPromise = race([]),
+      var foreverPendingPromise = Promise.race([]),
           wasSettled            = false;
 
       foreverPendingPromise.then(function() {
@@ -587,7 +587,7 @@ describe("extensions", function() {
       var promise = new Promise(function(resolve) { setTimeout(function() { resolve(1); }, 10); }),
           syncThenable = { then: function (onFulfilled) { onFulfilled(2); } };
 
-      race([promise, syncThenable]).then(function(result) {
+      Promise.race([promise, syncThenable]).then(function(result) {
         assert(result, 2);
         done();
       });
@@ -596,20 +596,11 @@ describe("extensions", function() {
     specify('works with a mix of thenables and non-promises', function (done) {
       var asyncThenable = { then: function (onFulfilled) { setTimeout(function() { onFulfilled(3); }, 0); } },
           nonPromise = 4;
-      race([asyncThenable, nonPromise]).then(function(result) {
+
+      Promise.race([asyncThenable, nonPromise]).then(function(result) {
         assert(result, 4);
         done();
       });
-    });
-  }
-
-  describe("race", function() {
-    testRace(race);
-  });
-
-  describe("Promise.race", function() {
-    testRace(function(){
-      return Promise.race.apply(Promise, arguments);
     });
   });
 
@@ -629,7 +620,7 @@ describe("extensions", function() {
           }
         };
 
-        wrapped = resolve(thenable);
+        wrapped = Promise.resolve(thenable);
 
         wrapped.then(function(value){
           assert(value === expectedValue);
@@ -651,7 +642,7 @@ describe("extensions", function() {
           }
         };
 
-        wrapped = resolve(thenable);
+        wrapped = Promise.resolve(thenable);
 
         wrapped.then(function(value){
           assert(value === expectedValue);
@@ -669,7 +660,7 @@ describe("extensions", function() {
           }
         };
 
-        wrapped = resolve(thenable);
+        wrapped = Promise.resolve(thenable);
 
         wrapped.then(null, function(error){
           assert(error === expectedError);
@@ -702,7 +693,7 @@ describe("extensions", function() {
 
         assert(accessCount === 0);
 
-        wrapped = resolve(thenable);
+        wrapped = Promise.resolve(thenable);
 
         assert(accessCount === 1);
 
@@ -724,7 +715,7 @@ describe("extensions", function() {
           }
         });
 
-        wrapped = resolve(thenable);
+        wrapped = Promise.resolve(thenable);
 
         wrapped.then(null, function(error){
           assert(error === expectedError, 'incorrect exception was thrown');
@@ -745,7 +736,7 @@ describe("extensions", function() {
           };
 
           expectedSuccess = 'success';
-          wrapped = resolve(thenable);
+          wrapped = Promise.resolve(thenable);
 
           wrapped.then(function(success){
             assert(calledThis === thenable, 'this must be the thenable');
@@ -771,7 +762,7 @@ describe("extensions", function() {
 
           expectedError = new Error();
 
-          wrapped = resolve(thenable);
+          wrapped = Promise.resolve(thenable);
 
           wrapped.then(null, function(error){
             assert(error === expectedError, 'rejected promise with x');
@@ -800,7 +791,7 @@ describe("extensions", function() {
 
           expectedError = new Error();
 
-          wrapped = resolve(thenable);
+          wrapped = Promise.resolve(thenable);
 
           wrapped.then(function(){
             calledResolved++;
@@ -842,7 +833,7 @@ describe("extensions", function() {
               }
             };
 
-            wrapped = resolve(thenable);
+            wrapped = Promise.resolve(thenable);
 
             wrapped.then(function(success){
               assert(success === expectedSuccess, 'resolved not errored');
@@ -858,7 +849,7 @@ describe("extensions", function() {
 
             thenable = { then: function() { throw expectedError; } };
 
-            wrapped = resolve(thenable);
+            wrapped = Promise.resolve(thenable);
 
             wrapped.then(null, function(error){
               callCount++;
@@ -876,7 +867,7 @@ describe("extensions", function() {
 
         thenable = { then: 3 };
         callCount = 0;
-        wrapped = resolve(thenable);
+        wrapped = Promise.resolve(thenable);
 
         wrapped.then(function(success){
           callCount++;
@@ -894,7 +885,7 @@ describe("extensions", function() {
 
         thenable = null;
         callCount = 0;
-        wrapped = resolve(thenable);
+        wrapped = Promise.resolve(thenable);
 
         wrapped.then(function(success){
           callCount++;
@@ -912,6 +903,7 @@ describe("extensions", function() {
   if (typeof Worker !== 'undefined') {
     describe('web worker', function () {
       it('should work', function (done) {
+        this.timeout(2000);
         var worker = new Worker('tests/worker.js');
         worker.addEventListener('error', function(reason) {
           done(new Error("Test failed:" + reason));
@@ -932,8 +924,6 @@ describe("extensions", function() {
 if (typeof module !== 'undefined' && module.exports) {
 
   describe("using reduce to sum integers using promises", function(){
-    var resolve = resolve;
-
     it("should build the promise pipeline without error", function(){
       var array, iters, pZero, i;
 
@@ -944,11 +934,11 @@ if (typeof module !== 'undefined' && module.exports) {
         array.push(i);
       }
 
-      pZero = resolve(0);
+      pZero = Promise.resolve(0);
 
       array.reduce(function(promise, nextVal) {
         return promise.then(function(currentVal) {
-          return resolve(currentVal + nextVal);
+          return Promise.resolve(currentVal + nextVal);
         });
       }, pZero);
     });
@@ -956,7 +946,7 @@ if (typeof module !== 'undefined' && module.exports) {
     it("should get correct answer without blowing the nextTick stack", function(done){
       var pZero, array, iters, result, i;
 
-      pZero = resolve(0);
+      pZero = Promise.resolve(0);
 
       array = [];
       iters = 1000;
@@ -967,7 +957,7 @@ if (typeof module !== 'undefined' && module.exports) {
 
       result = array.reduce(function(promise, nextVal) {
         return promise.then(function(currentVal) {
-          return resolve(currentVal + nextVal);
+          return Promise.resolve(currentVal + nextVal);
         });
       }, pZero);
 
