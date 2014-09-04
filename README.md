@@ -1,4 +1,5 @@
 # ES6-Promises (subset of [rsvp.js](https://github.com/tildeio/rsvp.js))
+[![Build Status](https://travis-ci.org/jakearchibald/es6-promise.svg?branch=master)](https://travis-ci.org/jakearchibald/es6-promise)
 
 This is a polyfill of [ES6 Promises](https://github.com/domenic/promises-unwrapping). The implementation is a subset of [rsvp.js](https://github.com/tildeio/rsvp.js), if you're wanting extra features and more debugging options, check out the [full library](https://github.com/tildeio/rsvp.js).
 
