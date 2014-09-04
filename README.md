@@ -43,10 +43,4 @@ promise.then(undefined, function(err) {
 
 ## Building & Testing
 
-This package uses the [grunt-microlib](https://github.com/thomasboyt/grunt-microlib) package for building.
-
-Custom tasks:
-
-* `grunt test` - Run Mocha tests through Node and PhantomJS.
-* `grunt test:phantom` - Run Mocha tests through PhantomJS (browser build).
-* `grunt test:node` - Run Mocha tests through Node (CommonJS build).
+* `npm run build-all && npm test` - Run Mocha tests through Node and PhantomJS.

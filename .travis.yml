@@ -2,9 +2,8 @@
 language: node_js
 node_js:
 - '0.10'
-before_install:
-- npm install -g grunt-cli
-after_success: grunt build s3:dev
+after_success:
+- "./bin/publish_to_s3.js"
 env:
   global:
   - secure: |-
@@ -15,3 +14,4 @@ env:
       mrNGoG5AycW+d5jlghF9PJHQW1ETT9jWI7bGe9QX1QRpoSLkGAvxavrujmhu
       UNRP/pe5AJBh3zDED38nD/ZGtrcSYQ5CC6QbFLx5mLtqn7mNTo1m3C5lr+55
       Sb6mnyLLz2eoPBUMcXwY1i9Qisy40uhfV9VuD5B/gvVud2+oJWI=
+  - EMBER_ENV=production
