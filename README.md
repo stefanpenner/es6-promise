@@ -42,6 +42,16 @@ promise.then(undefined, function(err) {
 });
 ```
 
+## Auto-polyfill
+
+To polyfill the global environment (either in Node or in the browser via CommonJS) use the following code snippet:
+
+```js
+require('es6-promise').polyfill();
+```
+
+Notice that we don't assign the result of `polyfill()` to any variable. The `polyfill()` method will patch the global environment (in this case to the `Promise` name) when called.
+
 ## Building & Testing
 
 * `npm run build-all && npm test` - Run Mocha tests through Node and PhantomJS.
