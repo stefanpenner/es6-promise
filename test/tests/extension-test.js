@@ -229,7 +229,11 @@ describe("extensions", function() {
         });
 
         promise.then(function(value) {
-          assert.equal(value, originalPromise);
+          assert(false);
+          done();
+        })['catch'](function(reason) {
+          assert.equal(reason.message, "You cannot resolve a promise with itself");
+          assert(reason instanceof TypeError);
           done();
         });
       });
