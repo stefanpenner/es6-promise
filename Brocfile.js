@@ -31,6 +31,7 @@ if (env === 'production') {
     destFile: 'es6-promise.min.js'
   }), {
     compilation_level: 'ADVANCED_OPTIMIZATIONS',
+    externs: ['node'],
   }));
 }
 
