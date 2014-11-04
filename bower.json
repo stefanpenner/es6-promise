@@ -16,7 +16,7 @@
   },
   "bugs": {
     "url": "https://github.com/jakearchibald/ES6-Promises/issues"
-  }
+  },
   "license": "MIT",
   "ignore": [
     "node_modules",
