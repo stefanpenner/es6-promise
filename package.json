@@ -7,6 +7,9 @@
   "directories": {
     "lib": "lib"
   },
+  "files": [
+    "dist"
+  ],
   "devDependencies": {
     "bower": "^1.3.9",
     "brfs": "0.0.8",
