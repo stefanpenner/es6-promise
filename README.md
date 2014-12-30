@@ -55,4 +55,6 @@ Notice that we don't assign the result of `polyfill()` to any variable. The `pol
 
 ## Building & Testing
 
-* `npm run build-all && npm test` - Run Mocha tests through Node and PhantomJS.
+* `npm run build` to build
+* `npm test` to run build and runt ests
+* `npm start` to run a build watcher, and webserver to test 
