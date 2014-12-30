@@ -59,9 +59,9 @@ function objectEquals(obj1, obj2) {
 
 describe("extensions", function() {
   describe("Promise constructor", function() {
-    it('should exist and have length 2', function() {
+    it('should exist and have length 1', function() {
       assert(Promise);
-      assert.equal(Promise.length, 2);
+      assert.equal(Promise.length, 1);
     });
 
     it('should fulfill if `resolve` is called with a value', function(done) {
@@ -908,7 +908,7 @@ describe("extensions", function() {
     describe('web worker', function () {
       it('should work', function (done) {
         this.timeout(2000);
-        var worker = new Worker('tests/worker.js');
+        var worker = new Worker('worker.js');
         worker.addEventListener('error', function(reason) {
           done(new Error("Test failed:" + reason));
         });
