@@ -58,3 +58,4 @@ Notice that we don't assign the result of `polyfill()` to any variable. The `pol
 * `npm run build` to build
 * `npm test` to run build and runt ests
 * `npm start` to run a build watcher, and webserver to test 
+* `npm run test:server` for a testem test runner and watching builder
