@@ -53,5 +53,8 @@
     "futures"
   ],
   "author": "Yehuda Katz, Tom Dale, Stefan Penner and contributors (Conversion to ES6 API by Jake Archibald)",
-  "license": "MIT"
+  "license": "MIT",
+  "spm": {
+    "main": "dist/es6-promise.js"
+  }
 }
