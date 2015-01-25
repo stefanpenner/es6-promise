@@ -998,3 +998,70 @@ describe("Thenables should not be able to run code during assimilation", functio
         assert.strictEqual(thenCalled, false);
     });
 });
+
+describe('hostile this', function() {
+  it('race', function(done) {
+    var BlueBirdPromise = require('bluebird');
+
+    Promise.race.call(BlueBirdPromise, [3]).then(function(a) {
+      assert.equal(a, 3);
+      done();
+    }, done);
+  });
+
+  it('resolve', function(done) {
+    var BlueBirdPromise = require('bluebird');
+
+    Promise.resolve.call(BlueBirdPromise, 3).then(function(a) {
+      assert.equal(a, 3);
+      done();
+    }, done);
+  });
+
+  it('reject', function(done) {
+    var BlueBirdPromise = require('bluebird');
+
+    Promise.reject.call(BlueBirdPromise, 3).then(undefined, function(reason) {
+      assert.equal(reason, 3);
+      done();
+    }, done);
+  });
+
+  it('all', function(done) {
+    var BlueBirdPromise = require('bluebird');
+    var slow = new BlueBirdPromise(function(resolve) {
+      setTimeout(function() { 
+        resolve('slow');
+      }, 100);
+    });
+
+    var own = new Promise(function(resolve) {
+      setTimeout(function() { 
+        resolve('own');
+      }, 100);
+    });
+
+    Promise.all.call(BlueBirdPromise, [3, slow, own]).then(function(value){
+      assert.equal(value[0], 3);
+      assert.equal(value[1], 'slow');
+      assert.equal(value[2], 'own');
+      done();
+    }, done);
+  });
+
+  it('then fulfillemtn', function(done) {
+    var BlueBirdPromise = require('bluebird');
+    Promise.prototype.then.call(BlueBirdPromise.resolve(1), function(value) {
+      assert.equal(value, 1);
+      done();
+    });
+  });
+
+  it('then rejection', function(done) {
+    var BlueBirdPromise = require('bluebird');
+    Promise.prototype.then.call(BlueBirdPromise.reject(1), undefined, function(reason) {
+      assert.equal(reason, 1);
+      done();
+    });
+  });
+});
