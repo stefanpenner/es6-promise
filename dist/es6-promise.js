@@ -57,6 +57,34 @@
       typeof importScripts !== 'undefined' &&
       typeof MessageChannel !== 'undefined';
 
+    var lib$es6$promise$asap$$local;
+    var lib$es6$promise$asap$$hasZoneJs = false;
+
+    if (typeof global !== 'undefined') {
+      lib$es6$promise$asap$$local = global;
+    } else if (typeof self !== 'undefined') {
+      lib$es6$promise$asap$$local = self;
+    } else {
+      try {
+        lib$es6$promise$asap$$local = Function('return this')();
+      } catch (e) { }
+    }
+
+    if (lib$es6$promise$asap$$local) {
+      lib$es6$promise$asap$$hasZoneJs = lib$es6$promise$asap$$local.Zone && lib$es6$promise$asap$$local.Zone.scheduleMicrotask;
+    }
+
+    function lib$es6$promise$asap$$useZoneJs() {
+      var fn = lib$es6$promise$asap$$queue[0];
+      var arg = lib$es6$promise$asap$$queue[1];
+      lib$es6$promise$asap$$local.Zone.scheduleMicrotask(function() {
+        fn(arg);
+      });
+      lib$es6$promise$asap$$queue[0] = undefined;
+      lib$es6$promise$asap$$queue[1] = undefined;
+      lib$es6$promise$asap$$len = 0;
+    }
+
     // node
     function lib$es6$promise$asap$$useNextTick() {
       var nextTick = process.nextTick;
@@ -132,7 +160,9 @@
 
     var lib$es6$promise$asap$$scheduleFlush;
     // Decide what async method to use to triggering processing of queued callbacks:
-    if (lib$es6$promise$asap$$isNode) {
+    if (lib$es6$promise$asap$$hasZoneJs) {
+      lib$es6$promise$asap$$scheduleFlush = lib$es6$promise$asap$$useZoneJs;
+    } else if (lib$es6$promise$asap$$isNode) {
       lib$es6$promise$asap$$scheduleFlush = lib$es6$promise$asap$$useNextTick();
     } else if (lib$es6$promise$asap$$BrowserMutationObserver) {
       lib$es6$promise$asap$$scheduleFlush = lib$es6$promise$asap$$useMutationObserver();
