@@ -27,20 +27,6 @@ var g = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ?
 var Promise = g.adapter.Promise;
 var assert = require('assert');
 
-var o_create = Object.create || function(o, props) {
-  function F() {}
-  F.prototype = o;
-
-  if (typeof(props) === "object") {
-    for (var prop in props) {
-      if (props.hasOwnProperty((prop))) {
-        F[prop] = props[prop];
-      }
-    }
-  }
-  return new F();
-};
-
 function objectEquals(obj1, obj2) {
   for (var i in obj1) {
     if (obj1.hasOwnProperty(i)) {
