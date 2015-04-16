@@ -48,6 +48,9 @@
   "bugs": {
     "url": "https://github.com/jakearchibald/ES6-Promises/issues"
   },
+  "browser": {
+    "vertx": false
+  },
   "keywords": [
     "promises",
     "futures"
