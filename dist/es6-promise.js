@@ -3,7 +3,7 @@
  * @copyright Copyright (c) 2014 Yehuda Katz, Tom Dale, Stefan Penner and contributors (Conversion to ES6 API by Jake Archibald)
  * @license   Licensed under MIT license
  *            See https://raw.githubusercontent.com/jakearchibald/es6-promise/master/LICENSE
- * @version   2.1.0
+ * @version   2.1.1
  */
 
 (function() {
@@ -205,7 +205,7 @@
     function lib$es6$promise$$internal$$handleOwnThenable(promise, thenable) {
       if (thenable._state === lib$es6$promise$$internal$$FULFILLED) {
         lib$es6$promise$$internal$$fulfill(promise, thenable._result);
-      } else if (promise._state === lib$es6$promise$$internal$$REJECTED) {
+      } else if (thenable._state === lib$es6$promise$$internal$$REJECTED) {
         lib$es6$promise$$internal$$reject(promise, thenable._result);
       } else {
         lib$es6$promise$$internal$$subscribe(thenable, undefined, function(value) {
