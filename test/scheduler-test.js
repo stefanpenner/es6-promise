@@ -52,4 +52,25 @@ describe('scheduler', function() {
       }, 'arg');
     });
   });
+
+  describe('Promise._setAsap', function() {
+    it('should allow overriding asap', function(done) {
+      var called = false;
+
+      Promise._setAsap(function(fn, arg) {
+        called = true;
+        // call the original implementation
+        Promise._asap(fn, arg);
+        // restore the original implementation
+        Promise._setAsap(Promise._asap);
+      });
+
+      Promise.resolve('value').then(function(v) {
+        resolvedWith = v;
+        assert.equal(v, 'value');
+        assert.equal(called, true);
+        done();
+      });
+    });
+  });
 });
