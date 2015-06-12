@@ -570,7 +570,7 @@ describe("extensions", function() {
       setTimeout(function() {
         assert(!wasSettled);
         done();
-      }, 100);
+      }, 50);
     });
 
     specify('works with a mix of promises and thenables', function(done) {
