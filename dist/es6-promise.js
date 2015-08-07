@@ -3,7 +3,7 @@
  * @copyright Copyright (c) 2014 Yehuda Katz, Tom Dale, Stefan Penner and contributors (Conversion to ES6 API by Jake Archibald)
  * @license   Licensed under MIT license
  *            See https://raw.githubusercontent.com/jakearchibald/es6-promise/master/LICENSE
- * @version   2.3.0
+ * @version   3.0.0
  */
 
 (function() {
@@ -71,15 +71,10 @@
 
     // node
     function lib$es6$promise$asap$$useNextTick() {
-      var nextTick = process.nextTick;
       // node version 0.10.x displays a deprecation warning when nextTick is used recursively
-      // setImmediate should be used instead instead
-      var version = process.versions.node.match(/^(?:(\d+)\.)?(?:(\d+)\.)?(\*|\d+)$/);
-      if (Array.isArray(version) && version[1] === '0' && version[2] === '10') {
-        nextTick = setImmediate;
-      }
+      // see https://github.com/cujojs/when/issues/410 for details
       return function() {
-        nextTick(lib$es6$promise$asap$$flush);
+        process.nextTick(lib$es6$promise$asap$$flush);
       };
     }
 
