@@ -126,7 +126,7 @@
       lib$es6$promise$asap$$len = 0;
     }
 
-    function lib$es6$promise$asap$$attemptVertex() {
+    function lib$es6$promise$asap$$attemptVertx() {
       try {
         var r = require;
         var vertx = r('vertx');
@@ -146,7 +146,7 @@
     } else if (lib$es6$promise$asap$$isWorker) {
       lib$es6$promise$asap$$scheduleFlush = lib$es6$promise$asap$$useMessageChannel();
     } else if (lib$es6$promise$asap$$browserWindow === undefined && typeof require === 'function') {
-      lib$es6$promise$asap$$scheduleFlush = lib$es6$promise$asap$$attemptVertex();
+      lib$es6$promise$asap$$scheduleFlush = lib$es6$promise$asap$$attemptVertx();
     } else {
       lib$es6$promise$asap$$scheduleFlush = lib$es6$promise$asap$$useSetTimeout();
     }
@@ -159,7 +159,7 @@
 
     var lib$es6$promise$$internal$$GET_THEN_ERROR = new lib$es6$promise$$internal$$ErrorObject();
 
-    function lib$es6$promise$$internal$$selfFullfillment() {
+    function lib$es6$promise$$internal$$selfFulfillment() {
       return new TypeError("You cannot resolve a promise with itself");
     }
 
@@ -243,7 +243,7 @@
 
     function lib$es6$promise$$internal$$resolve(promise, value) {
       if (promise === value) {
-        lib$es6$promise$$internal$$reject(promise, lib$es6$promise$$internal$$selfFullfillment());
+        lib$es6$promise$$internal$$reject(promise, lib$es6$promise$$internal$$selfFulfillment());
       } else if (lib$es6$promise$utils$$objectOrFunction(value)) {
         lib$es6$promise$$internal$$handleMaybeThenable(promise, value);
       } else {
