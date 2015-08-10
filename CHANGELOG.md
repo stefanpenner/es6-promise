@@ -1,5 +1,13 @@
 # Master
 
+# 3.0.2
+
+* correctly bump both bower and package.json versions
+
+# 3.0.1
+
+* no longer include dist/test in npm releases
+
 # 3.0.0
 
 * use nextTick() instead of setImmediate() to schedule microtasks with node 0.10. Later versions of 
