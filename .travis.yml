@@ -4,6 +4,9 @@ node_js:
 - '0.10'
 after_success:
 - "./bin/publish_to_s3.js"
+before_install:
+  - export PATH=/usr/local/phantomjs-2.0.0/bin:$PATH
+
 env:
   global:
   - secure: |-
