@@ -20,6 +20,25 @@
     var Promise = require('es6-promise').Promise;
     Promise._setScheduler(setImmediate);
 
+# 2.3.0
+
+* #121: Ability to override the internal asap implementation
+* #120: Use an ascii character for an apostrophe, for source maps
+
+# 2.2.0
+
+* #116: Expose asap() and a way to override the scheduling mechanism on Promise
+* Lock to v0.2.3 of ember-cli
+
+# 2.1.1
+
+* Fix #100 via #105: tell browserify to ignore vertx require
+* Fix #101 via #102: "follow thenable state, not own state"
+
+# 2.1.0
+
+* ? (see the commit log)
+
 # 2.0.0
 
 * re-sync with RSVP. Many large performance improvements and bugfixes.
