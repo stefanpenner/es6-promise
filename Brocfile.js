@@ -41,7 +41,7 @@ var dist = es6Promise;
 
 env('production', function() {
   dist = merge([
-    rename(uglify(dist), '.js', '.min.js'),
+    rename(uglify(dist, { mangle: true, compress: true }), '.js', '.min.js'),
     dist
   ]);
 });
