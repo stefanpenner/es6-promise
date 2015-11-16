@@ -954,10 +954,10 @@
     };
 
     /* global define:true module:true window: true */
-    if (typeof define === 'function' && define['amd']) {
-      define(function() { return lib$es6$promise$umd$$ES6Promise; });
-    } else if (typeof module !== 'undefined' && module['exports']) {
+    if (typeof module !== 'undefined' && module['exports']) {
       module['exports'] = lib$es6$promise$umd$$ES6Promise;
+    } else if (typeof define === 'function' && define['amd']) {
+      define(function() { return lib$es6$promise$umd$$ES6Promise; });
     } else if (typeof this !== 'undefined') {
       this['ES6Promise'] = lib$es6$promise$umd$$ES6Promise;
     }
