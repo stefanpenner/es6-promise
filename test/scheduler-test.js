@@ -4,7 +4,7 @@ var g = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ?
 var Promise = g.adapter.Promise;
 var assert = require('assert');
 
-describe('scheduler', function() {
+describe.skip('scheduler', function() {
   afterEach(function() {
       // make sure the es6-promise scheduler is restored after each test
       Promise._setScheduler(void 0);
