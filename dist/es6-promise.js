@@ -940,7 +940,7 @@
 
       var P = local.Promise;
 
-      if (P && Object.prototype.toString.call(P.resolve()) === '[object Promise]' && !P.cast) {
+      if (P && (Object.prototype.toString.call(P.resolve()) === '[object Promise]' || P.toString().indexOf('[native code]') !== -1) && !P.cast) {
         return;
       }
 
