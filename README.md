@@ -55,7 +55,11 @@ Notice that we don't assign the result of `polyfill()` to any variable. The `pol
 
 ## Building & Testing
 
+You will need to have PhantomJS installed globally in order to run the tests.
+
+`npm install -g phantomjs`
+
 * `npm run build` to build
 * `npm test` to run tests
-* `npm start` to run a build watcher, and webserver to test 
+* `npm start` to run a build watcher, and webserver to test
 * `npm run test:server` for a testem test runner and watching builder
