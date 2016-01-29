@@ -1150,4 +1150,6 @@ Promise.Promise = Promise;
 return Promise;
 
 })));
-//# sourceMappingURL=es6-promise.map
+
+ES6Promise.polyfill();
+//# sourceMappingURL=es6-promise.auto.map

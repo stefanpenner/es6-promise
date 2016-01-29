@@ -59,12 +59,24 @@ var header = stew.map(find('config/versionTemplate.txt'), function(content) {
   return content.replace(/VERSION_PLACEHOLDER_STRING/, version());
 });
 
+var dist = es6Promise;
+
 function concatAs(tree, outputFile) {
-  return concat(merge([tree, header]), {
-    headerFiles: ['config/versionTemplate.txt'],
-    inputFiles:  ['es6-promise.js'],
-    outputFile: outputFile
-  });
+  return merge([
+    concat(merge([tree, header]), {
+      headerFiles: ['config/versionTemplate.txt'],
+      inputFiles:  ['es6-promise.js'],
+      outputFile: outputFile
+    }),
+
+    concat(merge([tree, header]), {
+      headerFiles: ['config/versionTemplate.txt'],
+      inputFiles:  ['es6-promise.js'],
+      outputFile: outputFile.replace('es6-promise', 'es6-promise.auto'),
+      footer:    'ES6Promise.polyfill();',
+    }),
+
+  ]);
 }
 
 function production(dist, header) {
