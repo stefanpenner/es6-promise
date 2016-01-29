@@ -1,5 +1,6 @@
 /* jshint node:true, undef:true, unused:true */
 var compileModules   = require('broccoli-es6-module-transpiler');
+var concat           = require('broccoli-concat');
 var merge            = require('broccoli-merge-trees');
 var uglify           = require('broccoli-uglify-js');
 var version          = require('git-repo-version');
@@ -29,6 +30,13 @@ var es6Promise = compileModules(lib, {
   output: 'es6-promise.js'
 });
 
+var autoPolyfill = concat(es6Promise, {
+  inputFiles: ['es6-promise.js'],
+  outputFile: 'es6-promise.auto.js',
+  footer: 'ES6Promise.polyfill();',
+  sourceMapConfig: { enabled: false }
+});
+
 var testBundle = browserify(merge([
   mv(es6Promise, 'test'),
   testDir
@@ -37,7 +45,10 @@ var testBundle = browserify(merge([
   init: function (b) { b.external('vertx'); }
 });
 
-var dist = es6Promise;
+var dist = merge([
+  es6Promise,
+  autoPolyfill
+]);
 
 env('production', function() {
   dist = merge([
