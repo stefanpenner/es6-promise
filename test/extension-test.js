@@ -890,11 +890,11 @@ describe("extensions", function() {
     });
   });
 
-  if (typeof Worker !== 'undefined') {
+  if (typeof Worker !== 'undefined' && navigator.userAgent.indexOf('PhantomJS') < 1) {
     describe('web worker', function () {
       it('should work', function (done) {
         this.timeout(2000);
-        var worker = new Worker('worker.js');
+        var worker = new Worker('./worker.js');
         worker.addEventListener('error', function(reason) {
           done(new Error("Test failed:" + reason));
         });
