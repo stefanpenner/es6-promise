@@ -42,6 +42,64 @@ function objectEquals(obj1, obj2) {
   }
   return true;
 }
+describe('tampering', function() {
+  var resolve = Promise.resolve;
+
+  afterEach(function() {
+    Promise.resolve = resolve;
+  });
+
+  describe('then assimilation', function() {
+    it('tampered resolved and then', function() {
+      var one = Promise.resolve(1);
+      var two = Promise.resolve(2);
+      var thenCalled = 0;
+      var resolveCalled = 0;
+
+      two.then = function() {
+        thenCalled++;
+        return Promise.prototype.then.apply(this, arguments);
+      };
+
+      Promise.resolve = function(x) {
+        resolveCalled++;
+        return new Promise(function(resolve) { resolve(x); });
+      };
+
+      return one.then(function() {
+        return two;
+      }).then(function(value) {
+        assert.equal(thenCalled, 1, 'expected then to be called once');
+        assert.equal(resolveCalled, 0, 'expected resolve to be called once');
+        assert.equal(value, 2, 'expected fulfillment value to be 2');
+      });
+    });
+
+    describe('Promise.all', function() {
+      it('tampered resolved and then', function() {
+        var two = Promise.resolve(2);
+        var thenCalled = 0;
+        var resolveCalled = 0;
+
+        two.then = function() {
+          thenCalled++;
+          return Promise.prototype.then.apply(this, arguments);
+        };
+
+        Promise.resolve = function(x) {
+          resolveCalled++;
+          return new Promise(function(resolve) { resolve(x); });
+        };
+
+        return Promise.all([two]).then(function(value) {
+          assert.equal(thenCalled, 1);
+          assert.equal(resolveCalled, 1);
+          assert.deepEqual(value, [2]);
+        });
+      });
+    });
+  });
+});
 
 describe("extensions", function() {
   describe("Promise constructor", function() {
@@ -284,7 +342,7 @@ describe("extensions", function() {
     });
   });
 
-  describe("Promise.all", function() {
+  describe('Promise.all', function() {
     testAll(function(){
       return Promise.all.apply(Promise, arguments);
     });
@@ -293,6 +351,15 @@ describe("extensions", function() {
   function testAll(all) {
     it('should exist', function() {
       assert(all);
+    });
+
+    it('works with plan pojo input', function(done) {
+      all([
+          {}
+      ]).then(function(result) {
+        assert.deepEqual(result, [{}]);
+        done();
+      });
     });
 
     it('throws when not passed an array', function(done) {
