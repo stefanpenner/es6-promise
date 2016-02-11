@@ -23,6 +23,15 @@ To use:
 var Promise = require('es6-promise').Promise;
 ```
 
+## Bower
+
+To install:
+
+```sh
+bower install es6-promise --save
+```
+
+
 ## Usage in IE<9
 
 `catch` is a reserved word in IE<9, meaning `promise.catch(func)` throws a syntax error. To work around this, you can use a string to access the property as shown in the following example.
