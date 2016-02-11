@@ -963,3 +963,5 @@
     }
 }).call(this);
 
+
+ES6Promise.polyfill();

@@ -6,8 +6,10 @@ For API details and how to use promises, see the <a href="http://www.html5rocks.
 
 ## Downloads
 
-* [es6-promise](https://raw.githubusercontent.com/jakearchibald/es6-promise/master/dist/es6-promise.js)
-* [es6-promise-min](https://raw.githubusercontent.com/jakearchibald/es6-promise/master/dist/es6-promise.min.js)
+* [es6-promise](https://raw.githubusercontent.com/jakearchibald/es6-promise/master/dist/es6-promise.js) - Provides the `ES6Promise` object documented here (in [UMD](https://github.com/umdjs/umd) format).
+* [es6-promise-auto](https://raw.githubusercontent.com/jakearchibald/es6-promise/master/dist/es6-promise.auto.js) - Automatically provides/replaces `Promise` if missing or broken.
+* [es6-promise-min](https://raw.githubusercontent.com/jakearchibald/es6-promise/master/dist/es6-promise.min.js) - Minified version of `es6-promise` above.
+* [es6-promise-auto-min](https://raw.githubusercontent.com/jakearchibald/es6-promise/master/dist/es6-promise.auto.min.js) - Minified version of `es6-promise-auto` above.
 
 ## Node.js
 
@@ -58,6 +60,12 @@ To polyfill the global environment (either in Node or in the browser via CommonJ
 
 ```js
 require('es6-promise').polyfill();
+```
+
+Alternatively
+
+```js
+require('es6-promise/auto');
 ```
 
 Notice that we don't assign the result of `polyfill()` to any variable. The `polyfill()` method will patch the global environment (in this case to the `Promise` name) when called.
