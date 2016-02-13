@@ -16,6 +16,6 @@
     "files": ["**/*", "../package.json", "../bower.json"]
   },
   "npm": {
-    "publish": false
+    "publish": true
   }
 }
