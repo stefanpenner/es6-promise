@@ -1,8 +1,10 @@
 # Master
 
-# 3.0.2
-
-* correctly bump both bower and package.json versions
+* improve performance of Promise.all when it encounters a non-promise input object input
+* then/resolve tamper protection
+* reduce AST size of promise constructor, to facilitate more inlining
+* Update README.md with details about PhantomJS requirement for running tests
+* Mangle and compress the minified version
 
 # 3.0.1
 
@@ -10,10 +12,10 @@
 
 # 3.0.0
 
-* use nextTick() instead of setImmediate() to schedule microtasks with node 0.10. Later versions of 
-  nodes are not affected as they were already using nextTick(). Note that using nextTick() might 
+* use nextTick() instead of setImmediate() to schedule microtasks with node 0.10. Later versions of
+  nodes are not affected as they were already using nextTick(). Note that using nextTick() might
   trigger a depreciation warning on 0.10 as described at https://github.com/cujojs/when/issues/410.
-  The reason why nextTick() is preferred is that is setImmediate() would schedule a macrotask 
+  The reason why nextTick() is preferred is that is setImmediate() would schedule a macrotask
   instead of a microtask and might result in a different scheduling.
   If needed you can revert to the former behavior as follow:
 
