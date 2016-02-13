@@ -4,3 +4,5 @@
 /tmp
 /docs
 /dist/test
+!/dist/es6-promise.js
+!/dist/es6-promise.min.js
