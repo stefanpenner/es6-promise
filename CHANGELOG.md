@@ -1,5 +1,9 @@
 # Master
 
+* fix node detection issues with NWJS/electron
+
+# 3.1.0
+
 * improve performance of Promise.all when it encounters a non-promise input object input
 * then/resolve tamper protection
 * reduce AST size of promise constructor, to facilitate more inlining
