@@ -6,7 +6,7 @@
   "pkgFiles": ["package.json", "bower.json"],
   "increment": "patch",
   "commitMessage": "Release %s",
-  "tagName": "%s",
+  "tagName": "v%s",
   "tagAnnotation": "Release %s",
   "buildCommand": "npm run-script build:production",
   "dist": {
