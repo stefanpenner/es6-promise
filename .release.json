@@ -14,8 +14,5 @@
     "stageDir": "tmp/stage",
     "base": "dist",
     "files": ["**/*", "../package.json", "../bower.json"]
-  },
-  "npm": {
-    "publish": true
   }
 }
