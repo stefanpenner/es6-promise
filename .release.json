@@ -10,7 +10,7 @@
   "tagAnnotation": "Release %s",
   "buildCommand": "npm run-script build:production",
   "dist": {
-    "repo": "git@github.com:components/rsvp.js.git",
+    "repo": "git@github.com:components/es6-promise.js.git",
     "stageDir": "tmp/stage",
     "base": "dist",
     "files": ["**/*", "../package.json", "../bower.json"]
