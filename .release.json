@@ -8,7 +8,7 @@
   "commitMessage": "Release %s",
   "tagName": "%s",
   "tagAnnotation": "Release %s",
-  "buildCommand": "npm run-script build-all",
+  "buildCommand": "npm run-script build:production",
   "dist": {
     "repo": "git@github.com:components/rsvp.js.git",
     "stageDir": "tmp/stage",
