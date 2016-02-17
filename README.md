@@ -1,13 +1,13 @@
 # ES6-Promise (subset of [rsvp.js](https://github.com/tildeio/rsvp.js))
 
-This is a polyfill of the [ES6 Promise](http://people.mozilla.org/~jorendorff/es6-draft.html#sec-promise-constructor). The implementation is a subset of [rsvp.js](https://github.com/tildeio/rsvp.js), if you're wanting extra features and more debugging options, check out the [full library](https://github.com/tildeio/rsvp.js).
+This is a polyfill of the [ES6 Promise](http://people.mozilla.org/~jorendorff/es6-draft.html#sec-promise-constructor). The implementation is a subset of [rsvp.js](https://github.com/tildeio/rsvp.js) extracted by @jakearchibald, if you're wanting extra features and more debugging options, check out the [full library](https://github.com/tildeio/rsvp.js).
 
 For API details and how to use promises, see the <a href="http://www.html5rocks.com/en/tutorials/es6/promises/">JavaScript Promises HTML5Rocks article</a>.
 
 ## Downloads
 
-* [es6-promise](https://raw.githubusercontent.com/jakearchibald/es6-promise/master/dist/es6-promise.js)
-* [es6-promise-min](https://raw.githubusercontent.com/jakearchibald/es6-promise/master/dist/es6-promise.min.js)
+* [es6-promise](https://raw.githubusercontent.com/stefanpenner/es6-promise/master/dist/es6-promise.js)
+* [es6-promise-min](https://raw.githubusercontent.com/stefanpenner/es6-promise/master/dist/es6-promise.min.js)
 
 ## Node.js
 
