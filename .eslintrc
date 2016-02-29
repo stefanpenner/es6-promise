@@ -1,0 +1,31 @@
+{
+	"extends": "ember",
+
+	"parser": "babel-eslint",
+
+	"ecmaFeatures": {
+		modules: true,
+		blockBindings: true,
+		arrowFunctions: true,
+		objectLiteralShorthandMethods: true,
+		objectLiteralShorthandProperties: true,
+		templateStrings: true
+	},
+
+	"rules": {
+		"indent":                 [ 2, "tab", { "SwitchCase": 1 } ],
+		"object-shorthand":       [ 2, "always" ],
+		"prefer-const":           0,
+		"comma-dangle":           0,
+		"spaced-comment":         1,
+		"object-curly-spacing":   [2, "always"],
+		"arrow-spacing":          [ 1, { before: true, after: true } ],
+		"array-bracket-spacing":  [ 2, "always" ],
+		"no-restricted-syntax":   0,
+		"no-warning-comments":    [ 0, { "terms": [ "todo", "fixme", "xxx" ], "location": "start" } ],
+		"no-ternary":             0,
+		"no-nested-ternary":      2,
+		"brace-style":            [ 2, "stroustrup" ],
+		"no-else-return":         0
+	}
+}
