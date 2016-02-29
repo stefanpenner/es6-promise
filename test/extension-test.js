@@ -97,7 +97,68 @@ describe('tampering', function() {
           assert.deepEqual(value, [2]);
         });
       });
+    describe('Promise.race', function() {
+      it('tampered resolved and then', function() {
+        var two = Promise.resolve(2);
+        var thenCalled = 0;
+        var resolveCalled = 0;
+
+        two.then = function() {
+          thenCalled++;
+          return Promise.prototype.then.apply(this, arguments);
+        };
+
+        Promise.resolve = function(x) {
+          resolveCalled++;
+          return new Promise(function(resolve) { resolve(x); });
+        };
+
+        return Promise.race([two]).then(function(value) {
+          assert.equal(thenCalled, 1);
+          assert.equal(resolveCalled, 1);
+          assert.deepEqual(value, 2);
+        });
+      });
+
+      it('alternative constructor and tampered then', function() {
+        var two = Promise.resolve(2);
+        var thenCalled = 0;
+        var resolveCalled = 0;
+
+        two.then = function() {
+          thenCalled++;
+          return Promise.prototype.then.apply(this, arguments);
+        };
+
+        function AlternativeConstructor(executor) {
+          assert.equal(executor.length, 2);
+          var followers = this.followers = [];
+          executor(function(value) {
+            followers.forEach(function(onFulfillment) {
+              onFulfillment(value)
+            });
+          }, function() {
+            throw TypeError('No Rejections supported');
+          });
+        }
+
+        AlternativeConstructor.resolve = function(x) {
+          resolveCalled++;
+          return new Promise(function(resolve) { resolve(x); });
+        };
+
+        AlternativeConstructor.prototype.then = function(onFulfillment, onRejection) {
+          this.followers.push(onFulfillment);
+        };
+
+        return Promise.race.call(AlternativeConstructor, [two]).then(function(value) {
+          assert.equal(thenCalled, 1);
+          assert.equal(resolveCalled, 1);
+          assert.deepEqual(value, 2);
+        });
+      });
     });
+
   });
 });
 
