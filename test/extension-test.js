@@ -89,7 +89,6 @@ describe('tampering', function() {
         };
 
         function AlternativeConstructor(executor) {
-          assert.equal(executor.length, 2);
           invokedAlternativeConstructor++;
           var followers = this.followers = [];
           executor(function(value) {
@@ -163,7 +162,6 @@ describe('tampering', function() {
         };
 
         function AlternativeConstructor(executor) {
-          assert.equal(executor.length, 2);
           var followers = this.followers = [];
           executor(function(value) {
             followers.forEach(function(onFulfillment) {
@@ -191,6 +189,20 @@ describe('tampering', function() {
       });
     });
 
+    describe('core-js species test', function() {
+      it('foreign thenable has correct internal slots', function() {
+        var p = Promise.resolve();
+
+        function NewConstructor(it) {
+          it(function(){}, function(){})
+        }
+
+        p.constructor = NewConstructor;
+
+        var f = p.then(function(){});
+        assert(f instanceof NewConstructor);
+      });
+    });
     describe('Promise.race', function() {
       it('tampered resolved and then', function() {
         var two = Promise.resolve(2);
@@ -225,7 +237,6 @@ describe('tampering', function() {
         };
 
         function AlternativeConstructor(executor) {
-          assert.equal(executor.length, 2);
           var followers = this.followers = [];
           executor(function(value) {
             followers.forEach(function(onFulfillment) {
