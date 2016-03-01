@@ -75,6 +75,59 @@ describe('tampering', function() {
       });
     });
 
+    describe('alternative constructor', function() {
+      it('tampered resolved and then', function() {
+        var one = Promise.resolve(1);
+        var two = Promise.resolve(2);
+        var thenCalled = 0;
+        var resolveCalled = 0;
+        var invokedAlternativeConstructor = 0;
+
+        two.then = function() {
+          thenCalled++;
+          return Promise.prototype.then.apply(this, arguments);
+        };
+
+        function AlternativeConstructor(executor) {
+          invokedAlternativeConstructor++;
+          var followers = this.followers = [];
+          executor(function(value) {
+            followers.forEach(function(onFulfillment) {
+              onFulfillment(value)
+            });
+          }, function() {
+            throw TypeError('No Rejections supported');
+          });
+        }
+
+        AlternativeConstructor.resolve = function(x) {
+          resolveCalled++;
+          return new Promise(function(resolve) { resolve(x); });
+        };
+
+        AlternativeConstructor.prototype.then = function(onFulfillment, onRejection) {
+          this.followers.push(onFulfillment);
+        };
+
+        AlternativeConstructor.resolve = function(x) {
+          resolveCalled++;
+          return new Promise(function(resolve) { resolve(x); });
+        };
+
+        one.constructor = AlternativeConstructor
+
+        return one.then(function() {
+          return two;
+        }).then(function(value) {
+
+          assert.equal(invokedAlternativeConstructor, 1, 'expected AlternativeConstructor to be invoked once');
+          assert.equal(thenCalled, 1, 'expected then to be called once');
+          assert.equal(resolveCalled, 0, 'expected resolve to be called once');
+          assert.equal(value, 2, 'expected fulfillment value to be 2');
+        });
+      });
+    });
+
     describe('Promise.all', function() {
       it('tampered resolved and then', function() {
         var two = Promise.resolve(2);
@@ -97,7 +150,120 @@ describe('tampering', function() {
           assert.deepEqual(value, [2]);
         });
       });
+
+      it('alternative constructor and tampered then', function() {
+        var two = Promise.resolve(2);
+        var thenCalled = 0;
+        var resolveCalled = 0;
+
+        two.then = function() {
+          thenCalled++;
+          return Promise.prototype.then.apply(this, arguments);
+        };
+
+        function AlternativeConstructor(executor) {
+          var followers = this.followers = [];
+          executor(function(value) {
+            followers.forEach(function(onFulfillment) {
+              onFulfillment(value)
+            });
+          }, function() {
+            throw TypeError('No Rejections supported');
+          });
+        }
+
+        AlternativeConstructor.resolve = function(x) {
+          resolveCalled++;
+          return new Promise(function(resolve) { resolve(x); });
+        };
+
+        AlternativeConstructor.prototype.then = function(onFulfillment, onRejection) {
+          this.followers.push(onFulfillment);
+        };
+
+        return Promise.all.call(AlternativeConstructor, [two]).then(function(value) {
+          assert.equal(thenCalled, 1);
+          assert.equal(resolveCalled, 1);
+          assert.deepEqual(value, [2]);
+        });
+      });
     });
+
+    describe('core-js species test', function() {
+      it('foreign thenable has correct internal slots', function() {
+        var p = Promise.resolve();
+
+        function NewConstructor(it) {
+          it(function(){}, function(){})
+        }
+
+        p.constructor = NewConstructor;
+
+        var f = p.then(function(){});
+        assert(f instanceof NewConstructor);
+      });
+    });
+    describe('Promise.race', function() {
+      it('tampered resolved and then', function() {
+        var two = Promise.resolve(2);
+        var thenCalled = 0;
+        var resolveCalled = 0;
+
+        two.then = function() {
+          thenCalled++;
+          return Promise.prototype.then.apply(this, arguments);
+        };
+
+        Promise.resolve = function(x) {
+          resolveCalled++;
+          return new Promise(function(resolve) { resolve(x); });
+        };
+
+        return Promise.race([two]).then(function(value) {
+          assert.equal(thenCalled, 1);
+          assert.equal(resolveCalled, 1);
+          assert.deepEqual(value, 2);
+        });
+      });
+
+      it('alternative constructor and tampered then', function() {
+        var two = Promise.resolve(2);
+        var thenCalled = 0;
+        var resolveCalled = 0;
+
+        two.then = function() {
+          thenCalled++;
+          return Promise.prototype.then.apply(this, arguments);
+        };
+
+        function AlternativeConstructor(executor) {
+          var followers = this.followers = [];
+          executor(function(value) {
+            followers.forEach(function(onFulfillment) {
+              onFulfillment(value)
+            });
+          }, function() {
+            throw TypeError('No Rejections supported');
+          });
+        }
+
+        AlternativeConstructor.resolve = function(x) {
+          resolveCalled++;
+          return new Promise(function(resolve) { resolve(x); });
+        };
+
+        AlternativeConstructor.prototype.then = function(onFulfillment, onRejection) {
+          this.followers.push(onFulfillment);
+        };
+
+        return Promise.race.call(AlternativeConstructor, [two]).then(function(value) {
+          assert.equal(thenCalled, 1);
+          assert.equal(resolveCalled, 1);
+          assert.deepEqual(value, 2);
+        });
+      });
+    });
+
   });
 });
 
