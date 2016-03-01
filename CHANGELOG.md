@@ -1,5 +1,16 @@
 # Master
 
+# 3.2.0
+
+* improve tamper resistence of Promise.all Promise.race and
+  Promise.prototype.then (note, this isn't complete, but addresses an exception
+  when used \w core-js, follow up work will address entirely)
+* remove spec incompatible then chaining fast-path
+* add eslint
+* update build deps
+
+# 3.1.2
+
 * fix node detection issues with NWJS/electron
 
 # 3.1.0
