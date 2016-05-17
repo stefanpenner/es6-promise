@@ -54,7 +54,8 @@
 
 # 2.1.0
 
-* ? (see the commit log)
+* #59: Automatic polyfill. No need to invoke `ES6Promise.polyfill()` anymore.
+* ... (see the commit log)
 
 # 2.0.0
 
