@@ -2,7 +2,11 @@ var assert = require('assert');
 var g = typeof window !== 'undefined' ?
                window : typeof global !== 'undefined' ? global : this;
 
-var Promise = g.ES6Promise || require('./es6-promise').Promise;
+var Promise = g.ES6Promise || require('./es6-promise');
+
+assert(typeof Promise.polyfill === 'function')
+assert(typeof Promise.Promise === 'function')
+assert(Promise.Promise === Promise)
 
 function defer() {
   var deferred = {};
