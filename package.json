@@ -3,7 +3,7 @@
   "namespace": "es6-promise",
   "version": "3.2.2",
   "description": "A lightweight library that provides tools for organizing asynchronous code",
-  "main": "dist/es6-promise.js",
+  "main": "dist/lib/es6-promise.js",
   "directories": {
     "lib": "lib"
   },
