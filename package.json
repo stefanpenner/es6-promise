@@ -19,7 +19,7 @@
     "broccoli-merge-trees": "^1.1.1",
     "broccoli-replace": "^0.12.0",
     "broccoli-stew": "^1.2.0",
-    "broccoli-uglify-js": "^0.1.3",
+    "broccoli-uglify-js": "^0.2.0",
     "broccoli-watchify": "^0.2.0",
     "ember-cli": "2.5.0",
     "ember-publisher": "0.0.7",
