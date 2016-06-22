@@ -12,10 +12,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/jakearchibald/ES6-Promises.git"
+    "url": "git://github.com/stefanpenner/es6-promise.git"
   },
   "bugs": {
-    "url": "https://github.com/jakearchibald/ES6-Promises/issues"
+    "url": "https://github.com/stefanpenner/es6-promise/issues"
   },
   "license": "MIT",
   "ignore": [
