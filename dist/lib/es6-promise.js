@@ -2,7 +2,7 @@
  * @overview es6-promise - a tiny implementation of Promises/A+.
  * @copyright Copyright (c) 2014 Yehuda Katz, Tom Dale, Stefan Penner and contributors (Conversion to ES6 API by Jake Archibald)
  * @license   Licensed under MIT license
- *            See https://raw.githubusercontent.com/jakearchibald/es6-promise/master/LICENSE
+ *            See https://raw.githubusercontent.com/stefanpenner/es6-promise/master/LICENSE
  * @version   3.2.2+39aa2571
  */
 
