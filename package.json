@@ -11,7 +11,7 @@
   "files": [
     "dist",
     "lib",
-    "es6-promise.d.ts"
+    "es6-promise.d.ts",
     "!dist/test"
   ],
   "devDependencies": {
