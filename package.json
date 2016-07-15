@@ -25,7 +25,7 @@
     "ember-publisher": "0.0.7",
     "git-repo-version": "0.3.1",
     "json3": "^3.3.2",
-    "mocha": "^2.4.5",
+    "mocha": "^2.5.0",
     "promises-aplus-tests-phantom": "^2.1.0-revise",
     "release-it": "2.4.0"
   },
