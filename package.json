@@ -4,12 +4,14 @@
   "version": "3.2.2",
   "description": "A lightweight library that provides tools for organizing asynchronous code",
   "main": "dist/es6-promise.js",
+  "typings": "es6-promise.d.ts",
   "directories": {
     "lib": "lib"
   },
   "files": [
     "dist",
     "lib",
+    "es6-promise.d.ts",
     "!dist/test"
   ],
   "devDependencies": {
