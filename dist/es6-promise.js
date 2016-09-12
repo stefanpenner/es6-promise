@@ -3,7 +3,7 @@
  * @copyright Copyright (c) 2014 Yehuda Katz, Tom Dale, Stefan Penner and contributors (Conversion to ES6 API by Jake Archibald)
  * @license   Licensed under MIT license
  *            See https://raw.githubusercontent.com/stefanpenner/es6-promise/master/LICENSE
- * @version   3.2.2+e3449434
+ * @version   3.2.2+8623369b
  */
 
 (function (global, factory) {
@@ -20,7 +20,7 @@ function isFunction(x) {
   return typeof x === 'function';
 }
 
-var _isArray;
+var _isArray = undefined;
 if (!Array.isArray) {
   _isArray = function (x) {
     return Object.prototype.toString.call(x) === '[object Array]';
@@ -32,8 +32,8 @@ if (!Array.isArray) {
 var isArray = _isArray;
 
 var len = 0;
-var vertxNext;
-var customSchedulerFn;
+var vertxNext = undefined;
+var customSchedulerFn = undefined;
 
 var asap = function asap(callback, arg) {
   queue[len] = callback;
@@ -72,7 +72,7 @@ function useNextTick() {
   // node version 0.10.x displays a deprecation warning when nextTick is used recursively
   // see https://github.com/cujojs/when/issues/410 for details
   return function () {
-    process.nextTick(flush);
+    return process.nextTick(flush);
   };
 }
 
@@ -99,7 +99,7 @@ function useMessageChannel() {
   var channel = new MessageChannel();
   channel.port1.onmessage = flush;
   return function () {
-    channel.port2.postMessage(0);
+    return channel.port2.postMessage(0);
   };
 }
 
@@ -108,7 +108,7 @@ function useSetTimeout() {
   // other code modifying setTimeout (like sinon.useFakeTimers())
   var globalSetTimeout = setTimeout;
   return function () {
-    globalSetTimeout(flush, 1);
+    return globalSetTimeout(flush, 1);
   };
 }
 
@@ -138,7 +138,7 @@ function attemptVertx() {
   }
 }
 
-var scheduleFlush;
+var scheduleFlush = undefined;
 // Decide what async method to use to triggering processing of queued callbacks:
 if (isNode) {
   scheduleFlush = useNextTick();
@@ -153,6 +153,8 @@ if (isNode) {
 }
 
 function then(onFulfillment, onRejection) {
+  var _arguments = arguments;
+
   var parent = this;
 
   var child = new this.constructor(noop);
@@ -161,13 +163,15 @@ function then(onFulfillment, onRejection) {
     makePromise(child);
   }
 
-  var state = parent._state;
+  var _state = parent._state;
 
-  if (state) {
-    var callback = arguments[state - 1];
-    asap(function () {
-      invokeCallback(state, child, callback, parent._result);
-    });
+  if (_state) {
+    (function () {
+      var callback = _arguments[_state - 1];
+      asap(function () {
+        return invokeCallback(_state, child, callback, parent._result);
+      });
+    })();
   } else {
     subscribe(parent, child, onFulfillment, onRejection);
   }
@@ -180,7 +184,7 @@ function then(onFulfillment, onRejection) {
   passed `value`. It is shorthand for the following:
 
   ```javascript
-  var promise = new Promise(function(resolve, reject){
+  let promise = new Promise(function(resolve, reject){
     resolve(1);
   });
 
@@ -192,7 +196,7 @@ function then(onFulfillment, onRejection) {
   Instead of writing the above, your code now simply becomes the following:
 
   ```javascript
-  var promise = Promise.resolve(1);
+  let promise = Promise.resolve(1);
 
   promise.then(function(value){
     // value === 1
@@ -290,9 +294,9 @@ function handleOwnThenable(promise, thenable) {
     _reject(promise, thenable._result);
   } else {
     subscribe(thenable, undefined, function (value) {
-      _resolve(promise, value);
+      return _resolve(promise, value);
     }, function (reason) {
-      _reject(promise, reason);
+      return _reject(promise, reason);
     });
   }
 }
@@ -355,14 +359,14 @@ function _reject(promise, reason) {
 }
 
 function subscribe(parent, child, onFulfillment, onRejection) {
-  var subscribers = parent._subscribers;
-  var length = subscribers.length;
+  var _subscribers = parent._subscribers;
+  var length = _subscribers.length;
 
   parent._onerror = null;
 
-  subscribers[length] = child;
-  subscribers[length + FULFILLED] = onFulfillment;
-  subscribers[length + REJECTED] = onRejection;
+  _subscribers[length] = child;
+  _subscribers[length + FULFILLED] = onFulfillment;
+  _subscribers[length + REJECTED] = onRejection;
 
   if (length === 0 && parent._state) {
     asap(publish, parent);
@@ -377,8 +381,8 @@ function publish(promise) {
     return;
   }
 
-  var child,
-      callback,
+  var child = undefined,
+      callback = undefined,
       detail = promise._result;
 
   for (var i = 0; i < subscribers.length; i += 3) {
@@ -412,10 +416,10 @@ function tryCatch(callback, detail) {
 
 function invokeCallback(settled, promise, callback, detail) {
   var hasCallback = isFunction(callback),
-      value,
-      error,
-      succeeded,
-      failed;
+      value = undefined,
+      error = undefined,
+      succeeded = undefined,
+      failed = undefined;
 
   if (hasCallback) {
     value = tryCatch(callback, detail);
@@ -509,10 +513,10 @@ function validationError() {
 
 Enumerator.prototype._enumerate = function () {
   var length = this.length;
-  var input = this._input;
+  var _input = this._input;
 
   for (var i = 0; this._state === PENDING && i < length; i++) {
-    this._eachEntry(input[i], i);
+    this._eachEntry(_input[i], i);
   }
 };
 
@@ -521,20 +525,20 @@ Enumerator.prototype._eachEntry = function (entry, i) {
   var resolve$$ = c.resolve;
 
   if (resolve$$ === resolve) {
-    var then$$ = getThen(entry);
+    var _then = getThen(entry);
 
-    if (then$$ === then && entry._state !== PENDING) {
+    if (_then === then && entry._state !== PENDING) {
       this._settledAt(entry._state, i, entry._result);
-    } else if (typeof then$$ !== 'function') {
+    } else if (typeof _then !== 'function') {
       this._remaining--;
       this._result[i] = entry;
     } else if (c === Promise) {
       var promise = new c(noop);
-      handleMaybeThenable(promise, entry, then$$);
+      handleMaybeThenable(promise, entry, _then);
       this._willSettleAt(promise, i);
     } else {
       this._willSettleAt(new c(function (resolve$$) {
-        resolve$$(entry);
+        return resolve$$(entry);
       }), i);
     }
   } else {
@@ -564,9 +568,9 @@ Enumerator.prototype._willSettleAt = function (promise, i) {
   var enumerator = this;
 
   subscribe(promise, undefined, function (value) {
-    enumerator._settledAt(FULFILLED, i, value);
+    return enumerator._settledAt(FULFILLED, i, value);
   }, function (reason) {
-    enumerator._settledAt(REJECTED, i, reason);
+    return enumerator._settledAt(REJECTED, i, reason);
   });
 };
 
@@ -579,10 +583,10 @@ Enumerator.prototype._willSettleAt = function (promise, i) {
   Example:
 
   ```javascript
-  var promise1 = resolve(1);
-  var promise2 = resolve(2);
-  var promise3 = resolve(3);
-  var promises = [ promise1, promise2, promise3 ];
+  let promise1 = resolve(1);
+  let promise2 = resolve(2);
+  let promise3 = resolve(3);
+  let promises = [ promise1, promise2, promise3 ];
 
   Promise.all(promises).then(function(array){
     // The array here would be [ 1, 2, 3 ];
@@ -596,10 +600,10 @@ Enumerator.prototype._willSettleAt = function (promise, i) {
   Example:
 
   ```javascript
-  var promise1 = resolve(1);
-  var promise2 = reject(new Error("2"));
-  var promise3 = reject(new Error("3"));
-  var promises = [ promise1, promise2, promise3 ];
+  let promise1 = resolve(1);
+  let promise2 = reject(new Error("2"));
+  let promise3 = reject(new Error("3"));
+  let promises = [ promise1, promise2, promise3 ];
 
   Promise.all(promises).then(function(array){
     // Code here never runs because there are rejected promises!
@@ -628,13 +632,13 @@ function all(entries) {
   Example:
 
   ```javascript
-  var promise1 = new Promise(function(resolve, reject){
+  let promise1 = new Promise(function(resolve, reject){
     setTimeout(function(){
       resolve('promise 1');
     }, 200);
   });
 
-  var promise2 = new Promise(function(resolve, reject){
+  let promise2 = new Promise(function(resolve, reject){
     setTimeout(function(){
       resolve('promise 2');
     }, 100);
@@ -653,13 +657,13 @@ function all(entries) {
   promise will become rejected:
 
   ```javascript
-  var promise1 = new Promise(function(resolve, reject){
+  let promise1 = new Promise(function(resolve, reject){
     setTimeout(function(){
       resolve('promise 1');
     }, 200);
   });
 
-  var promise2 = new Promise(function(resolve, reject){
+  let promise2 = new Promise(function(resolve, reject){
     setTimeout(function(){
       reject(new Error('promise 2'));
     }, 100);
@@ -691,8 +695,8 @@ function race(entries) {
   var Constructor = this;
 
   if (!isArray(entries)) {
-    return new Constructor(function (resolve, reject) {
-      reject(new TypeError('You must pass an array to race.'));
+    return new Constructor(function (_, reject) {
+      return reject(new TypeError('You must pass an array to race.'));
     });
   } else {
     return new Constructor(function (resolve, reject) {
@@ -709,7 +713,7 @@ function race(entries) {
   It is shorthand for the following:
 
   ```javascript
-  var promise = new Promise(function(resolve, reject){
+  let promise = new Promise(function(resolve, reject){
     reject(new Error('WHOOPS'));
   });
 
@@ -723,7 +727,7 @@ function race(entries) {
   Instead of writing the above, your code now simply becomes the following:
 
   ```javascript
-  var promise = Promise.reject(new Error('WHOOPS'));
+  let promise = Promise.reject(new Error('WHOOPS'));
 
   promise.then(function(value){
     // Code here doesn't run because the promise is rejected!
@@ -787,7 +791,7 @@ function needsNew() {
   ------------
 
   ```js
-  var promise = new Promise(function(resolve, reject) {
+  let promise = new Promise(function(resolve, reject) {
     // on success
     resolve(value);
 
@@ -811,7 +815,7 @@ function needsNew() {
   ```js
   function getJSON(url) {
     return new Promise(function(resolve, reject){
-      var xhr = new XMLHttpRequest();
+      let xhr = new XMLHttpRequest();
 
       xhr.open('GET', url);
       xhr.onreadystatechange = handler;
@@ -968,7 +972,7 @@ Promise.prototype = {
     Synchronous Example
   
     ```javascript
-    var result;
+    let result;
   
     try {
       result = findResult();
@@ -1006,7 +1010,7 @@ Promise.prototype = {
     Synchronous Example
   
     ```javascript
-    var author, books;
+    let author, books;
   
     try {
       author = findAuthor();
@@ -1107,7 +1111,7 @@ Promise.prototype = {
 };
 
 function polyfill() {
-    var local;
+    var local = undefined;
 
     if (typeof global !== 'undefined') {
         local = global;

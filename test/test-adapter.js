@@ -1,8 +1,5 @@
 var assert = require('assert');
-var g = typeof window !== 'undefined' ?
-               window : typeof global !== 'undefined' ? global : this;
-
-var Promise = g.ES6Promise || require('./es6-promise');
+var Promise = require('./es6-promise');
 
 assert(typeof Promise.polyfill === 'function')
 assert(typeof Promise.Promise === 'function')
@@ -18,11 +15,8 @@ function defer() {
 
   return deferred;
 }
-var resolve = Promise.resolve;
-var reject = Promise.reject;
 
-
-module.exports = g.adapter = {
+new Function('return this;')().adapter = {
   resolved: function(a) { return Promise.resolve(a); },
   rejected: function(a) { return Promise.reject(a);  },
   deferred: defer,
