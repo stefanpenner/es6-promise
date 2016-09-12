@@ -1,5 +1,7 @@
 # Master
 
+# 3.3.0
+
 * support polyfil on WebMAF (playstation env)
 * fix tampering related bug global `constructor` was referenced by mistake.
 * provide TS Typings
