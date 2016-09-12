@@ -1,10 +1,12 @@
 /* jshint node:true, undef:true, unused:true */
-var compileModules   = require('broccoli-es6-module-transpiler');
-var merge            = require('broccoli-merge-trees');
-var uglify           = require('broccoli-uglify-js');
-var version          = require('git-repo-version');
-var browserify       = require('broccoli-watchify');
-var fs               = require('fs');
+var Rollup   = require('broccoli-rollup');
+var Babel    = require('broccoli-babel-transpiler');
+var merge    = require('broccoli-merge-trees');
+var uglify   = require('broccoli-uglify-js');
+var version  = require('git-repo-version');
+var watchify = require('broccoli-watchify');
+var concat   = require('broccoli-concat');
+var fs       = require('fs');
 
 var stew   = require('broccoli-stew');
 
@@ -15,51 +17,78 @@ var env    = stew.env;
 var map    = stew.map;
 
 var lib       = find('lib');
+
+// test stuff
 var testDir   = find('test');
 var testFiles = find('test/{index.html,worker.js}');
 
 var json3     = mv(find('node_modules/json3/lib/{json3.js}'), 'node_modules/json3/lib/', 'test/');
+// mocha doesn't browserify correctly
 var mocha     = mv(find('node_modules/mocha/mocha.{js,css}'), 'node_modules/mocha/',    'test/');
 
 var testVendor = merge([ json3, mocha ]);
 
-var es6Promise = compileModules(lib, {
-  format: 'bundle',
-  entry: 'es6-promise.umd.js',
-  output: 'es6-promise.js'
+
+var es5 = new Babel(lib, {
+  blacklist: ['es6.modules']
 });
 
-var testBundle = browserify(merge([
+// build RSVP itself
+var es6Promise = new Rollup(es5, {
+  rollup: {
+    entry: 'lib/es6-promise.js',
+    targets: [
+      {
+        format: 'umd',
+        moduleName: 'ES6Promise',
+        dest: 'es6-promise.js',
+        sourceMap: 'inline'
+      }
+    ]
+  }
+});
+
+var testBundle = watchify(merge([
   mv(es6Promise, 'test'),
   testDir
 ]), {
-  browserify: { entries: ['./test/index.js'] },
-  init: function (b) { b.external('vertx'); }
+  browserify: { debug: true, entries: ['./test/index.js'] }
 });
 
-var dist = es6Promise;
-
-env('production', function() {
-  dist = merge([
-    rename(uglify(dist, { mangle: true, compress: true }), '.js', '.min.js'),
-    dist
-  ]);
+var header = stew.map(find('config/versionTemplate.txt'), function(content) {
+  return content.replace(/VERSION_PLACEHOLDER_STRING/, version());
 });
 
-function prependLicense(content) {
-  var license = fs.readFileSync('./config/versionTemplate.txt').toString().replace(/VERSION_PLACEHOLDER_STRING/, version());
-  // strip source maps for now...
-  var content = content.replace(/\/\/# sourceMappingURL=es6-promise.*/,'');
-  return license + '\n' + content;
+function concatAs(tree, outputFile) {
+  return concat(merge([tree, header]), {
+    headerFiles: ['config/versionTemplate.txt'],
+    inputFiles:  ['es6-promise.js'],
+    outputFile: outputFile
+  });
 }
 
-// exclude source maps for now, until map/cat supports source maps
-dist = find(dist, '!*.map');
+function production(dist, header) {
+  var result;
+  env('production', function(){
+    result = uglify(concatAs(dist, 'es6-promise.min.js'), {
+      compress: true,
+      mangle: true,
+    });
+  })
+  return result;
+}
+
+function development(dist, header) {
+  return concatAs(dist, 'es6-promise.js');
+}
 
 module.exports = merge([
-  map(dist, prependLicense),
+  merge([
+    production(es6Promise, header),
+    development(es6Promise, header),
+  ].filter(Boolean)),
+  // test stuff
   testFiles,
   testVendor,
-  mv(dist, 'test'),
   mv(testBundle, 'test')
 ]);
