@@ -1,23 +1,20 @@
----
 language: node_js
 node_js:
-- '0.10'
-
-sudo: false
-
+  - "6"
+  - "5"
+  - "4"
+  - "0.12"
 after_success:
-- "./bin/publish_to_s3.js"
+  - "./bin/publish_to_s3.js"
 before_install:
+  - nvm install 6
+  - nvm use 6
   - export PATH=/usr/local/phantomjs-2.0.0/bin:$PATH
-
+before_script:
+  - nvm use $TRAVIS_NODE_VERSION
 env:
   global:
-  - secure: |-
-      d59CLXVX6GiFNo9z2vzCt/l/3p2/RjvjgYvrE3Tx7Ose6H7BBOuV6fSGOQ2n
-      MK4RHcA+2TIhNshldeX6ZCXNaRIMY3dixfJBF7eb2N7wDBj2hA17oxvE0MzE
-      rOWXzvAmxA53/xvr4bShoCbsa06WDGScEkcdJRCnFG+ReAyG/WU=
-  - secure: |-
-      mrNGoG5AycW+d5jlghF9PJHQW1ETT9jWI7bGe9QX1QRpoSLkGAvxavrujmhu
-      UNRP/pe5AJBh3zDED38nD/ZGtrcSYQ5CC6QbFLx5mLtqn7mNTo1m3C5lr+55
-      Sb6mnyLLz2eoPBUMcXwY1i9Qisy40uhfV9VuD5B/gvVud2+oJWI=
   - EMBER_ENV=production
+  - secure: MiR5zbpHpblG1HcQyxzhYqxcb+3gGsjKWOjLYi1AOU4BG90+Ckim4mCJbneIHaBfeIZKZCm+X1wRRwUE0TlaMFEiXqReHt8k/1ChjfFdTicZtXYytbnGdRlHjvN/LVCaVhBiORSXWPzjIWhwYInMhCtekWTOqChtblRGdbrCLCY=
+  - secure: LF1yJIzr4z5e4RxFt+ZIwjazDyItPoPtSUgcoSQfTUhRtkxFsIRpOpf4VnzPH2FSpw4wbkNq+hm+K1xrKHNq+OE0PLYtD+H7i03ac993jReSJN8rwb0gpAlwAGWC++uF7j7aMKJAlZA1u4tnPD5cxuk6BKnNSONtD0BwKQ6oXkk=
+  - secure: MB2RZPsHVuikayckVYCVE9TWiooaFV+jyxEkpSoNJ5pRIVTwy9xRHK56S1sxkXmPIm7sYyaLWpngp13/CN80pT796HS8mEuxJ011XwjY6YutXHnR2gOrCssah6kQ6gaXO1sFVkerBa/GwdkKu/k8LVAiORiz1JlPZvOKDRsJaNw=
