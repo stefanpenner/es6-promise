@@ -6,8 +6,8 @@ For API details and how to use promises, see the <a href="http://www.html5rocks.
 
 ## Downloads
 
-* [es6-promise 27.86 KB (7.33 KB gzipped)](https://raw.githubusercontent.com/stefanpenner/es6-promise/master/dist/lib/es6-promise.js)
-* [es6-promise-min 6.17 KB (2.4 KB gzipped)](https://raw.githubusercontent.com/stefanpenner/es6-promise/master/dist/lib/es6-promise.min.js)
+* [es6-promise 27.86 KB (7.33 KB gzipped)](https://raw.githubusercontent.com/stefanpenner/es6-promise/master/dist/es6-promise.js)
+* [es6-promise-min 6.17 KB (2.4 KB gzipped)](https://raw.githubusercontent.com/stefanpenner/es6-promise/master/dist/es6-promise.min.js)
 
 ## Node.js
 
