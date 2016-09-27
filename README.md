@@ -25,12 +25,6 @@ To use:
 var Promise = require('es6-promise').Promise;
 ```
 
-
-```js
-require('es6-promise/auto');
-Promise;
-```
-
 ## Bower
 
 To install:
