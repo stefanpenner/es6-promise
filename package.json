@@ -11,6 +11,7 @@
   "files": [
     "dist",
     "lib",
+    "auto.js",
     "es6-promise.d.ts",
     "!dist/test"
   ],
