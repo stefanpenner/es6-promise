@@ -1,5 +1,10 @@
 # Master
 
+# 4.0.0
+
+* no longer polyfill automatically, if needed one can still invoke
+  `require('es6-promise/auto')` directly.
+
 # 3.3.1
 
 * fix links in readme
