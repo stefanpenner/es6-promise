@@ -1,5 +1,9 @@
 # Master
 
+# 4.0.1
+
+* fix require('es6-promise/auto');
+
 # 4.0.0
 
 * no longer polyfill automatically, if needed one can still invoke
