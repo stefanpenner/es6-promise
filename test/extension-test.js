@@ -282,7 +282,6 @@ describe('tampering', function() {
         });
       });
     });
-
   });
 });
 
@@ -293,24 +292,21 @@ describe("extensions", function() {
       assert.equal(Promise.length, 1);
     });
 
-    it('should fulfill if `resolve` is called with a value', function(done) {
+    it('should fulfill if `resolve` is called with a value', function() {
       var promise = new Promise(function(resolve) { resolve('value'); });
 
-      promise.then(function(value) {
+      return promise.then(function(value) {
         assert.equal(value, 'value');
-        done();
       });
     });
 
-    it('should reject if `reject` is called with a reason', function(done) {
+    it('should reject if `reject` is called with a reason', function() {
       var promise = new Promise(function(resolve, reject) { reject('reason'); });
 
-      promise.then(function() {
+      return promise.then(function() {
         assert(false);
-        done();
       }, function(reason) {
         assert.equal(reason, 'reason');
-        done();
       });
     });
 
@@ -342,12 +338,13 @@ describe("extensions", function() {
       }, TypeError);
     });
 
-    it('should reject on resolver exception', function(done) {
-     new Promise(function() {
+    it('should reject on resolver exception', function() {
+     return new Promise(function() {
         throw 'error';
-      }).then(null, function(e) {
+      }).then(function() {
+        assert(false);
+      }, function(e) {
         assert.equal(e, 'error');
-        done();
       });
     });
 
@@ -388,30 +385,27 @@ describe("extensions", function() {
     });
 
     describe('assimilation', function() {
-      it('should assimilate if `resolve` is called with a fulfilled promise', function(done) {
+      it('should assimilate if `resolve` is called with a fulfilled promise', function() {
         var originalPromise = new Promise(function(resolve) { resolve('original value'); });
         var promise = new Promise(function(resolve) { resolve(originalPromise); });
 
-        promise.then(function(value) {
+        return promise.then(function(value) {
           assert.equal(value, 'original value');
-          done();
         });
       });
 
-      it('should assimilate if `resolve` is called with a rejected promise', function(done) {
+      it('should assimilate if `resolve` is called with a rejected promise', function() {
         var originalPromise = new Promise(function(resolve, reject) { reject('original reason'); });
         var promise = new Promise(function(resolve) { resolve(originalPromise); });
 
-        promise.then(function() {
+        return promise.then(function() {
           assert(false);
-          done();
         }, function(reason) {
           assert.equal(reason, 'original reason');
-          done();
         });
       });
 
-      it('should assimilate if `resolve` is called with a fulfilled thenable', function(done) {
+      it('should assimilate if `resolve` is called with a fulfilled thenable', function() {
         var originalThenable = {
           then: function (onFulfilled) {
             setTimeout(function() { onFulfilled('original value'); }, 0);
@@ -419,13 +413,12 @@ describe("extensions", function() {
         };
         var promise = new Promise(function(resolve) { resolve(originalThenable); });
 
-        promise.then(function(value) {
+        return promise.then(function(value) {
           assert.equal(value, 'original value');
-          done();
         });
       });
 
-      it('should assimilate if `resolve` is called with a rejected thenable', function(done) {
+      it('should assimilate if `resolve` is called with a rejected thenable', function() {
         var originalThenable = {
           then: function (onFulfilled, onRejected) {
             setTimeout(function() { onRejected('original reason'); }, 0);
@@ -433,17 +426,15 @@ describe("extensions", function() {
         };
         var promise = new Promise(function(resolve) { resolve(originalThenable); });
 
-        promise.then(function() {
+        return promise.then(function() {
           assert(false);
-          done();
         }, function(reason) {
           assert.equal(reason, 'original reason');
-          done();
         });
       });
 
 
-      it('should assimilate two levels deep, for fulfillment of self fulfilling promises', function(done) {
+      it('should assimilate two levels deep, for fulfillment of self fulfilling promises', function() {
         var originalPromise, promise;
         originalPromise = new Promise(function(resolve) {
           setTimeout(function() {
@@ -457,42 +448,37 @@ describe("extensions", function() {
           }, 0);
         });
 
-        promise.then(function(value) {
+        return promise.then(function(value) {
           assert(false);
-          done();
         })['catch'](function(reason) {
           assert.equal(reason.message, "You cannot resolve a promise with itself");
           assert(reason instanceof TypeError);
-          done();
         });
       });
 
-      it('should assimilate two levels deep, for fulfillment', function(done) {
+      it('should assimilate two levels deep, for fulfillment', function() {
         var originalPromise = new Promise(function(resolve) { resolve('original value'); });
         var nextPromise = new Promise(function(resolve) { resolve(originalPromise); });
         var promise = new Promise(function(resolve) { resolve(nextPromise); });
 
-        promise.then(function(value) {
+        return promise.then(function(value) {
           assert.equal(value, 'original value');
-          done();
         });
       });
 
-      it('should assimilate two levels deep, for rejection', function(done) {
+      it('should assimilate two levels deep, for rejection', function() {
         var originalPromise = new Promise(function(resolve, reject) { reject('original reason'); });
         var nextPromise = new Promise(function(resolve) { resolve(originalPromise); });
         var promise = new Promise(function(resolve) { resolve(nextPromise); });
 
-        promise.then(function() {
+        return promise.then(function() {
           assert(false);
-          done();
         }, function(reason) {
           assert.equal(reason, 'original reason');
-          done();
         });
       });
 
-      it('should assimilate three levels deep, mixing thenables and promises (fulfilled case)', function(done) {
+      it('should assimilate three levels deep, mixing thenables and promises (fulfilled case)', function() {
         var originalPromise = new Promise(function(resolve) { resolve('original value'); });
         var intermediateThenable = {
           then: function (onFulfilled) {
@@ -501,13 +487,12 @@ describe("extensions", function() {
         };
         var promise = new Promise(function(resolve) { resolve(intermediateThenable); });
 
-        promise.then(function(value) {
+        return promise.then(function(value) {
           assert.equal(value, 'original value');
-          done();
         });
       });
 
-      it('should assimilate three levels deep, mixing thenables and promises (rejected case)', function(done) {
+      it('should assimilate three levels deep, mixing thenables and promises (rejected case)', function() {
         var originalPromise = new Promise(function(resolve, reject) { reject('original reason'); });
         var intermediateThenable = {
           then: function (onFulfilled) {
@@ -516,12 +501,10 @@ describe("extensions", function() {
         };
         var promise = new Promise(function(resolve) { resolve(intermediateThenable); });
 
-        promise.then(function() {
+        return promise.then(function() {
           assert(false);
-          done();
         }, function(reason) {
           assert.equal(reason, 'original reason');
-          done();
         });
       });
     });
@@ -538,28 +521,27 @@ describe("extensions", function() {
       assert(all);
     });
 
-    it('works with plan pojo input', function(done) {
-      all([
-          {}
+    it('works with plane pojo input', function() {
+      return all([
+        {}
       ]).then(function(result) {
         assert.deepEqual(result, [{}]);
-        done();
       });
     });
 
-    it('throws when not passed an array', function(done) {
+    it('throws when not passed an array', function() {
       var nothing = assertRejection(all());
       var string  = assertRejection(all(''));
       var object  = assertRejection(all({}));
 
-      Promise.all([
+      return Promise.all([
         nothing,
         string,
         object
-      ]).then(function(){ done(); });
+      ]);
     });
 
-    specify('fulfilled only after all of the other promises are fulfilled', function(done) {
+    specify('fulfilled after all of the other promises are fulfilled', function() {
       var firstResolved, secondResolved, firstResolver, secondResolver;
 
       var first = new Promise(function(resolve) {
@@ -584,14 +566,13 @@ describe("extensions", function() {
         secondResolver(true);
       }, 0);
 
-      all([first, second]).then(function() {
+      return all([first, second]).then(function() {
         assert(firstResolved);
         assert(secondResolved);
-        done();
       });
     });
 
-    specify('rejected as soon as a promise is rejected', function(done) {
+    specify('rejected as soon as a promise is rejected', function() {
       var firstResolver, secondResolver;
 
       var first = new Promise(function(resolve, reject) {
@@ -618,16 +599,15 @@ describe("extensions", function() {
         secondCompleted = true;
       });
 
-      all([first, second]).then(function() {
+      return all([first, second]).then(function() {
         assert(false);
       }, function() {
         assert(firstWasRejected);
         assert(!secondCompleted);
-        done();
       });
     });
 
-    specify('passes the resolved values of each promise to the callback in the correct order', function(done) {
+    specify('passes the resolved values of each promise to the callback in the correct order', function() {
       var firstResolver, secondResolver, thirdResolver;
 
       var first = new Promise(function(resolve, reject) {
@@ -646,39 +626,35 @@ describe("extensions", function() {
       firstResolver.resolve(1);
       secondResolver.resolve(2);
 
-      all([first, second, third]).then(function(results) {
+      return all([first, second, third]).then(function(results) {
         assert(results.length === 3);
         assert(results[0] === 1);
         assert(results[1] === 2);
         assert(results[2] === 3);
-        done();
       });
     });
 
-    specify('resolves an empty array passed to all()', function(done) {
-      all([]).then(function(results) {
+    specify('resolves an empty array passed to all()', function() {
+      return all([]).then(function(results) {
         assert(results.length === 0);
-        done();
       });
     });
 
-    specify('works with null', function(done) {
-      all([null]).then(function(results) {
+    specify('works with null', function() {
+      return all([null]).then(function(results) {
         assert.equal(results[0], null);
-        done();
       });
     });
 
-    specify('works with a mix of promises and thenables and non-promises', function(done) {
+    specify('works with a mix of promises and thenables and non-promises', function() {
       var promise = new Promise(function(resolve) { resolve(1); });
       var syncThenable = { then: function (onFulfilled) { onFulfilled(2); } };
       var asyncThenable = { then: function (onFulfilled) { setTimeout(function() { onFulfilled(3); }, 0); } };
       var nonPromise = 4;
 
-      all([promise, syncThenable, asyncThenable, nonPromise]).then(function(results) {
+      return all([promise, syncThenable, asyncThenable, nonPromise]).then(function(results) {
         assert(objectEquals(results, [1, 2, 3, 4]));
-        done();
-      })['catch'](done);
+      });
     });
   }
 
@@ -691,7 +667,7 @@ describe("extensions", function() {
       var reason = 'the reason',
       promise = Promise.reject(reason);
 
-      promise.then(function(){
+      return promise.then(function(){
         assert(false, 'should not fulfill');
       }, function(actualReason){
         assert.equal(reason, actualReason);
@@ -712,24 +688,25 @@ describe("extensions", function() {
       assert(Promise.race);
     });
 
-    it("throws when not passed an array", function(done) {
+    it("throws when not passed an array", function() {
       var nothing = assertRejection(Promise.race());
       var string  = assertRejection(Promise.race(''));
       var object  = assertRejection(Promise.race({}));
 
-      Promise.all([
+      return Promise.all([
         nothing,
         string,
         object
-      ]).then(function(){ done(); });
+      ]);
     });
 
-    specify('fulfilled after one of the other promises are fulfilled', function(done) {
+    specify('fulfilled after one of the other promises are fulfilled', function() {
       var firstResolved, secondResolved, firstResolver, secondResolver;
 
       var first = new Promise(function(resolve) {
         firstResolver = resolve;
       });
+
       first.then(function() {
         firstResolved = true;
       });
@@ -749,14 +726,13 @@ describe("extensions", function() {
         secondResolver(true);
       }, 0);
 
-      Promise.race([first, second]).then(function() {
+      return Promise.race([first, second]).then(function() {
         assert(secondResolved);
         assert.equal(firstResolved, undefined);
-        done();
       });
     });
 
-    specify('the race begins on nextTurn and prioritized by array entry', function(done) {
+    specify('the race begins on nextTurn and prioritized by array entry', function() {
       var firstResolver, secondResolver, nonPromise = 5;
 
       var first = new Promise(function(resolve, reject) {
@@ -767,13 +743,12 @@ describe("extensions", function() {
         resolve(false);
       });
 
-      Promise.race([first, second, nonPromise]).then(function(value) {
+      return Promise.race([first, second, nonPromise]).then(function(value) {
         assert.equal(value, true);
-        done();
       });
     });
 
-    specify('rejected as soon as a promise is rejected', function(done) {
+    specify('rejected as soon as a promise is rejected', function() {
       var firstResolver, secondResolver;
 
       var first = new Promise(function(resolve, reject) {
@@ -790,7 +765,7 @@ describe("extensions", function() {
 
       var firstWasRejected, secondCompleted;
 
-      first['catch'](function(){
+      first['catch'](function() {
         firstWasRejected = true;
       });
 
@@ -800,12 +775,11 @@ describe("extensions", function() {
         secondCompleted = true;
       });
 
-      Promise.race([first, second]).then(function() {
+      return Promise.race([first, second]).then(function() {
         assert(false);
       }, function() {
         assert(firstWasRejected);
         assert(!secondCompleted);
-        done();
       });
     });
 
@@ -825,23 +799,21 @@ describe("extensions", function() {
       }, 50);
     });
 
-    specify('works with a mix of promises and thenables', function(done) {
+    specify('works with a mix of promises and thenables', function() {
       var promise = new Promise(function(resolve) { setTimeout(function() { resolve(1); }, 10); }),
           syncThenable = { then: function (onFulfilled) { onFulfilled(2); } };
 
-      Promise.race([promise, syncThenable]).then(function(result) {
+      return Promise.race([promise, syncThenable]).then(function(result) {
         assert(result, 2);
-        done();
       });
     });
 
-    specify('works with a mix of thenables and non-promises', function (done) {
+    specify('works with a mix of thenables and non-promises', function() {
       var asyncThenable = { then: function (onFulfilled) { setTimeout(function() { onFulfilled(3); }, 0); } },
           nonPromise = 4;
 
-      Promise.race([asyncThenable, nonPromise]).then(function(result) {
+      return Promise.race([asyncThenable, nonPromise]).then(function(result) {
         assert(result, 4);
-        done();
       });
     });
   });
@@ -852,7 +824,7 @@ describe("extensions", function() {
     });
 
     describe("1. If x is a promise, adopt its state ", function(){
-      specify("1.1 If x is pending, promise must remain pending until x is fulfilled or rejected.", function(done){
+      specify("1.1 If x is pending, promise must remain pending until x is fulfilled or rejected.", function(){
         var expectedValue, resolver, thenable, wrapped;
 
         expectedValue = 'the value';
@@ -864,17 +836,16 @@ describe("extensions", function() {
 
         wrapped = Promise.resolve(thenable);
 
-        wrapped.then(function(value){
-          assert(value === expectedValue);
-          done();
-        });
-
         setTimeout(function(){
           resolver(expectedValue);
         }, 10);
+
+        return wrapped.then(function(value){
+          assert(value === expectedValue);
+        });
       });
 
-      specify("1.2 If/when x is fulfilled, fulfill promise with the same value.", function(done){
+      specify("1.2 If/when x is fulfilled, fulfill promise with the same value.", function(){
         var expectedValue, thenable, wrapped;
 
         expectedValue = 'the value';
@@ -884,29 +855,23 @@ describe("extensions", function() {
           }
         };
 
-        wrapped = Promise.resolve(thenable);
-
-        wrapped.then(function(value){
+        return Promise.resolve(thenable).then(function(value){
           assert(value === expectedValue);
-          done();
         })
       });
 
-      specify("1.3 If/when x is rejected, reject promise with the same reason.", function(done){
+      specify("1.3 If/when x is rejected, reject promise with the same reason.", function(){
         var expectedError, thenable, wrapped;
 
-        expectedError =  new Error();
+        expectedError = new Error();
         thenable = {
           then: function(resolve, reject){
             reject(expectedError);
           }
         };
 
-        wrapped = Promise.resolve(thenable);
-
-        wrapped.then(null, function(error){
+        return Promise.resolve(thenable).then(null, function(error){
           assert(error === expectedError);
-          done();
         });
       });
     });
@@ -942,14 +907,14 @@ describe("extensions", function() {
         done();
       });
 
-      specify("2.2 If retrieving the property x.then results in a thrown exception e, reject promise with e as the reason.", function(done){
+      specify("2.2 If retrieving the property x.then results in a thrown exception e, reject promise with e as the reason.", function(){
         var wrapped, thenable, expectedError;
 
         expectedError = new Error();
         thenable = { };
 
         // we likely don't need to test this, if the browser doesn't support it
-        if (typeof Object.defineProperty !== "function") { done(); return; }
+        if (typeof Object.defineProperty !== "function") { return; }
 
         Object.defineProperty(thenable, 'then', {
           get: function(){
@@ -959,14 +924,13 @@ describe("extensions", function() {
 
         wrapped = Promise.resolve(thenable);
 
-        wrapped.then(null, function(error){
+        return wrapped.then(null, function(error){
           assert(error === expectedError, 'incorrect exception was thrown');
-          done();
         });
       });
 
       describe('2.3. If then is a function, call it with x as this, first argument resolvePromise, and second argument rejectPromise, where', function(){
-        specify('2.3.1 If/when resolvePromise is called with a value y, run Resolve(promise, y)', function(done){
+        specify('2.3.1 If/when resolvePromise is called with a value y, run Resolve(promise, y)', function(){
           var expectedSuccess, resolver, rejector, thenable, wrapped, calledThis;
 
           thenable = {
@@ -980,18 +944,17 @@ describe("extensions", function() {
           expectedSuccess = 'success';
           wrapped = Promise.resolve(thenable);
 
-          wrapped.then(function(success){
-            assert(calledThis === thenable, 'this must be the thenable');
-            assert(success === expectedSuccess, 'rejected promise with x');
-            done();
-          });
-
           setTimeout(function() {
             resolver(expectedSuccess);
           }, 20);
+
+          return wrapped.then(function(success){
+            assert(calledThis === thenable, 'this must be the thenable');
+            assert(success === expectedSuccess, 'rejected promise with x');
+          });
         });
 
-        specify('2.3.2 If/when rejectPromise is called with a reason r, reject promise with r.', function(done){
+        specify('2.3.2 If/when rejectPromise is called with a reason r, reject promise with r.', function(){
           var expectedError, resolver, rejector, thenable, wrapped, calledThis;
 
           thenable = {
@@ -1006,14 +969,14 @@ describe("extensions", function() {
 
           wrapped = Promise.resolve(thenable);
 
-          wrapped.then(null, function(error){
-            assert(error === expectedError, 'rejected promise with x');
-            done();
-          });
-
           setTimeout(function() {
             rejector(expectedError);
           }, 20);
+
+          return wrapped.then(null, function(error){
+            assert(error === expectedError, 'rejected promise with x');
+          });
+
         });
 
         specify("2.3.3 If both resolvePromise and rejectPromise are called, or multiple calls to the same argument are made, the first call takes precedence, and any further calls are ignored", function(done){
@@ -1040,7 +1003,7 @@ describe("extensions", function() {
           }, function(error){
             calledRejected++;
             assert(calledResolved === 0, 'never resolved');
-            assert(calledRejected === 1, 'rejected only once');
+            assert(calledRejected === 1, 'rejected exactly once');
             assert(error === expectedError, 'rejected promise with x');
           });
 
@@ -1055,14 +1018,14 @@ describe("extensions", function() {
           }, 20);
 
           setTimeout(function(){
-            assert(calledRejected === 1, 'only rejected once');
+            assert(calledRejected === 1, 'exactly rejected once');
             assert(calledResolved === 0, 'never resolved');
             done();
           }, 50);
         });
 
         describe("2.3.4 If calling then throws an exception e", function(){
-          specify("2.3.4.1 If resolvePromise or rejectPromise have been called, ignore it.", function(done){
+          specify("2.3.4.1 If resolvePromise or rejectPromise have been called, ignore it.", function(){
             var expectedSuccess, resolver, rejector, thenable, wrapped, calledThis,
             calledRejected, calledResolved;
 
@@ -1077,9 +1040,8 @@ describe("extensions", function() {
 
             wrapped = Promise.resolve(thenable);
 
-            wrapped.then(function(success){
+            return wrapped.then(function(success){
               assert(success === expectedSuccess, 'resolved not errored');
-              done();
             });
           });
 
