@@ -1,5 +1,6 @@
-/*global self*/
 import Promise from './promise';
+
+declare class global { }
 
 export default function polyfill() {
   let local;

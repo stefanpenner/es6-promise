@@ -1,8 +1,40 @@
-/* jshint node:true, undef:true, unused:true */
-var Rollup   = require('broccoli-rollup');
-var Babel    = require('broccoli-babel-transpiler');
-var merge    = require('broccoli-merge-trees');
+var TypeScript= require('broccoli-typescript-compiler');
+var Rollup  = require('broccoli-rollup');
 var uglify   = require('broccoli-uglify-js');
+
+var es = new TypeScript('lib',{
+  files: ['index.ts'],
+  tsconfig: {
+    compilerOptions: {
+      module: "es2015"
+    }
+  }
+});
+var es6 = new TypeScript('lib',{
+  files: ['index.ts'],
+  tsconfig: {
+    compilerOptions: {
+      target: 'es6',
+      module: "es2015"
+    }
+  }
+});
+var es6Promise = new Rollup(es, {
+  rollup: {
+    entry: 'es6-promise.js',
+    targets: [
+      {
+        format: 'umd',
+        moduleName: 'ES6Promise',
+        dest: 'es6-promise.js',
+        sourceMap: 'inline'
+      }
+    ]
+  }
+});
+
+/* jshint node:true, undef:true, unused:true */
+var merge    = require('broccoli-merge-trees');
 var version  = require('git-repo-version');
 var watchify = require('broccoli-watchify');
 var concat   = require('broccoli-concat');
@@ -22,31 +54,10 @@ var lib       = find('lib');
 var testDir   = find('test');
 var testFiles = find('test/{index.html,worker.js}');
 
-var json3     = mv(find('node_modules/json3/lib/{json3.js}'), 'node_modules/json3/lib/', 'test/');
 // mocha doesn't browserify correctly
 var mocha     = mv(find('node_modules/mocha/mocha.{js,css}'), 'node_modules/mocha/',    'test/');
 
-var testVendor = merge([ json3, mocha ]);
-
-
-var es5 = new Babel(lib, {
-  blacklist: ['es6.modules']
-});
-
-// build RSVP itself
-var es6Promise = new Rollup(es5, {
-  rollup: {
-    entry: 'lib/es6-promise.js',
-    targets: [
-      {
-        format: 'umd',
-        moduleName: 'ES6Promise',
-        dest: 'es6-promise.js',
-        sourceMap: 'inline'
-      }
-    ]
-  }
-});
+var testVendor = mocha;
 
 var testBundle = watchify(merge([
   mv(es6Promise, 'test'),
@@ -102,5 +113,6 @@ module.exports = merge([
   // test stuff
   testFiles,
   testVendor,
+  mv(es6, 'esnext'),
   mv(testBundle, 'test')
 ]);

@@ -2,6 +2,21 @@ let len = 0;
 let vertxNext;
 let customSchedulerFn;
 
+declare var require: Function;
+
+declare namespace process {
+  function nextTick(callback: Function);
+}
+
+declare class MutationObserver {
+  constructor(callback: Function)
+}
+
+declare class window {
+  MutationObserver?: MutationObserver;
+  WebKitMutationObserver?: MutationObserver;
+}
+
 export var asap = function asap(callback, arg) {
   queue[len] = callback;
   queue[len + 1] = arg;
@@ -26,8 +41,10 @@ export function setAsap(asapFn) {
   asap = asapFn;
 }
 
+interface Global { MutationObserver?: any; WebKitMutationObserver?: any; }
+
 const browserWindow = (typeof window !== 'undefined') ? window : undefined;
-const browserGlobal = browserWindow || {};
+const browserGlobal: Global = (browserWindow || {});
 const BrowserMutationObserver = browserGlobal.MutationObserver || browserGlobal.WebKitMutationObserver;
 const isNode = typeof self === 'undefined' && typeof process !== 'undefined' && {}.toString.call(process) === '[object process]';
 
@@ -57,7 +74,7 @@ function useMutationObserver() {
   observer.observe(node, { characterData: true });
 
   return () => {
-    node.data = (iterations = ++iterations % 2);
+    node.data = '' + (iterations = ++iterations % 2);
   };
 }
 

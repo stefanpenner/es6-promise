@@ -3,20 +3,24 @@ import {
   isFunction
 } from './utils';
 
+import { STATE } from './state'
+
 import {
   asap
 } from './asap';
 
-import originalThen from './then';
-import originalResolve from './promise/resolve';
+import {
+  _then as originalThen,
+  _resolve  as originalResolve
+} from './promise';
 
-export const PROMISE_ID = Math.random().toString(36).substring(16);
+export const PROMISE_ID: string = Math.random().toString(36).substring(16);
 
 function noop() {}
 
-const PENDING   = void 0;
-const FULFILLED = 1;
-const REJECTED  = 2;
+class ErrorObject {
+  error = null;
+}
 
 const GET_THEN_ERROR = new ErrorObject();
 
@@ -37,7 +41,10 @@ function getThen(promise) {
   }
 }
 
-function tryThen(then, value, fulfillmentHandler, rejectionHandler) {
+function tryThen(then: Function,
+                 value,
+                 fulfillmentHandler: (Function | void),
+                 rejectionHandler:   (Function | void)) : (void | Error) {
   try {
     then.call(value, fulfillmentHandler, rejectionHandler);
   } catch(e) {
@@ -61,7 +68,7 @@ function handleForeignThenable(promise, thenable, then) {
       sealed = true;
 
       reject(promise, reason);
-    }, 'Settle: ' + (promise._label || ' unknown promise'));
+    });
 
     if (!sealed && error) {
       sealed = true;
@@ -71,9 +78,9 @@ function handleForeignThenable(promise, thenable, then) {
 }
 
 function handleOwnThenable(promise, thenable) {
-  if (thenable._state === FULFILLED) {
+  if (thenable._state === STATE.FULFILLED) {
     fulfill(promise, thenable._result);
-  } else if (thenable._state === REJECTED) {
+  } else if (thenable._state === STATE.REJECTED) {
     reject(promise, thenable._result);
   } else {
     subscribe(thenable, undefined, value  => resolve(promise, value),
@@ -118,10 +125,10 @@ function publishRejection(promise) {
 }
 
 function fulfill(promise, value) {
-  if (promise._state !== PENDING) { return; }
+  if (promise._state !== STATE.PENDING) { return; }
 
   promise._result = value;
-  promise._state = FULFILLED;
+  promise._state = STATE.FULFILLED;
 
   if (promise._subscribers.length !== 0) {
     asap(publish, promise);
@@ -129,8 +136,8 @@ function fulfill(promise, value) {
 }
 
 function reject(promise, reason) {
-  if (promise._state !== PENDING) { return; }
-  promise._state = REJECTED;
+  if (promise._state !== STATE.PENDING) { return; }
+  promise._state = STATE.REJECTED;
   promise._result = reason;
 
   asap(publishRejection, promise);
@@ -143,8 +150,8 @@ function subscribe(parent, child, onFulfillment, onRejection) {
   parent._onerror = null;
 
   _subscribers[length] = child;
-  _subscribers[length + FULFILLED] = onFulfillment;
-  _subscribers[length + REJECTED]  = onRejection;
+  _subscribers[length + STATE.FULFILLED] = onFulfillment;
+  _subscribers[length + STATE.REJECTED]  = onRejection;
 
   if (length === 0 && parent._state) {
     asap(publish, parent);
@@ -173,13 +180,9 @@ function publish(promise) {
   promise._subscribers.length = 0;
 }
 
-function ErrorObject() {
-  this.error = null;
-}
-
 const TRY_CATCH_ERROR = new ErrorObject();
 
-function tryCatch(callback, detail) {
+function tryCatch(callback: Function, detail) {
   try {
     return callback(detail);
   } catch(e) {
@@ -188,7 +191,7 @@ function tryCatch(callback, detail) {
   }
 }
 
-function invokeCallback(settled, promise, callback, detail) {
+function invokeCallback(settled: STATE, promise, callback: Function, detail) {
   let hasCallback = isFunction(callback),
       value, error, succeeded, failed;
 
@@ -213,38 +216,35 @@ function invokeCallback(settled, promise, callback, detail) {
     succeeded = true;
   }
 
-  if (promise._state !== PENDING) {
+  if (promise._state !== STATE.PENDING) {
     // noop
   } else if (hasCallback && succeeded) {
     resolve(promise, value);
   } else if (failed) {
     reject(promise, error);
-  } else if (settled === FULFILLED) {
+  } else if (settled === STATE.FULFILLED) {
     fulfill(promise, value);
-  } else if (settled === REJECTED) {
+  } else if (settled === STATE.REJECTED) {
     reject(promise, value);
   }
 }
 
 function initializePromise(promise, resolver) {
   try {
-    resolver(function resolvePromise(value){
-      resolve(promise, value);
-    }, function rejectPromise(reason) {
-      reject(promise, reason);
-    });
+    resolver(value  => resolve(promise, value),
+             reason => reject(promise, reason));
   } catch(e) {
     reject(promise, e);
   }
 }
 
-let id = 0;
+let _id = 0;
 function nextId() {
-  return id++;
+  return _id++;
 }
 
 function makePromise(promise) {
-  promise[PROMISE_ID] = id++;
+  promise[PROMISE_ID] = nextId();
   promise._state = undefined;
   promise._result = undefined;
   promise._subscribers = [];
@@ -263,8 +263,5 @@ export {
   publishRejection,
   initializePromise,
   invokeCallback,
-  FULFILLED,
-  REJECTED,
-  PENDING,
   handleMaybeThenable
 };
