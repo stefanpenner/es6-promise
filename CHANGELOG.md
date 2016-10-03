@@ -1,5 +1,9 @@
 # Master
 
+# 4.0.4
+
+* fix asap when using https://github.com/Kinvey/titanium-sdk
+
 # 4.0.3
 
 * fix Readme links
