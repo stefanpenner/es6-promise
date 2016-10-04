@@ -1,5 +1,9 @@
 # Master
 
+# 4.0.5
+
+* fix require('es6-promise/auto') for Node < 4
+
 # 4.0.4
 
 * fix asap when using https://github.com/Kinvey/titanium-sdk
