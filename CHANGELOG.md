@@ -68,6 +68,10 @@
 * Update README.md with details about PhantomJS requirement for running tests
 * Mangle and compress the minified version
 
+# 3.0.2
+
+* correctly bump both bower and package.json versions
+
 # 3.0.1
 
 * no longer include dist/test in npm releases
