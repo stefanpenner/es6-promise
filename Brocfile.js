@@ -37,7 +37,6 @@ function rollupConfig(entry) {
   return new Rollup(es5, {
     rollup: {
       entry: 'lib/' + entry,
-      cache: 'BUILD:es6-promise',
       targets: [
         {
           format: 'umd',
