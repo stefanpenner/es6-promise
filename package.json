@@ -18,7 +18,7 @@
   "devDependencies": {
     "broccoli-babel-transpiler": "^5.6.1",
     "broccoli-concat": "^3.1.0",
-    "broccoli-merge-trees": "^1.1.1",
+    "broccoli-merge-trees": "^1.2.2",
     "broccoli-rollup": "^1.0.2",
     "broccoli-stew": "^1.2.0",
     "broccoli-uglify-js": "^0.2.0",
