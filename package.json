@@ -1,7 +1,7 @@
 {
   "name": "es6-promise",
   "namespace": "es6-promise",
-  "version": "4.0.5",
+  "version": "4.0.6",
   "description": "A lightweight library that provides tools for organizing asynchronous code",
   "main": "dist/es6-promise.js",
   "typings": "es6-promise.d.ts",
@@ -61,5 +61,12 @@
   "license": "MIT",
   "spm": {
     "main": "dist/es6-promise.js"
+  },
+  "jspm": {
+    "main": "es6-promise",
+    "directories": {
+      "lib": "dist"
+    },
+    "format": "global"
   }
 }
