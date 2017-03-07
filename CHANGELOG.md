@@ -1,5 +1,10 @@
 # Master
 
+# 4.1.0
+
+* [BUGFIX] Fix memory leak [#269]
+* [BUGFIX] Auto Bundles within an AMD Environment [#263]
+
 # 4.0.5
 
 * fix require('es6-promise/auto') for Node < 4
