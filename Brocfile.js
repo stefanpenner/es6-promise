@@ -33,20 +33,25 @@ var es5 = new Babel(lib, {
   blacklist: ['es6.modules']
 });
 
+function rollupConfig(entry) {
+  return new Rollup(es5, {
+    rollup: {
+      entry: 'lib/' + entry,
+      targets: [
+        {
+          format: 'umd',
+          moduleName: 'ES6Promise',
+          dest: entry,
+          sourceMap: 'inline'
+        }
+      ]
+    }
+  });
+}
+
 // build RSVP itself
-var es6Promise = new Rollup(es5, {
-  rollup: {
-    entry: 'lib/es6-promise.js',
-    targets: [
-      {
-        format: 'umd',
-        moduleName: 'ES6Promise',
-        dest: 'es6-promise.js',
-        sourceMap: 'inline'
-      }
-    ]
-  }
-});
+var es6Promise = rollupConfig('es6-promise.js')
+var es6PromiseAuto = rollupConfig('es6-promise.auto.js')
 
 var testBundle = watchify(merge([
   mv(es6Promise, 'test'),
@@ -59,30 +64,27 @@ var header = stew.map(find('config/versionTemplate.txt'), function(content) {
   return content.replace(/VERSION_PLACEHOLDER_STRING/, version());
 });
 
-var dist = es6Promise;
-
-function concatAs(tree, outputFile) {
+function concatAs(outputFile) {
   return merge([
-    concat(merge([tree, header]), {
+    concat(merge([es6Promise, header]), {
       headerFiles: ['config/versionTemplate.txt'],
       inputFiles:  ['es6-promise.js'],
       outputFile: outputFile
     }),
 
-    concat(merge([tree, header]), {
+    concat(merge([es6PromiseAuto, header]), {
       headerFiles: ['config/versionTemplate.txt'],
-      inputFiles:  ['es6-promise.js'],
+      inputFiles:  ['es6-promise.auto.js'],
       outputFile: outputFile.replace('es6-promise', 'es6-promise.auto'),
-      footer:    'ES6Promise.polyfill();',
     }),
 
   ]);
 }
 
-function production(dist, header) {
+function production() {
   var result;
   env('production', function(){
-    result = uglify(concatAs(dist, 'es6-promise.min.js'), {
+    result = uglify(concatAs('es6-promise.min.js'), {
       compress: true,
       mangle: true,
     });
@@ -90,14 +92,14 @@ function production(dist, header) {
   return result;
 }
 
-function development(dist, header) {
-  return concatAs(dist, 'es6-promise.js');
+function development() {
+  return concatAs('es6-promise.js');
 }
 
 module.exports = merge([
   merge([
-    production(es6Promise, header),
-    development(es6Promise, header),
+    production(),
+    development(),
   ].filter(Boolean)),
   // test stuff
   testFiles,
