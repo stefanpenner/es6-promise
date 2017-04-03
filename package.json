@@ -30,7 +30,7 @@
     "json3": "^3.3.2",
     "mocha": "^3.1.0",
     "promises-aplus-tests-phantom": "^2.1.0-revise",
-    "release-it": "2.6.0"
+    "release-it": "2.7.0"
   },
   "scripts": {
     "build": "ember build --environment production",
