@@ -55,6 +55,8 @@
   },
   "keywords": [
     "promises",
+    "promise",
+    "polyfill",
     "futures"
   ],
   "author": "Yehuda Katz, Tom Dale, Stefan Penner and contributors (Conversion to ES6 API by Jake Archibald)",
