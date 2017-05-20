@@ -1,36 +1,50 @@
+'use strict';
+
 /* jshint node:true, undef:true, unused:true */
-var Rollup   = require('broccoli-rollup');
-var Babel    = require('broccoli-babel-transpiler');
-var merge    = require('broccoli-merge-trees');
-var uglify   = require('broccoli-uglify-js');
-var version  = require('git-repo-version');
-var watchify = require('broccoli-watchify');
-var concat   = require('broccoli-concat');
-var fs       = require('fs');
+const Rollup   = require('broccoli-rollup');
+const Babel    = require('broccoli-babel-transpiler');
+const merge    = require('broccoli-merge-trees');
+const uglify   = require('broccoli-uglify-js');
+const version  = require('git-repo-version');
+const watchify = require('broccoli-watchify');
+const concat   = require('broccoli-concat');
+const fs       = require('fs');
 
-var stew   = require('broccoli-stew');
+const stew   = require('broccoli-stew');
 
-var find   = stew.find;
-var mv     = stew.mv;
-var rename = stew.rename;
-var env    = stew.env;
-var map    = stew.map;
+const find   = stew.find;
+const mv     = stew.mv;
+const rename = stew.rename;
+const env    = stew.env;
+const map    = stew.map;
 
-var lib       = find('lib');
+const lib       = find('lib');
 
 // test stuff
-var testDir   = find('test');
-var testFiles = find('test/{index.html,worker.js}');
+const testDir   = find('test');
+const testFiles = find('test/{index.html,worker.js}');
 
-var json3     = mv(find('node_modules/json3/lib/{json3.js}'), 'node_modules/json3/lib/', 'test/');
+const json3     = mv(find('node_modules/json3/lib/{json3.js}'), 'node_modules/json3/lib/', 'test/');
 // mocha doesn't browserify correctly
-var mocha     = mv(find('node_modules/mocha/mocha.{js,css}'), 'node_modules/mocha/',    'test/');
+const mocha     = mv(find('node_modules/mocha/mocha.{js,css}'), 'node_modules/mocha/',    'test/');
 
-var testVendor = merge([ json3, mocha ]);
+const testVendor = merge([ json3, mocha ]);
 
 
-var es5 = new Babel(lib, {
-  blacklist: ['es6.modules']
+const es5 = new Babel(lib, {
+  plugins: [
+    'transform-es2015-arrow-functions',
+    'transform-es2015-computed-properties',
+    'transform-es2015-shorthand-properties',
+    'transform-es2015-template-literals',
+    'transform-es2015-parameters',
+    'transform-es2015-destructuring',
+    'transform-es2015-spread',
+    'transform-es2015-block-scoping',
+    'transform-es2015-constants',
+    ['transform-es2015-classes', { loose: true }],
+    'babel6-plugin-strip-class-callcheck'
+  ]
 });
 
 function rollupConfig(entry) {
@@ -50,19 +64,17 @@ function rollupConfig(entry) {
 }
 
 // build RSVP itself
-var es6Promise = rollupConfig('es6-promise.js')
-var es6PromiseAuto = rollupConfig('es6-promise.auto.js')
+const es6Promise = rollupConfig('es6-promise.js')
+const es6PromiseAuto = rollupConfig('es6-promise.auto.js')
 
-var testBundle = watchify(merge([
+const testBundle = watchify(merge([
   mv(es6Promise, 'test'),
   testDir
 ]), {
   browserify: { debug: true, entries: ['./test/index.js'] }
 });
 
-var header = stew.map(find('config/versionTemplate.txt'), function(content) {
-  return content.replace(/VERSION_PLACEHOLDER_STRING/, version());
-});
+const header = stew.map(find('config/versionTemplate.txt'), content => content.replace(/VERSION_PLACEHOLDER_STRING/, version()));
 
 function concatAs(outputFile) {
   return merge([
@@ -82,8 +94,8 @@ function concatAs(outputFile) {
 }
 
 function production() {
-  var result;
-  env('production', function(){
+  let result;
+  env('production', () => {
     result = uglify(concatAs('es6-promise.min.js'), {
       compress: true,
       mangle: true,
