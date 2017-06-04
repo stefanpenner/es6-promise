@@ -11,18 +11,6 @@ if (typeof Object.getPrototypeOf !== "function") {
     };
 }
 
-function keysOf(object) {
-  var results = [];
-
-  for (var key in object) {
-    if (object.hasOwnProperty(key)) {
-      results.push(key);
-    }
-  }
-
-  return results;
-}
-
 var g = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : this;
 var Promise = g.adapter.Promise;
 var assert = require('assert');
@@ -460,7 +448,7 @@ describe("extensions", function() {
         promise.then(function(value) {
           assert(false);
           done();
-        })['catch'](function(reason) {
+        }).catch(function(reason) {
           assert.equal(reason.message, "You cannot resolve a promise with itself");
           assert(reason instanceof TypeError);
           done();
@@ -608,7 +596,7 @@ describe("extensions", function() {
 
       var firstWasRejected, secondCompleted;
 
-      first['catch'](function(){
+      first.catch(function(){
         firstWasRejected = true;
       });
 
@@ -678,7 +666,7 @@ describe("extensions", function() {
       all([promise, syncThenable, asyncThenable, nonPromise]).then(function(results) {
         assert(objectEquals(results, [1, 2, 3, 4]));
         done();
-      })['catch'](done);
+      }).catch(done);
     });
   }
 
@@ -790,7 +778,7 @@ describe("extensions", function() {
 
       var firstWasRejected, secondCompleted;
 
-      first['catch'](function(){
+      first.catch(function(){
         firstWasRejected = true;
       });
 
