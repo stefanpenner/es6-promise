@@ -3,7 +3,7 @@
  * @copyright Copyright (c) 2014 Yehuda Katz, Tom Dale, Stefan Penner and contributors (Conversion to ES6 API by Jake Archibald)
  * @license   Licensed under MIT license
  *            See https://raw.githubusercontent.com/stefanpenner/es6-promise/master/LICENSE
- * @version   4.1.1+e1bb7b6e
+ * @version   4.1.1+40141055
  */
 
 (function (global, factory) {
@@ -1155,5 +1155,7 @@ Promise$3.polyfill();
 return Promise$3;
 
 })));
+
+
 
 //# sourceMappingURL=es6-promise.auto.map

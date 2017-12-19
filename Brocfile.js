@@ -36,13 +36,13 @@ var es5 = new Babel(lib, {
 function rollupConfig(entry) {
   return new Rollup(es5, {
     rollup: {
-      entry: 'lib/' + entry,
-      targets: [
+      input: 'lib/' + entry,
+      output: [
         {
           format: 'umd',
-          moduleName: 'ES6Promise',
-          dest: entry,
-          sourceMap: 'inline'
+          name: 'ES6Promise',
+          file: entry,
+          sourcemap: 'inline'
         }
       ]
     }
