@@ -3,7 +3,7 @@
  * @copyright Copyright (c) 2014 Yehuda Katz, Tom Dale, Stefan Penner and contributors (Conversion to ES6 API by Jake Archibald)
  * @license   Licensed under MIT license
  *            See https://raw.githubusercontent.com/stefanpenner/es6-promise/master/LICENSE
- * @version   4.1.0+f046478d
+ * @version   4.1.1+40141055
  */
 
 (function (global, factory) {
@@ -1153,5 +1153,7 @@ Promise$2.Promise = Promise$2;
 return Promise$2;
 
 })));
+
+
 
 //# sourceMappingURL=es6-promise.map
