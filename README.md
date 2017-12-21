@@ -31,6 +31,12 @@ To use via a CDN include this in your html:
 To install:
 
 ```sh
+yarn add es6-promise
+```
+
+or
+
+```sh
 npm install es6-promise
 ```
 
@@ -38,14 +44,6 @@ To use:
 
 ```js
 var Promise = require('es6-promise').Promise;
-```
-
-## Bower
-
-To install:
-
-```sh
-bower install es6-promise --save
 ```
 
 
