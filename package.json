@@ -36,7 +36,6 @@
     "broccoli-watchify": "^1.0.1",
     "ember-cli": "2.17.1",
     "ember-cli-dependency-checker": "^2.1.0",
-    "ember-publisher": "0.0.7",
     "git-repo-version": "1.0.1",
     "json3": "^3.3.2",
     "mocha": "^4.0.1",
