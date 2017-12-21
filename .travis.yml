@@ -4,17 +4,13 @@ node_js:
   - "6"
   - "4"
 
-after_success:
-  - "./bin/publish_to_s3.js"
 before_install:
   - nvm install 6
   - nvm use 6
   - export PATH=/usr/local/phantomjs-2.0.0/bin:$PATH
+
 before_script:
   - nvm use $TRAVIS_NODE_VERSION
 env:
   global:
   - EMBER_ENV=production
-  - secure: MiR5zbpHpblG1HcQyxzhYqxcb+3gGsjKWOjLYi1AOU4BG90+Ckim4mCJbneIHaBfeIZKZCm+X1wRRwUE0TlaMFEiXqReHt8k/1ChjfFdTicZtXYytbnGdRlHjvN/LVCaVhBiORSXWPzjIWhwYInMhCtekWTOqChtblRGdbrCLCY=
-  - secure: LF1yJIzr4z5e4RxFt+ZIwjazDyItPoPtSUgcoSQfTUhRtkxFsIRpOpf4VnzPH2FSpw4wbkNq+hm+K1xrKHNq+OE0PLYtD+H7i03ac993jReSJN8rwb0gpAlwAGWC++uF7j7aMKJAlZA1u4tnPD5cxuk6BKnNSONtD0BwKQ6oXkk=
-  - secure: MB2RZPsHVuikayckVYCVE9TWiooaFV+jyxEkpSoNJ5pRIVTwy9xRHK56S1sxkXmPIm7sYyaLWpngp13/CN80pT796HS8mEuxJ011XwjY6YutXHnR2gOrCssah6kQ6gaXO1sFVkerBa/GwdkKu/k8LVAiORiz1JlPZvOKDRsJaNw=
