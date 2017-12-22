@@ -48,7 +48,7 @@
     "test": "ember test",
     "test:server": "ember test --server",
     "test:node": "ember build && mocha ./dist/test/browserify",
-    "prepublish": "ember build --environment production",
+    "prepublishOnly": "ember build --environment production",
     "lint": "jshint lib"
   },
   "repository": {
