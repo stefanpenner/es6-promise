@@ -4,6 +4,9 @@ node_js:
   - "6"
   - "4"
 
+addons:
+  chrome: stable
+
 before_install:
   - nvm install 6
   - nvm use 6

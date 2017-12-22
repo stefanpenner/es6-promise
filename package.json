@@ -34,7 +34,7 @@
     "broccoli-stew": "^1.5.0",
     "broccoli-uglify-js": "^0.2.0",
     "broccoli-watchify": "^1.0.1",
-    "ember-cli": "2.17.1",
+    "ember-cli": "2.18.0-beta.2",
     "ember-cli-dependency-checker": "^2.1.0",
     "git-repo-version": "1.0.1",
     "json3": "^3.3.2",
@@ -43,13 +43,12 @@
   },
   "scripts": {
     "build": "ember build --environment production",
-    "build:production": "ember build --env production",
     "start": "ember s",
     "test": "ember test",
     "test:server": "ember test --server",
-    "test:node": "ember build && mocha ./dist/test/browserify",
-    "prepublishOnly": "ember build --environment production",
-    "lint": "jshint lib"
+    "test:node": "ember test --launch Mocha",
+    "test:browser": "ember test --launch PhantomJS",
+    "prepublishOnly": "ember build --environment production"
   },
   "repository": {
     "type": "git",
@@ -71,5 +70,6 @@
   "license": "MIT",
   "spm": {
     "main": "dist/es6-promise.js"
-  }
+  },
+  "dependencies": {}
 }
