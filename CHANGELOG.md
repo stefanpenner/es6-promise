@@ -1,5 +1,17 @@
 # Master
 
+* Cleanup testem related build configuration
+* Use `prepublishOnly` instead of `prepublish` (thanks @rhysd)
+* Add Node.js 9, 8 to testing matrix
+* drop now unused s3 deployment files
+* internal cleanup (thanks to @bekzod, @mariusschulz)
+* Fixup Changelog
+
+# 4.2.2
+
+* Ensure PROMISE_ID works correctly
+* internal cleanup (thanks yo @mariusschulz)
+
 # 4.2.1
 
 * drop bower support
