@@ -1,5 +1,9 @@
 # Master
 
+# 4.2.4
+
+* [Fixes #305] Confuse webpack
+
 # 4.2.3
 
 * Cleanup testem related build configuration
