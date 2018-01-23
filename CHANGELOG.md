@@ -1,5 +1,16 @@
 # Master
 
+# 4.2.1
+
+* drop bower support
+
+# 4.2.0
+
+* drop `dist` from git repo
+* add `Promise.prototype.finally`
+* update various build related dependencies
+* add CDN links
+
 # 4.1.0
 
 * [BUGFIX] Fix memory leak [#269]
