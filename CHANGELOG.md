@@ -1,5 +1,7 @@
 # Master
 
+# 4.2.3
+
 * Cleanup testem related build configuration
 * Use `prepublishOnly` instead of `prepublish` (thanks @rhysd)
 * Add Node.js 9, 8 to testing matrix
