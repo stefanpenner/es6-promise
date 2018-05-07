@@ -43,7 +43,7 @@ npm install es6-promise
 To use:
 
 ```js
-var Promise = require('es6-promise').Promise;
+var Promise = require('es6-promise').ES6Promise;
 ```
 
 
