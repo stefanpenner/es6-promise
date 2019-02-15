@@ -1,20 +1,15 @@
 {
   "name": "es6-promise",
-  "namespace": "es6-promise",
-  "version": "4.2.5",
   "description": "A lightweight library that provides tools for organizing asynchronous code",
-  "main": "dist/es6-promise.js",
-  "typings": "es6-promise.d.ts",
-  "directories": {
-    "lib": "lib"
+  "version": "4.2.5",
+  "author": "Yehuda Katz, Tom Dale, Stefan Penner and contributors (Conversion to ES6 API by Jake Archibald)",
+  "browser": {
+    "vertx": false
   },
-  "files": [
-    "dist",
-    "lib",
-    "es6-promise.d.ts",
-    "auto.js",
-    "!dist/test"
-  ],
+  "bugs": {
+    "url": "https://github.com/stefanpenner/es6-promise/issues"
+  },
+  "dependencies": {},
   "devDependencies": {
     "babel-plugin-transform-es2015-arrow-functions": "^6.22.0",
     "babel-plugin-transform-es2015-block-scoping": "^6.24.1",
@@ -41,35 +36,42 @@
     "mocha": "^4.0.1",
     "promises-aplus-tests-phantom": "^2.1.0-revise"
   },
-  "scripts": {
-    "build": "ember build --environment production",
-    "start": "ember s",
-    "test": "ember test",
-    "test:server": "ember test --server",
-    "test:node": "ember test --launch Mocha",
-    "test:browser": "ember test --launch PhantomJS",
-    "prepublishOnly": "ember build --environment production"
+  "directories": {
+    "lib": "lib"
   },
+  "files": [
+    "dist",
+    "lib",
+    "es6-promise.d.ts",
+    "auto.js",
+    "!dist/test"
+  ],
+  "jsdelivr": "dist/es6-promise.auto.min.js",
+  "keywords": [
+    "futures",
+    "polyfill",
+    "promise",
+    "promises"
+  ],
+  "license": "MIT",
+  "main": "dist/es6-promise.js",
+  "namespace": "es6-promise",
   "repository": {
     "type": "git",
     "url": "git://github.com/stefanpenner/es6-promise.git"
   },
-  "bugs": {
-    "url": "https://github.com/stefanpenner/es6-promise/issues"
+  "scripts": {
+    "build": "ember build --environment production",
+    "prepublishOnly": "ember build --environment production",
+    "start": "ember s",
+    "test": "ember test",
+    "test:browser": "ember test --launch PhantomJS",
+    "test:node": "ember test --launch Mocha",
+    "test:server": "ember test --server"
   },
-  "browser": {
-    "vertx": false
-  },
-  "keywords": [
-    "promises",
-    "promise",
-    "polyfill",
-    "futures"
-  ],
-  "author": "Yehuda Katz, Tom Dale, Stefan Penner and contributors (Conversion to ES6 API by Jake Archibald)",
-  "license": "MIT",
   "spm": {
     "main": "dist/es6-promise.js"
   },
-  "dependencies": {}
+  "typings": "es6-promise.d.ts",
+  "unpkg": "dist/es6-promise.auto.min.js"
 }
