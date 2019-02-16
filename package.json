@@ -1,7 +1,7 @@
 {
   "name": "es6-promise",
   "description": "A lightweight library that provides tools for organizing asynchronous code",
-  "version": "4.2.5",
+  "version": "4.2.6",
   "author": "Yehuda Katz, Tom Dale, Stefan Penner and contributors (Conversion to ES6 API by Jake Archibald)",
   "browser": {
     "vertx": false
