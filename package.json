@@ -46,6 +46,7 @@
     "auto.js",
     "!dist/test"
   ],
+  "homepage": "https://github.com/stefanpenner/es6-promise",
   "jsdelivr": "dist/es6-promise.auto.min.js",
   "keywords": [
     "futures",
