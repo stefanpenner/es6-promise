@@ -34,11 +34,13 @@ export class Promise <R> implements Thenable <R> {
   catch <U> (onRejected?: (error: any) => U | Thenable<U>): Promise<U>;
 
   /**
-   * onSettled is invoked when/if the "promise" settles (either rejects or fulfills);
+   * onSettled is invoked when/if the "promise" settles (either rejects or fulfills).
+   * The returned promise is settled when the `Thenable` returned by `onFinally`
    *
    * @param onFinally called when/if "promise" settles
+
    */
-  finally <U> (onFinally?: (callback: any) => U | Thenable<U>): Promise<U>;
+  finally (onFinally?: () => any | Thenable<any>): Promise<R>;
 
   /**
    * Make a new promise from the thenable.
