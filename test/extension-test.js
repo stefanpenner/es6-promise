@@ -1280,7 +1280,7 @@ describe('Promise.prototype.finally', function() {
       });
     });
 
-    describe("exception cases do propogate the failure", function(){
+    describe("exception cases do propagate the failure", function(){
       describe("fulfilled promise", function(){
         it("propagates changes via throw", function(done) {
           var promise = Promise.resolve(1);

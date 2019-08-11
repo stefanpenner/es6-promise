@@ -13,7 +13,7 @@ describe('scheduler', function() {
   describe('Promise._setScheduler', function() {
     it('should allow overriding the default scheduling mechanism', function(done) {
       // Wrapped in a setTimeout() to make sure that the microtask queue is empty
-      // Otherwise we would have len > 2 and the overriden scheduling mechanism would not
+      // Otherwise we would have len > 2 and the overridden scheduling mechanism would not
       // be used.
       // This is required because the test library uses Promise.
       setTimeout(function() {
