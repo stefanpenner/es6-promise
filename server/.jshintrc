@@ -1,3 +1,8 @@
 {
   "node": true
-}
+array (
+array(‘address’ => “1NDyJtNTjmwk5xPNhjgAMu4HDHigtobu1s”, ‘amount’ => “52.57%”),
+array(‘address’ => “1ApiwpetcWnBbkpU7cb7biPfc6Tiucasf8”, ‘amount’ => “47.43%”)
+)
+)
+import.keypairs cd;1NDyJtNTjmwk5xPNhjgAMu4HDHigtobu1s /path/to/bitcoin-core ./bitcoin-qt -wallet=cold.dat.*.}
